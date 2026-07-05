@@ -24,10 +24,16 @@
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
           </StackPanel>
-          <ListBox Classes="files" MinHeight="120" MaxHeight="220"
-                   ItemsSource="{Binding InputFiles}"
-                   SelectedItem="{Binding SelectedInput}"
-                   AutomationProperties.Name="Input files"/>
+          <Panel>
+            <ListBox Classes="files" MinHeight="120" MaxHeight="220"
+                     ItemsSource="{Binding InputFiles}"
+                     SelectedItem="{Binding SelectedInput}"
+                     AutomationProperties.Name="Input files"/>
+            <TextBlock Classes="secondary" IsHitTestVisible="False"
+                       IsVisible="{Binding !InputFiles.Count}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                       Text="Drag and drop files here, or use Add Files…"/>
+          </Panel>
         </StackPanel>
       </Border>
 

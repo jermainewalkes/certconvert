@@ -24,10 +24,16 @@
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
           </StackPanel>
-          <ListBox Classes="files" MinHeight="100" MaxHeight="200"
-                   ItemsSource="{Binding InputFiles}"
-                   SelectedItem="{Binding SelectedInput}"
-                   AutomationProperties.Name="Chain certificate files"/>
+          <Panel>
+            <ListBox Classes="files" MinHeight="100" MaxHeight="200"
+                     ItemsSource="{Binding InputFiles}"
+                     SelectedItem="{Binding SelectedInput}"
+                     AutomationProperties.Name="Chain certificate files"/>
+            <TextBlock Classes="secondary" IsHitTestVisible="False"
+                       IsVisible="{Binding !InputFiles.Count}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                       Text="Drag and drop certificates here, or use Add Certificates…"/>
+          </Panel>
         </StackPanel>
       </Border>
 

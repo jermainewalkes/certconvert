@@ -25,6 +25,9 @@
                     AutomationProperties.HelpText="Reload the key using the password"/>
             <TextBlock Text="{Binding KeyDescription}" VerticalAlignment="Center" FontWeight="SemiBold"/>
           </StackPanel>
+          <TextBlock Classes="secondary" FontSize="12"
+                     IsVisible="{Binding !KeyDescription.Length}"
+                     Text="You can also drag and drop a key file anywhere on this page."/>
         </StackPanel>
       </Border>
 
