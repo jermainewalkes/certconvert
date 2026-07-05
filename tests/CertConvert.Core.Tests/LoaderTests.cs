@@ -62,6 +62,78 @@ public class LoaderTests
     }
 
     [Fact]
+    public void FileErrors_NameTheOffendingFile()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "mystery-input.bin");
+        File.WriteAllText(path, "definitely not a certificate");
+        try
+        {
+            var e = Assert.Throws<UnrecognisedContentException>(
+                () => ContentLoader.LoadFile(path));
+            Assert.StartsWith("mystery-input.bin:", e.Message);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void PasswordErrors_NameTheOffendingFile()
+    {
+        using var chain = TestChain.Create();
+        var path = Path.Combine(Path.GetTempPath(), "locked.pfx");
+        File.WriteAllBytes(path, Converter.Export([chain.Leaf], CertOutputFormat.Pkcs12,
+            new ExportOptions { Password = "secret" }));
+        try
+        {
+            var e = Assert.Throws<PasswordRequiredException>(
+                () => ContentLoader.LoadFile(path));
+            Assert.StartsWith("locked.pfx:", e.Message);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void OversizeFile_IsRefused()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        using (var fs = File.Create(path))
+            fs.SetLength(11 * 1024 * 1024);
+        try
+        {
+            var e = Assert.Throws<UnrecognisedContentException>(
+                () => ContentLoader.LoadFile(path));
+            Assert.Contains("10 MB", e.Message);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void RemoveDuplicates_KeepsFirstOccurrenceInOrder()
+    {
+        using var chain = TestChain.Create();
+        var leafCopy = System.Security.Cryptography.X509Certificates
+            .X509CertificateLoader.LoadCertificate(chain.Leaf.RawData);
+        var list = new List<System.Security.Cryptography.X509Certificates.X509Certificate2>
+        {
+            chain.Leaf, chain.Root, leafCopy, chain.Intermediate,
+        };
+
+        Converter.RemoveDuplicates(list);
+
+        Assert.Equal(
+            new[] { chain.Leaf.Thumbprint, chain.Root.Thumbprint, chain.Intermediate.Thumbprint },
+            list.Select(c => c.Thumbprint));
+    }
+
+    [Fact]
     public void EmptyFile_IsRejected()
     {
         var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

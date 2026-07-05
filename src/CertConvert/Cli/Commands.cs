@@ -45,15 +45,18 @@ internal static class Commands
         if (opts.Positionals.Count == 0)
             return CliRunner.Usage("Usage: certconvert convert <in>... -o <out> [--to <format>]");
         string outPath = opts.Require("--out", "Output file");
+        var format = ResolveFormat(opts.Get("--to"), outPath);
 
         var (certs, keys) = LoadInputs(opts);
         try
         {
             if (certs.Count == 0 && keys.Count > 0)
-                throw new CertConvertException(
-                    "The input holds only private keys — use \"certconvert key convert\" for keys.");
+                throw new CertConvertException(format == CertOutputFormat.Pkcs12
+                    ? "Only private keys were supplied. Add the certificate the key belongs " +
+                      "to — a PFX pairs certificates with their key."
+                    : "The input holds only private keys — use \"certconvert key convert\" for keys.");
 
-            ExportCertificates(certs, keys, outPath, opts);
+            ExportCertificates(certs, keys, outPath, format, opts);
         }
         finally
         {
@@ -71,6 +74,7 @@ internal static class Commands
             return CliRunner.Usage("Usage: certconvert chain build <files>... -o <out>");
         string outPath = opts.Require("--out", "Output file");
 
+        var format = ResolveFormat(opts.Get("--to"), outPath);
         var (certs, keys) = LoadInputs(opts);
         try
         {
@@ -79,7 +83,7 @@ internal static class Commands
             foreach (var cert in ordered)
                 Console.WriteLine($"  {Inspector.Inspect(cert).DisplayName}");
 
-            ExportCertificates(ordered, keys, outPath, opts);
+            ExportCertificates(ordered, keys, outPath, format, opts);
         }
         finally
         {
@@ -279,6 +283,7 @@ internal static class Commands
             keys.AddRange(keyContent.PrivateKeys);
             certs.AddRange(keyContent.Certificates);
         }
+        Converter.RemoveDuplicates(certs);
         return (certs, keys);
     }
 
@@ -286,10 +291,9 @@ internal static class Commands
         IReadOnlyList<X509Certificate2> certs,
         List<PrivateKeyEntry> keys,
         string outPath,
+        CertOutputFormat format,
         ArgReader opts)
     {
-        var format = ResolveFormat(opts.Get("--to"), outPath);
-
         AsymmetricAlgorithm? pfxKey = null;
         if (format == CertOutputFormat.Pkcs12 && keys.Count > 0)
         {
@@ -297,6 +301,9 @@ internal static class Commands
                 .FirstOrDefault(k => certs.Any(c => KeyTools.Matches(c, k.Key)))?.Key
                 ?? throw new CertConvertException(
                     "None of the supplied private keys match a certificate being exported.");
+            if (keys.Count > 1)
+                Console.Error.WriteLine(
+                    $"Warning: {keys.Count - 1} unused key(s) were ignored — a PFX carries one key.");
         }
         if (format == CertOutputFormat.Pkcs12 && pfxKey is null)
             Console.Error.WriteLine("Warning: writing a PKCS #12 file without a private key.");

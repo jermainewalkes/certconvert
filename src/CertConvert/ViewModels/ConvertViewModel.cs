@@ -110,8 +110,15 @@ public partial class ConvertViewModel : ViewModelBase
                 keys.AddRange(keyContent.PrivateKeys);
                 keyContent.PrivateKeys.Clear();
             }
+            Converter.RemoveDuplicates(certs);
 
             var format = SelectedFormat.Value;
+            if (certs.Count == 0 && keys.Count > 0)
+                throw new CertConvertException(format == CertOutputFormat.Pkcs12
+                    ? "Only private keys were supplied. Add the certificate the key belongs " +
+                      "to — a PFX pairs certificates with their key."
+                    : "Only private keys were supplied — the Keys page converts key formats.");
+
             System.Security.Cryptography.AsymmetricAlgorithm? pfxKey = null;
             if (format == CertOutputFormat.Pkcs12 && keys.Count > 0)
             {
@@ -144,9 +151,18 @@ public partial class ConvertViewModel : ViewModelBase
                 return;
             }
             File.WriteAllBytes(outPath, bytes);
+            var notes = new List<string>();
+            if (format == CertOutputFormat.Pkcs12)
+            {
+                if (pfxKey is null)
+                    notes.Add("no private key was included");
+                if (keys.Count > 1)
+                    notes.Add($"{keys.Count - 1} unused key(s) were ignored — a PFX carries one key");
+                if (OutPassword.Length == 0)
+                    notes.Add("warning: the PFX password is empty");
+            }
             Status = $"Wrote {Path.GetFileName(outPath)} ({bytes.Length:N0} bytes)" +
-                     (format == CertOutputFormat.Pkcs12 && pfxKey is null
-                         ? " — note: no private key was included." : ".");
+                     (notes.Count > 0 ? " — " + string.Join("; ", notes) + "." : ".");
         }
         catch (Exception e)
         {

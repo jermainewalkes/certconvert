@@ -165,8 +165,12 @@ public partial class ChainViewModel : ViewModelBase
                 return;
             }
             File.WriteAllBytes(outPath, bytes);
+            string warn = format == CertOutputFormat.Pkcs12 && OutPassword.Length == 0
+                ? " Warning: the PFX password is empty."
+                : "";
             Status = $"Wrote {Path.GetFileName(outPath)} — order: " +
-                     string.Join(" → ", ordered.Select(c => Inspector.Inspect(c).DisplayName)) + ".";
+                     string.Join(" → ", ordered.Select(c => Inspector.Inspect(c).DisplayName)) +
+                     "." + warn;
         }
         catch (Exception e)
         {

@@ -8,11 +8,20 @@ namespace CertConvert.Core;
 /// <summary>Loads any supported input and auto-detects what it is.</summary>
 public static class ContentLoader
 {
+    /// <summary>Certificate material is kilobytes; anything huge is a mistake (or a memory bomb).</summary>
+    private const long MaxInputBytes = 10 * 1024 * 1024;
+
     public static LoadedContent LoadFile(string path, string? password = null)
     {
+        string name = Path.GetFileName(path);
         byte[] data;
         try
         {
+            var info = new FileInfo(path);
+            if (info.Exists && info.Length > MaxInputBytes)
+                throw new UnrecognisedContentException(
+                    $"{name} is {info.Length / (1024.0 * 1024.0):F0} MB — certificate files are a few " +
+                    "kilobytes, so this is almost certainly not one. Files over 10 MB are refused.");
             data = File.ReadAllBytes(path);
         }
         catch (IOException e)
@@ -20,8 +29,29 @@ public static class ContentLoader
             throw new CertConvertException($"Cannot read {path}: {e.Message}", e);
         }
         if (data.Length == 0)
-            throw new UnrecognisedContentException($"{Path.GetFileName(path)} is empty.");
-        return Load(data, password);
+            throw new UnrecognisedContentException($"{name} is empty.");
+
+        // Attach the file name so multi-file operations name the offender.
+        try
+        {
+            return Load(data, password);
+        }
+        catch (PasswordRequiredException e)
+        {
+            throw new PasswordRequiredException(name, e);
+        }
+        catch (InvalidPasswordException e)
+        {
+            throw new InvalidPasswordException(name, e);
+        }
+        catch (UnrecognisedContentException e)
+        {
+            throw new UnrecognisedContentException($"{name}: {e.Message}");
+        }
+        catch (CertConvertException e)
+        {
+            throw new CertConvertException($"{name}: {e.Message}", e);
+        }
     }
 
     public static LoadedContent Load(byte[] data, string? password = null) =>

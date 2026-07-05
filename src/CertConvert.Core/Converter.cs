@@ -58,6 +58,27 @@ public static class Converter
         }
     }
 
+    /// <summary>
+    /// Removes duplicate certificates (same thumbprint) in place, keeping first
+    /// occurrences in order and disposing the dropped instances.
+    /// </summary>
+    public static void RemoveDuplicates(List<X509Certificate2> certs)
+    {
+        var seen = new HashSet<string>();
+        for (int i = 0; i < certs.Count; )
+        {
+            if (seen.Add(certs[i].Thumbprint))
+            {
+                i++;
+            }
+            else
+            {
+                certs[i].Dispose();
+                certs.RemoveAt(i);
+            }
+        }
+    }
+
     /// <summary>Guesses the output format from a file extension; null when ambiguous.</summary>
     public static CertOutputFormat? GuessFormatFromExtension(string path) =>
         Path.GetExtension(path).ToLowerInvariant() switch
