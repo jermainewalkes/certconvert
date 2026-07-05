@@ -9,10 +9,12 @@ public partial class AboutViewModel : ViewModelBase
 {
     public const string KoFiUrl = "https://ko-fi.com/jwalkes";
 
+    // The SDK appends "+<git sha>" for traceability; keep that in the assembly
+    // and in `certconvert --version`, but display just the release number.
     public string Version { get; } = "Version " +
         (Assembly.GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-            .InformationalVersion ?? "unknown");
+            .InformationalVersion ?? "unknown").Split('+')[0];
 
     public string SecurityStatement { get; } =
         "CertConvert runs entirely on this machine. It never connects to the network, " +
