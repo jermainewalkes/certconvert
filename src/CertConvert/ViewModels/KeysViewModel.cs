@@ -57,6 +57,12 @@ public partial class KeysViewModel : ViewModelBase
         }
     }
 
+    public void LoadDroppedKey(string path)
+    {
+        KeyFile = path;
+        LoadKey();
+    }
+
     [RelayCommand]
     private void LoadKey()
     {

@@ -63,6 +63,13 @@ public partial class ConvertViewModel : ViewModelBase
             InputFiles.Remove(SelectedInput);
     }
 
+    public void AddDroppedFiles(IEnumerable<string> paths)
+    {
+        foreach (var p in paths)
+            if (!InputFiles.Contains(p))
+                InputFiles.Add(p);
+    }
+
     [RelayCommand]
     private void ClearFiles() => InputFiles.Clear();
 

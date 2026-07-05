@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:CertConvert.ViewModels"
              x:Class="CertConvert.Views.ConvertView"
-             x:DataType="vm:ConvertViewModel">
+             x:DataType="vm:ConvertViewModel"
+             DragDrop.AllowDrop="True">
   <ScrollViewer>
     <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="920">
 

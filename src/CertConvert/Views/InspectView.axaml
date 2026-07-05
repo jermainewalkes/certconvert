@@ -22,6 +22,9 @@
                      AutomationProperties.Name="Password for encrypted files"/>
             <Button Content="Unlock" Command="{Binding ReloadCommand}"
                     AutomationProperties.HelpText="Reload the current file using the password"/>
+            <Button Content="Clear" Command="{Binding ClearCommand}"
+                    IsVisible="{Binding FileName.Length}"
+                    AutomationProperties.HelpText="Close the current file"/>
             <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" FontWeight="SemiBold"/>
           </StackPanel>
 

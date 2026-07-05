@@ -37,6 +37,19 @@ public partial class InspectViewModel : ViewModelBase
             LoadPath(_currentPath);
     }
 
+    [RelayCommand]
+    private void Clear()
+    {
+        _currentPath = null;
+        FileName = "";
+        Password = "";
+        Detected = "";
+        KeysSummary = "";
+        HasCsr = false;
+        Status = "";
+        Certificates.Clear();
+    }
+
     public void LoadPath(string path)
     {
         _currentPath = path;

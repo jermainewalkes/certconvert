@@ -78,6 +78,12 @@ public class MainWindowTests
         Assert.Single(vm.Inspect.Certificates);
         Assert.Equal("headless.test.local", vm.Inspect.Certificates[0].Info.DisplayName);
         Assert.Contains("1 certificate", vm.Inspect.Detected);
+
+        // Clear resets the page completely.
+        vm.Inspect.ClearCommand.Execute(null);
+        Assert.Empty(vm.Inspect.Certificates);
+        Assert.Equal("", vm.Inspect.FileName);
+        Assert.Equal("", vm.Inspect.Detected);
     }
 
     [AvaloniaFact]
