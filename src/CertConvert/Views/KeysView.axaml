@@ -8,7 +8,7 @@
     <TextBlock Text="Private key" FontWeight="SemiBold" FontSize="16"/>
     <StackPanel Orientation="Horizontal" Spacing="8">
       <Button Content="Open Key…" Command="{Binding OpenKeyCommand}"/>
-      <TextBox Width="200" Watermark="Key Password (If Needed)" PasswordChar="•"
+      <TextBox Width="200" PlaceholderText="Key Password (If Needed)" PasswordChar="•"
                Text="{Binding Password}"
                AutomationProperties.Name="Password for the key file"/>
       <Button Content="Unlock" Command="{Binding LoadKeyCommand}"
@@ -23,7 +23,7 @@
       <ComboBox MaxWidth="320" ItemsSource="{Binding Formats}"
                 SelectedItem="{Binding SelectedFormat}"
                 AutomationProperties.Name="Key output format"/>
-      <TextBox Width="200" Watermark="New Password" PasswordChar="•"
+      <TextBox Width="200" PlaceholderText="New Password" PasswordChar="•"
                Text="{Binding OutPassword}" IsVisible="{Binding NeedsOutPassword}"
                AutomationProperties.Name="Password for the converted key"/>
       <Button Content="Save Converted Key…" Command="{Binding SaveConvertedCommand}" Classes="accent"/>

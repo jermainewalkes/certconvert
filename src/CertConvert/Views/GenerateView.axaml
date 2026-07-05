@@ -11,7 +11,7 @@
         <ComboBox MaxWidth="220" ItemsSource="{Binding Algorithms}"
                   SelectedItem="{Binding SelectedAlgorithm}"
                   AutomationProperties.Name="Key algorithm"/>
-        <TextBox Width="200" Watermark="Key Password (Optional)" PasswordChar="•"
+        <TextBox Width="200" PlaceholderText="Key Password (Optional)" PasswordChar="•"
                  Text="{Binding KeyPassword}"
                  AutomationProperties.Name="Password to encrypt the key file, also used when loading"/>
         <Button Content="Generate Key And Save…" Command="{Binding GenerateKeyAndSaveCommand}"/>
@@ -24,7 +24,7 @@
             RowSpacing="8" ColumnSpacing="8">
         <TextBlock Grid.Row="0" Text="Common name (CN) *" VerticalAlignment="Center"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CommonName}"
-                 Watermark="device.example.com"
+                 PlaceholderText="device.example.com"
                  AutomationProperties.Name="Common name"/>
         <TextBlock Grid.Row="1" Text="Organisation (O)" VerticalAlignment="Center"/>
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Organization}"
@@ -33,7 +33,7 @@
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OrganizationalUnit}"
                  AutomationProperties.Name="Organisational unit"/>
         <TextBlock Grid.Row="3" Text="Country (two letters)" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Country}" Watermark="GB"
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Country}" PlaceholderText="GB"
                  AutomationProperties.Name="Country code"/>
         <TextBlock Grid.Row="4" Text="State or county" VerticalAlignment="Center"/>
         <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding State}"
@@ -48,11 +48,11 @@
             RowSpacing="8" ColumnSpacing="8">
         <TextBlock Grid.Row="0" Text="DNS names (comma-separated)" VerticalAlignment="Center" TextWrapping="Wrap"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding DnsNames}"
-                 Watermark="a.example.com, b.example.com"
+                 PlaceholderText="a.example.com, b.example.com"
                  AutomationProperties.Name="DNS subject alternative names"/>
         <TextBlock Grid.Row="1" Text="IP addresses (comma-separated)" VerticalAlignment="Center" TextWrapping="Wrap"/>
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IpAddresses}"
-                 Watermark="10.0.0.36"
+                 PlaceholderText="10.0.0.36"
                  AutomationProperties.Name="IP subject alternative names"/>
         <TextBlock Grid.Row="2" Text="Validity (days)" VerticalAlignment="Center"/>
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ValidityDays}"

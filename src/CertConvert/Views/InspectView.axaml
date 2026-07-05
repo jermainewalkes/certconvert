@@ -8,7 +8,7 @@
 
     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
       <Button Content="Open File…" Command="{Binding OpenFileCommand}"/>
-      <TextBox Width="200" Watermark="Password (If Needed)" PasswordChar="•"
+      <TextBox Width="200" PlaceholderText="Password (If Needed)" PasswordChar="•"
                Text="{Binding Password}"
                AutomationProperties.Name="Password for encrypted files"/>
       <Button Content="Unlock" Command="{Binding ReloadCommand}"

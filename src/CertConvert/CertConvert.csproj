@@ -5,6 +5,16 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>CertConvert</AssemblyName>
+    <Version>0.1.0</Version>
+    <InformationalVersion>0.1.0</InformationalVersion>
+    <Company>Jermaine Walkes</Company>
+    <Product>CertConvert</Product>
+    <!-- Trimming is unsafe here: the ViewLocator and BCL crypto use reflection.
+         Self-contained / single-file are passed by build/publish.sh at publish time,
+         not set here, so the test project can still reference this project. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
