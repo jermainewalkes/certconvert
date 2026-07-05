@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CertConvert.Core/CertConvert.Core.csproj" />
+    <Project Path="src/CertConvert/CertConvert.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CertConvert.Core.Tests/CertConvert.Core.Tests.csproj" />
+  </Folder>
+</Solution>
