@@ -22,4 +22,8 @@
     <ProjectReference Include="..\..\src\CertConvert.Core\CertConvert.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Fixtures\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
