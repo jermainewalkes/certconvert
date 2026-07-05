@@ -25,9 +25,19 @@
                     AutomationProperties.HelpText="Reload the key using the password"/>
             <TextBlock Text="{Binding KeyDescription}" VerticalAlignment="Center" FontWeight="SemiBold"/>
           </StackPanel>
-          <TextBlock Classes="secondary" FontSize="12"
-                     IsVisible="{Binding !KeyDescription.Length}"
-                     Text="You can also drag and drop a key file anywhere on this page."/>
+          <Panel MinHeight="150" IsVisible="{Binding !KeyDescription.Length}">
+            <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
+                       StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+              <PathIcon Data="{StaticResource IconKey}" Width="26" Height="26"
+                        Foreground="{DynamicResource AppTextSecondary}"
+                        HorizontalAlignment="Center"/>
+              <TextBlock Text="Drag and drop a key file here"
+                         FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock Classes="secondary" FontSize="12" HorizontalAlignment="Center"
+                         Text="PKCS #8, PKCS #1, SEC 1 and encrypted keys are detected automatically"/>
+            </StackPanel>
+          </Panel>
         </StackPanel>
       </Border>
 

@@ -24,16 +24,24 @@
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
           </StackPanel>
-          <Panel>
-            <ListBox Classes="files" MinHeight="120" MaxHeight="220"
-                     ItemsSource="{Binding InputFiles}"
-                     SelectedItem="{Binding SelectedInput}"
-                     AutomationProperties.Name="Input files"/>
-            <TextBlock Classes="secondary" IsHitTestVisible="False"
-                       IsVisible="{Binding !InputFiles.Count}"
-                       VerticalAlignment="Center" HorizontalAlignment="Center"
-                       Text="Drag and drop files here, or use Add Files…"/>
+          <Panel MinHeight="150" IsVisible="{Binding !InputFiles.Count}">
+            <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
+                       StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+              <PathIcon Data="{StaticResource IconConvert}" Width="26" Height="26"
+                        Foreground="{DynamicResource AppTextSecondary}"
+                        HorizontalAlignment="Center"/>
+              <TextBlock Text="Drag and drop files here"
+                         FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock Classes="secondary" FontSize="12" HorizontalAlignment="Center"
+                         Text="Or use Add Files… — certificates, bundles and keys all work"/>
+            </StackPanel>
           </Panel>
+          <ListBox Classes="files" MinHeight="120" MaxHeight="220"
+                   IsVisible="{Binding InputFiles.Count}"
+                   ItemsSource="{Binding InputFiles}"
+                   SelectedItem="{Binding SelectedInput}"
+                   AutomationProperties.Name="Input files"/>
         </StackPanel>
       </Border>
 

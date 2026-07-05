@@ -24,16 +24,24 @@
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
           </StackPanel>
-          <Panel>
-            <ListBox Classes="files" MinHeight="100" MaxHeight="200"
-                     ItemsSource="{Binding InputFiles}"
-                     SelectedItem="{Binding SelectedInput}"
-                     AutomationProperties.Name="Chain certificate files"/>
-            <TextBlock Classes="secondary" IsHitTestVisible="False"
-                       IsVisible="{Binding !InputFiles.Count}"
-                       VerticalAlignment="Center" HorizontalAlignment="Center"
-                       Text="Drag and drop certificates here, or use Add Certificates…"/>
+          <Panel MinHeight="150" IsVisible="{Binding !InputFiles.Count}">
+            <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
+                       StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+              <PathIcon Data="{StaticResource IconChain}" Width="26" Height="26"
+                        Foreground="{DynamicResource AppTextSecondary}"
+                        HorizontalAlignment="Center"/>
+              <TextBlock Text="Drag and drop certificates here"
+                         FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock Classes="secondary" FontSize="12" HorizontalAlignment="Center"
+                         Text="Any order — the chain is sorted leaf to root automatically"/>
+            </StackPanel>
           </Panel>
+          <ListBox Classes="files" MinHeight="100" MaxHeight="200"
+                   IsVisible="{Binding InputFiles.Count}"
+                   ItemsSource="{Binding InputFiles}"
+                   SelectedItem="{Binding SelectedInput}"
+                   AutomationProperties.Name="Chain certificate files"/>
         </StackPanel>
       </Border>
 
