@@ -7,8 +7,7 @@ namespace CertConvert.ViewModels;
 
 public partial class AboutViewModel : ViewModelBase
 {
-    // TODO: replace with the real Ko-fi page before release.
-    public const string KoFiUrl = "https://ko-fi.com/YOUR_PAGE";
+    public const string KoFiUrl = "https://ko-fi.com/jwalkes";
 
     public string Version { get; } = "Version " +
         (Assembly.GetExecutingAssembly()
