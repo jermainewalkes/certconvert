@@ -1,38 +1,103 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:CertConvert.ViewModels"
-        xmlns:views="using:CertConvert.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="CertConvert.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Width="1000" Height="700" MinWidth="820" MinHeight="560"
+        Width="1060" Height="720" MinWidth="860" MinHeight="580"
+        ExtendClientAreaToDecorationsHint="True"
+        Background="{DynamicResource AppPageBackground}"
         Title="CertConvert">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TabControl Margin="4">
-        <TabItem Header="Inspect">
-            <views:InspectView DataContext="{Binding Inspect}"/>
-        </TabItem>
-        <TabItem Header="Convert">
-            <views:ConvertView DataContext="{Binding Convert}"/>
-        </TabItem>
-        <TabItem Header="Chain">
-            <views:ChainView DataContext="{Binding Chain}"/>
-        </TabItem>
-        <TabItem Header="Keys">
-            <views:KeysView DataContext="{Binding Keys}"/>
-        </TabItem>
-        <TabItem Header="Generate">
-            <views:GenerateView DataContext="{Binding Generate}"/>
-        </TabItem>
-        <TabItem Header="About">
-            <views:AboutView DataContext="{Binding About}"/>
-        </TabItem>
-    </TabControl>
+    <Panel>
+        <Grid ColumnDefinitions="230,*">
+
+            <!-- Sidebar -->
+            <Border Grid.Column="0" Classes="sidebar">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="20,48,20,16"
+                                Orientation="Horizontal" Spacing="10">
+                        <Border Width="32" Height="32" CornerRadius="9"
+                                Background="{DynamicResource AppAccentBrush}">
+                            <PathIcon Data="{StaticResource IconShield}" Foreground="White"
+                                      Width="16" Height="16"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="0">
+                            <TextBlock Text="CertConvert" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="Certificate toolbox" FontSize="11" Classes="secondary"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Bottom" Margin="20,8,20,16" Spacing="2">
+                        <TextBlock Text="Runs fully offline" FontSize="11" Classes="secondary"/>
+                        <TextBlock Text="{Binding About.Version}" FontSize="11" Classes="secondary"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <ListBox Classes="nav" Margin="12,0"
+                             SelectedIndex="{Binding SelectedIndex}"
+                             AutomationProperties.Name="Navigation">
+                        <ListBox.Resources>
+                            <SolidColorBrush x:Key="SystemControlHighlightListLowBrush"
+                                             Color="{DynamicResource AppNavHoverColor}"/>
+                            <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush"
+                                             Color="{DynamicResource AppNavSelectedColor}"/>
+                            <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush"
+                                             Color="{DynamicResource AppNavSelectedHoverColor}"/>
+                        </ListBox.Resources>
+                        <ListBoxItem AutomationProperties.Name="Inspect">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconInspect}"/>
+                                <TextBlock Text="Inspect"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="Convert">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconConvert}"/>
+                                <TextBlock Text="Convert"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="Chain">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconChain}"/>
+                                <TextBlock Text="Chain"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="Keys">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconKey}"/>
+                                <TextBlock Text="Keys"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="Generate">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconGenerate}"/>
+                                <TextBlock Text="Generate"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="About">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconInfo}"/>
+                                <TextBlock Text="About"/>
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Page content; views are resolved by the ViewLocator. -->
+            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}"/>
+        </Grid>
+
+        <!-- Invisible strip so the frameless window can still be dragged. -->
+        <Border Height="36" VerticalAlignment="Top" Background="Transparent"
+                PointerPressed="OnDragRegionPressed"/>
+    </Panel>
 </Window>

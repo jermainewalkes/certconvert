@@ -18,22 +18,36 @@ namespace CertConvert.Gui.Tests;
 public class MainWindowTests
 {
     [AvaloniaFact]
-    public void Window_Renders_WithAllSixTabs()
+    public void Window_Renders_WithAllSixNavigationItems()
     {
         var window = new MainWindow { DataContext = new MainWindowViewModel() };
         window.Show();
 
-        var tabs = window.GetVisualDescendants()
-            .OfType<TabControl>()
-            .Single();
-        var headers = tabs.Items
-            .OfType<TabItem>()
-            .Select(t => t.Header?.ToString())
+        var nav = window.GetVisualDescendants()
+            .OfType<ListBox>()
+            .Single(l => l.Classes.Contains("nav"));
+        var names = nav.Items
+            .OfType<ListBoxItem>()
+            .Select(Avalonia.Automation.AutomationProperties.GetName)
             .ToArray();
 
         Assert.Equal(
             new[] { "Inspect", "Convert", "Chain", "Keys", "Generate", "About" },
-            headers);
+            names);
+    }
+
+    [AvaloniaFact]
+    public void Navigation_SwitchesPages()
+    {
+        var vm = new MainWindowViewModel();
+        var window = new MainWindow { DataContext = vm };
+        window.Show();
+
+        Assert.Same(vm.Inspect, vm.CurrentPage);
+        vm.SelectedIndex = 5;
+        Assert.Same(vm.About, vm.CurrentPage);
+        vm.SelectedIndex = 2;
+        Assert.Same(vm.Chain, vm.CurrentPage);
     }
 
     [AvaloniaFact]

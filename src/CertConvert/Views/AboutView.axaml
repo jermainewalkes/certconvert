@@ -4,27 +4,53 @@
              x:Class="CertConvert.Views.AboutView"
              x:DataType="vm:AboutViewModel">
   <ScrollViewer>
-    <StackPanel Margin="24" Spacing="14" MaxWidth="640" HorizontalAlignment="Left">
-      <TextBlock Text="CertConvert" FontSize="28" FontWeight="Bold"/>
-      <TextBlock Text="{Binding Version}"/>
-      <TextBlock TextWrapping="Wrap"
+    <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="680" HorizontalAlignment="Left">
+
+      <StackPanel Orientation="Horizontal" Spacing="14" Margin="0,0,0,4">
+        <Border Width="52" Height="52" CornerRadius="14"
+                Background="{DynamicResource AppAccentBrush}">
+          <PathIcon Data="{StaticResource IconShield}" Foreground="White" Width="26" Height="26"/>
+        </Border>
+        <StackPanel VerticalAlignment="Center" Spacing="2">
+          <TextBlock Classes="pageTitle" Text="CertConvert"/>
+          <TextBlock Classes="pageSub" Text="{Binding Version}"/>
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock TextWrapping="Wrap" Classes="secondary"
                  Text="Convert, chain, inspect and generate certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
 
-      <TextBlock Text="Security" FontWeight="SemiBold" FontSize="16"/>
-      <TextBlock TextWrapping="Wrap" Text="{Binding SecurityStatement}"/>
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="section" Text="Security"/>
+          <TextBlock TextWrapping="Wrap" Text="{Binding SecurityStatement}"/>
+        </StackPanel>
+      </Border>
 
-      <TextBlock Text="Command line" FontWeight="SemiBold" FontSize="16"/>
-      <TextBlock TextWrapping="Wrap" Text="{Binding CliHint}"/>
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="section" Text="Command line"/>
+          <TextBlock TextWrapping="Wrap" Text="{Binding CliHint}"/>
+        </StackPanel>
+      </Border>
 
-      <TextBlock Text="Accessibility" FontWeight="SemiBold" FontSize="16"/>
-      <TextBlock TextWrapping="Wrap" Text="{Binding AccessibilityStatement}"/>
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="section" Text="Accessibility"/>
+          <TextBlock TextWrapping="Wrap" Text="{Binding AccessibilityStatement}"/>
+        </StackPanel>
+      </Border>
 
-      <TextBlock Text="Support" FontWeight="SemiBold" FontSize="16"/>
-      <TextBlock TextWrapping="Wrap"
-                 Text="CertConvert is free and open source (MIT licence). If it saves you time, a coffee is always appreciated."/>
-      <Button Content="Buy Me A Coffee On Ko-fi" Command="{Binding OpenKoFiCommand}"
-              Classes="accent"
-              AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser"/>
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="Support"/>
+          <TextBlock TextWrapping="Wrap"
+                     Text="CertConvert is free and open source (MIT licence). If it saves you time, a coffee is always appreciated."/>
+          <Button Content="Buy Me A Coffee On Ko-fi" Command="{Binding OpenKoFiCommand}"
+                  Classes="accent" HorizontalAlignment="Left"
+                  AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser"/>
+        </StackPanel>
+      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

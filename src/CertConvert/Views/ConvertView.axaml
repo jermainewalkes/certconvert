@@ -3,45 +3,63 @@
              xmlns:vm="using:CertConvert.ViewModels"
              x:Class="CertConvert.Views.ConvertView"
              x:DataType="vm:ConvertViewModel">
-  <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Margin="16" RowSpacing="12">
+  <ScrollViewer>
+    <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="920">
 
-    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
-      <Button Content="Add Files…" Command="{Binding AddFilesCommand}"/>
-      <Button Content="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
-      <Button Content="Clear" Command="{Binding ClearFilesCommand}"/>
-      <TextBox Width="200" PlaceholderText="Input Password (If Needed)" PasswordChar="•"
-               Text="{Binding Password}"
-               AutomationProperties.Name="Password for encrypted input files"/>
+      <StackPanel Spacing="4" Margin="0,0,0,4">
+        <TextBlock Classes="pageTitle" Text="Convert"/>
+        <TextBlock Classes="pageSub"
+                   Text="Re-encode certificates between PEM, DER, PKCS #7 and PKCS #12 — in both directions."/>
+      </StackPanel>
+
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="section" Text="Input files"/>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Add Files…" Command="{Binding AddFilesCommand}"/>
+            <Button Content="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
+            <Button Content="Clear" Command="{Binding ClearFilesCommand}"/>
+            <TextBox Width="210" PlaceholderText="Input Password (If Needed)" PasswordChar="•"
+                     Text="{Binding Password}"
+                     AutomationProperties.Name="Password for encrypted input files"/>
+          </StackPanel>
+          <ListBox Classes="files" MinHeight="120" MaxHeight="220"
+                   ItemsSource="{Binding InputFiles}"
+                   SelectedItem="{Binding SelectedInput}"
+                   AutomationProperties.Name="Input files"/>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="section" Text="Output"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Target format" VerticalAlignment="Center" Classes="secondary"/>
+            <ComboBox MinWidth="240" ItemsSource="{Binding Formats}"
+                      SelectedItem="{Binding SelectedFormat}"
+                      AutomationProperties.Name="Target format"/>
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsPfx}">
+            <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"/>
+            <TextBlock Text="{Binding KeyFile}" VerticalAlignment="Center" MaxWidth="230"
+                       TextTrimming="CharacterEllipsis" Classes="secondary"/>
+            <TextBox Width="160" PlaceholderText="Key Password" PasswordChar="•"
+                     Text="{Binding KeyPassword}"
+                     AutomationProperties.Name="Password for the key file"/>
+            <TextBox Width="160" PlaceholderText="PFX Password" PasswordChar="•"
+                     Text="{Binding OutPassword}"
+                     AutomationProperties.Name="Password for the new PFX file"/>
+            <CheckBox Content="Legacy Ciphers (Old Importers)" IsChecked="{Binding LegacyCiphers}"/>
+          </StackPanel>
+
+          <Button Content="Convert And Save…" Classes="accent" HorizontalAlignment="Left"
+                  Command="{Binding ConvertAndSaveCommand}"/>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                 AutomationProperties.LiveSetting="Polite"/>
     </StackPanel>
-
-    <ListBox Grid.Row="1" ItemsSource="{Binding InputFiles}"
-             SelectedItem="{Binding SelectedInput}"
-             AutomationProperties.Name="Input files"/>
-
-    <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-      <TextBlock Grid.Column="0" Text="Target format" VerticalAlignment="Center"/>
-      <ComboBox Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left"
-                ItemsSource="{Binding Formats}" SelectedItem="{Binding SelectedFormat}"
-                AutomationProperties.Name="Target format"/>
-      <Button Grid.Column="2" Content="Convert And Save…" Command="{Binding ConvertAndSaveCommand}"
-              Classes="accent"/>
-    </Grid>
-
-    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8"
-                IsVisible="{Binding IsPfx}">
-      <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"/>
-      <TextBlock Text="{Binding KeyFile}" VerticalAlignment="Center" MaxWidth="260"
-                 TextTrimming="CharacterEllipsis"/>
-      <TextBox Width="170" PlaceholderText="Key Password" PasswordChar="•"
-               Text="{Binding KeyPassword}"
-               AutomationProperties.Name="Password for the key file"/>
-      <TextBox Width="170" PlaceholderText="PFX Password" PasswordChar="•"
-               Text="{Binding OutPassword}"
-               AutomationProperties.Name="Password for the new PFX file"/>
-      <CheckBox Content="Legacy Ciphers (Old Importers)" IsChecked="{Binding LegacyCiphers}"/>
-    </StackPanel>
-
-    <TextBlock Grid.Row="4" Text="{Binding Status}" TextWrapping="Wrap"
-               AutomationProperties.LiveSetting="Polite"/>
-  </Grid>
+  </ScrollViewer>
 </UserControl>

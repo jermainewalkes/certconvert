@@ -3,13 +3,171 @@
              x:Class="CertConvert.App"
              xmlns:local="using:CertConvert"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" follows the system light/dark setting. -->
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Accent palette (indigo) picked up by the Fluent theme. -->
+            <Color x:Key="SystemAccentColor">#4F46E5</Color>
+            <Color x:Key="SystemAccentColorDark1">#4338CA</Color>
+            <Color x:Key="SystemAccentColorDark2">#3B34A8</Color>
+            <Color x:Key="SystemAccentColorDark3">#322B8C</Color>
+            <Color x:Key="SystemAccentColorLight1">#6159E9</Color>
+            <Color x:Key="SystemAccentColorLight2">#736CEC</Color>
+            <Color x:Key="SystemAccentColorLight3">#867FF0</Color>
+            <SolidColorBrush x:Key="AppAccentBrush" Color="{DynamicResource SystemAccentColor}"/>
+
+            <!-- Icons (24x24 path data, filled) -->
+            <StreamGeometry x:Key="IconShield">M12,2 L20,5 L20,11 C20,16.6 16.6,20.5 12,22 C7.4,20.5 4,16.6 4,11 L4,5 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconInspect">M10.5,4 A6.5,6.5 0 1 0 10.5,17 A6.5,6.5 0 1 0 10.5,4 M10.5,6.2 A4.3,4.3 0 1 1 10.5,14.8 A4.3,4.3 0 1 1 10.5,6.2 M15.8,17.2 L17.2,15.8 L21.4,20 L20,21.4 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconConvert">M4,6.25 L13,6.25 L13,3.5 L19.5,7.5 L13,11.5 L13,8.75 L4,8.75 Z M20,15.25 L11,15.25 L11,12.5 L4.5,16.5 L11,20.5 L11,17.75 L20,17.75 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconChain">M8,3 L17,3 A3,3 0 0 1 20,6 L20,15 L18,15 L18,6 A1,1 0 0 0 17,5 L8,5 Z M6,7 L15,7 A3,3 0 0 1 18,10 L18,18 A3,3 0 0 1 15,21 L6,21 A3,3 0 0 1 3,18 L3,10 A3,3 0 0 1 6,7 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconKey">M7.5,9.5 A4.5,4.5 0 1 0 7.5,18.5 A4.5,4.5 0 1 0 7.5,9.5 M7.5,12 A2,2 0 1 1 7.5,16 A2,2 0 1 1 7.5,12 M11.5,12.75 L21,12.75 L21,17 L18.7,17 L18.7,15.25 L16.9,15.25 L16.9,17 L14.6,17 L14.6,15.25 L11.5,15.25 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconGenerate">M11,4 L13,4 L13,11 L20,11 L20,13 L13,13 L13,20 L11,20 L11,13 L4,13 L4,11 L11,11 Z</StreamGeometry>
+            <StreamGeometry x:Key="IconInfo">M12,3 A9,9 0 1 0 12,21 A9,9 0 1 0 12,3 M12,5 A7,7 0 1 1 12,19 A7,7 0 1 1 12,5 M11,8 L13,8 L13,10 L11,10 Z M11,11.5 L13,11.5 L13,16.5 L11,16.5 Z</StreamGeometry>
+
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppPageBackground" Color="#F5F6F8"/>
+                    <SolidColorBrush x:Key="AppSidebarBackground" Color="#EDEEF2"/>
+                    <SolidColorBrush x:Key="AppCardBackground" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="AppCardBorder" Color="#E3E6EB"/>
+                    <SolidColorBrush x:Key="AppInsetBackground" Color="#F2F3F6"/>
+                    <SolidColorBrush x:Key="AppTextSecondary" Color="#5B6472"/>
+                    <Color x:Key="AppNavHoverColor">#E2E4E9</Color>
+                    <Color x:Key="AppNavSelectedColor">#E3E1FB</Color>
+                    <Color x:Key="AppNavSelectedHoverColor">#D8D5F9</Color>
+                    <SolidColorBrush x:Key="AppOkBackground" Color="#DCFCE7"/>
+                    <SolidColorBrush x:Key="AppOkForeground" Color="#166534"/>
+                    <SolidColorBrush x:Key="AppFailBackground" Color="#FEE2E2"/>
+                    <SolidColorBrush x:Key="AppFailForeground" Color="#991B1B"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppPageBackground" Color="#191A1E"/>
+                    <SolidColorBrush x:Key="AppSidebarBackground" Color="#141519"/>
+                    <SolidColorBrush x:Key="AppCardBackground" Color="#222329"/>
+                    <SolidColorBrush x:Key="AppCardBorder" Color="#33353D"/>
+                    <SolidColorBrush x:Key="AppInsetBackground" Color="#1B1C21"/>
+                    <SolidColorBrush x:Key="AppTextSecondary" Color="#9AA1AC"/>
+                    <Color x:Key="AppNavHoverColor">#23252B</Color>
+                    <Color x:Key="AppNavSelectedColor">#312F55</Color>
+                    <Color x:Key="AppNavSelectedHoverColor">#3A3866</Color>
+                    <SolidColorBrush x:Key="AppOkBackground" Color="#14532D"/>
+                    <SolidColorBrush x:Key="AppOkForeground" Color="#BBF7D0"/>
+                    <SolidColorBrush x:Key="AppFailBackground" Color="#7F1D1D"/>
+                    <SolidColorBrush x:Key="AppFailForeground" Color="#FECACA"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
+
+        <!-- Consistent modern rounding on the common controls. -->
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14,7"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="Expander">
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <!-- Surfaces -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource AppCardBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="18"/>
+            <Setter Property="BoxShadow" Value="0 1 2 0 #10000000"/>
+        </Style>
+        <Style Selector="Border.sidebar">
+            <Setter Property="Background" Value="{DynamicResource AppSidebarBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorder}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        </Style>
+        <Style Selector="ListBox.files">
+            <Setter Property="Background" Value="{DynamicResource AppInsetBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+
+        <!-- Typography -->
+        <Style Selector="TextBlock.pageTitle">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.pageSub">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondary}"/>
+        </Style>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.secondary">
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondary}"/>
+        </Style>
+        <Style Selector="TextBlock.status">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondary}"/>
+        </Style>
+
+        <!-- Result pills -->
+        <Style Selector="Border.pillOk">
+            <Setter Property="Background" Value="{DynamicResource AppOkBackground}"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="10,2"/>
+        </Style>
+        <Style Selector="Border.pillOk TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AppOkForeground}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Border.pillFail">
+            <Setter Property="Background" Value="{DynamicResource AppFailBackground}"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="10,2"/>
+        </Style>
+        <Style Selector="Border.pillFail TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AppFailForeground}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Sidebar navigation -->
+        <Style Selector="ListBox.nav">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+        <Style Selector="ListBox.nav PathIcon">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Opacity" Value="0.85"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
     </Application.Styles>
 </Application>

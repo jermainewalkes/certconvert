@@ -4,77 +4,105 @@
              x:Class="CertConvert.Views.InspectView"
              x:DataType="vm:InspectViewModel"
              DragDrop.AllowDrop="True">
-  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="16" RowSpacing="12">
+  <ScrollViewer>
+    <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="920" HorizontalAlignment="Stretch">
 
-    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
-      <Button Content="Open File…" Command="{Binding OpenFileCommand}"/>
-      <TextBox Width="200" PlaceholderText="Password (If Needed)" PasswordChar="•"
-               Text="{Binding Password}"
-               AutomationProperties.Name="Password for encrypted files"/>
-      <Button Content="Unlock" Command="{Binding ReloadCommand}"
-              AutomationProperties.HelpText="Reload the current file using the password"/>
-      <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" FontWeight="SemiBold"/>
-    </StackPanel>
+      <StackPanel Spacing="4" Margin="0,0,0,4">
+        <TextBlock Classes="pageTitle" Text="Inspect"/>
+        <TextBlock Classes="pageSub"
+                   Text="Decode any certificate, key, CSR or bundle — nothing ever leaves this machine."/>
+      </StackPanel>
 
-    <Border Grid.Row="1" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-            BorderThickness="1" CornerRadius="6" Padding="12"
-            IsVisible="{Binding !Certificates.Count}">
-      <TextBlock Text="Drag and drop a certificate, key or bundle anywhere on this tab — PEM, DER, PKCS #7 and PKCS #12 are detected automatically."
-                 TextWrapping="Wrap" Opacity="0.8"/>
-    </Border>
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Open File…" Classes="accent" Command="{Binding OpenFileCommand}"/>
+            <TextBox Width="210" PlaceholderText="Password (If Needed)" PasswordChar="•"
+                     Text="{Binding Password}"
+                     AutomationProperties.Name="Password for encrypted files"/>
+            <Button Content="Unlock" Command="{Binding ReloadCommand}"
+                    AutomationProperties.HelpText="Reload the current file using the password"/>
+            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+          </StackPanel>
 
-    <StackPanel Grid.Row="2" Spacing="4">
-      <TextBlock Text="{Binding Status}" TextWrapping="Wrap"
-                 AutomationProperties.LiveSetting="Polite"/>
-      <TextBlock Text="{Binding KeysSummary}" TextWrapping="Wrap"
-                 IsVisible="{Binding KeysSummary.Length}"/>
-      <TextBlock Text="A certificate request (CSR) is present in this file."
-                 IsVisible="{Binding HasCsr}"/>
-    </StackPanel>
+          <!-- Drop zone shown until something is loaded. -->
+          <Panel MinHeight="180" IsVisible="{Binding !Certificates.Count}">
+            <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
+                       StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+              <PathIcon Data="{StaticResource IconInspect}" Width="26" Height="26"
+                        Foreground="{DynamicResource AppTextSecondary}"
+                        HorizontalAlignment="Center"/>
+              <TextBlock Text="Drag and drop a file anywhere on this page"
+                         FontWeight="SemiBold" HorizontalAlignment="Center"/>
+              <TextBlock Classes="secondary" FontSize="12" HorizontalAlignment="Center"
+                         Text="PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are detected automatically"/>
+            </StackPanel>
+          </Panel>
 
-    <ScrollViewer Grid.Row="3">
+          <StackPanel Spacing="4">
+            <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                       AutomationProperties.LiveSetting="Polite"/>
+            <TextBlock Classes="status" Text="{Binding KeysSummary}" TextWrapping="Wrap"
+                       IsVisible="{Binding KeysSummary.Length}"/>
+            <TextBlock Classes="status" Text="A certificate request (CSR) is present in this file."
+                       IsVisible="{Binding HasCsr}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
       <ItemsControl ItemsSource="{Binding Certificates}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="vm:CertItemViewModel">
-            <Expander Header="{Binding Header}" Margin="0,4" HorizontalAlignment="Stretch"
-                      IsExpanded="True">
-              <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                    RowSpacing="4" Margin="8">
-                <TextBlock Grid.Row="0" Text="Subject"/>
-                <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Info.Subject}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="1" Text="Issuer"/>
-                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Info.Issuer}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="2" Text="Serial number"/>
-                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Info.SerialNumber}"/>
-                <TextBlock Grid.Row="3" Text="Valid"/>
-                <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Validity}"/>
-                <TextBlock Grid.Row="4" Text="Public key"/>
-                <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Info.KeyAlgorithm}"/>
-                <TextBlock Grid.Row="5" Text="Signature"/>
-                <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Info.SignatureAlgorithm}"/>
-                <TextBlock Grid.Row="6" Text="SANs" IsVisible="{Binding HasSans}"/>
-                <SelectableTextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SansText}"
-                           TextWrapping="Wrap" IsVisible="{Binding HasSans}"/>
-                <TextBlock Grid.Row="7" Text="Key usage" IsVisible="{Binding HasKeyUsage}"/>
-                <SelectableTextBlock Grid.Row="7" Grid.Column="1" Text="{Binding KeyUsageText}"
-                           TextWrapping="Wrap" IsVisible="{Binding HasKeyUsage}"/>
-                <TextBlock Grid.Row="8" Text="Extended usage" IsVisible="{Binding HasEku}"/>
-                <SelectableTextBlock Grid.Row="8" Grid.Column="1" Text="{Binding EkuText}"
-                           TextWrapping="Wrap" IsVisible="{Binding HasEku}"/>
-                <TextBlock Grid.Row="9" Text="SHA-256"/>
-                <SelectableTextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Info.Sha256Fingerprint}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="10" Text="SHA-1"/>
-                <SelectableTextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Info.Sha1Fingerprint}" TextWrapping="Wrap"/>
-                <StackPanel Grid.Row="12" Grid.ColumnSpan="2" Orientation="Horizontal"
-                            Spacing="8" Margin="0,8,0,0">
-                  <Button Content="Copy PEM" Command="{Binding CopyPemCommand}"/>
-                  <Button Content="Copy SHA-256" Command="{Binding CopySha256Command}"/>
-                </StackPanel>
-              </Grid>
-            </Expander>
+            <Border Classes="card" Margin="0,0,0,12" Padding="10">
+              <Expander IsExpanded="True" Background="Transparent"
+                        HorizontalAlignment="Stretch">
+                <Expander.Header>
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{Binding Header}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Validity}" Classes="secondary" FontSize="12"
+                               VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Expander.Header>
+                <Grid ColumnDefinitions="160,*"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                      RowSpacing="6" Margin="8,10,8,4">
+                  <TextBlock Grid.Row="0" Classes="secondary" Text="Subject"/>
+                  <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Info.Subject}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="1" Classes="secondary" Text="Issuer"/>
+                  <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Info.Issuer}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="2" Classes="secondary" Text="Serial number"/>
+                  <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Info.SerialNumber}"/>
+                  <TextBlock Grid.Row="3" Classes="secondary" Text="Valid"/>
+                  <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Validity}"/>
+                  <TextBlock Grid.Row="4" Classes="secondary" Text="Public key"/>
+                  <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Info.KeyAlgorithm}"/>
+                  <TextBlock Grid.Row="5" Classes="secondary" Text="Signature"/>
+                  <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Info.SignatureAlgorithm}"/>
+                  <TextBlock Grid.Row="6" Classes="secondary" Text="SANs" IsVisible="{Binding HasSans}"/>
+                  <SelectableTextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SansText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasSans}"/>
+                  <TextBlock Grid.Row="7" Classes="secondary" Text="Key usage" IsVisible="{Binding HasKeyUsage}"/>
+                  <SelectableTextBlock Grid.Row="7" Grid.Column="1" Text="{Binding KeyUsageText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasKeyUsage}"/>
+                  <TextBlock Grid.Row="8" Classes="secondary" Text="Extended usage" IsVisible="{Binding HasEku}"/>
+                  <SelectableTextBlock Grid.Row="8" Grid.Column="1" Text="{Binding EkuText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasEku}"/>
+                  <TextBlock Grid.Row="9" Classes="secondary" Text="SHA-256"/>
+                  <SelectableTextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Info.Sha256Fingerprint}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="10" Classes="secondary" Text="SHA-1"/>
+                  <SelectableTextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Info.Sha1Fingerprint}" TextWrapping="Wrap"/>
+                  <StackPanel Grid.Row="11" Grid.ColumnSpan="2" Orientation="Horizontal"
+                              Spacing="8" Margin="0,10,0,0">
+                    <Button Content="Copy PEM" Command="{Binding CopyPemCommand}"/>
+                    <Button Content="Copy SHA-256" Command="{Binding CopySha256Command}"/>
+                  </StackPanel>
+                </Grid>
+              </Expander>
+            </Border>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-    </ScrollViewer>
-  </Grid>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>
