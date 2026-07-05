@@ -60,8 +60,8 @@ needs installing.
 Needs the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
 ```bash
-git clone <this repo>
-cd CertConvert
+git clone https://github.com/jermainewalkes/certconvert.git
+cd certconvert
 dotnet run --project src/CertConvert    # launches the GUI
 dotnet test                             # runs the test suite
 ```
