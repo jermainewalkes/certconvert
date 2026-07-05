@@ -1,14 +1,30 @@
-# CertConvert
+<p align="center">
+  <img src="src/CertConvert/Assets/icon-256.png" width="110" alt="CertConvert icon"/>
+</p>
+<h1 align="center">CertConvert</h1>
+<p align="center"><b>Certificate Toolbox</b> — convert, chain, inspect and generate X.509 certificates without installing OpenSSL.</p>
 
-Convert, chain, inspect and generate X.509 certificates without installing
-OpenSSL. CertConvert is a single self-contained desktop app (and command-line
-tool) that runs entirely offline on macOS — Intel and Apple Silicon — and
-Windows.
+<p align="center">
+  <img src="https://img.shields.io/badge/licence-MIT-green" alt="MIT licence"/>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue" alt="Platforms: macOS and Windows"/>
+  <img src="https://img.shields.io/badge/.NET-10.0-512BD4" alt=".NET 10"/>
+  <img src="https://img.shields.io/badge/tests-64%20passing-brightgreen" alt="64 tests passing"/>
+  <a href="https://ko-fi.com/jwalkes"><img src="https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white" alt="Support on Ko-fi"/></a>
+</p>
 
-It exists for the times you need to turn a `.pem` into a `.cer`, assemble a
-root → intermediate → device chain, or bundle a key and certificate into a
-`.pfx`, but you're on a machine where installing OpenSSL and running shell
-commands isn't an option.
+CertConvert is a single self-contained desktop app (and command-line tool)
+that runs entirely offline. It exists for the times you need to turn a `.pem`
+into a `.cer`, assemble a root → intermediate → device chain, or bundle a key
+and certificate into a `.pfx`, but you're on a machine where installing
+OpenSSL and running shell commands isn't an option.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/inspect-dark.png">
+    <img src="design/screenshots/inspect-light.png" width="880"
+         alt="CertConvert inspecting a certificate: subject, issuer, validity, SANs, key usage and fingerprints decoded from a PEM file"/>
+  </picture>
+</p>
 
 ## What it does
 
@@ -24,6 +40,9 @@ commands isn't an option.
 - **Generate** keys, CSRs and self-signed certificates (RSA or ECDSA), with
   SANs and CA options — the `openssl req` workflows.
 
+Formats are detected from file *content*, not extensions, so misnamed
+files — the `.cer` that's secretly PEM — just work.
+
 ## Security posture
 
 For a tool that handles private keys, the dependency surface is the whole
@@ -33,27 +52,34 @@ story:
   (`System.Security.Cryptography`). There is no third-party crypto code. The
   only third-party dependencies are the UI framework (Avalonia) and the MVVM
   helper (CommunityToolkit.Mvvm) — neither touches key material.
-- **It never uses the network.** There is no telemetry, no update check, no
-  outbound connection of any kind. The only thing that opens a browser is the
-  Ko-fi link on the About tab, and only when you click it.
+- **It never uses the network.** No telemetry, no update check, no outbound
+  connection of any kind. The only thing that opens a browser is the Ko-fi
+  link on the About tab, and only when you click it.
 - **Private keys stay in memory.** Keys loaded from PKCS #12 files are handled
   in process and are never imported into the operating-system key store.
 - **It only writes the files you ask it to.**
 
-## Running it
+## Where things live
 
-### From a released build (no .NET needed)
+Nowhere — by design. CertConvert keeps no settings, no cache, no logs and no
+history. The only files it ever creates are the ones you explicitly save.
 
-Downloads are self-contained — the .NET runtime is bundled, so nothing else
-needs installing.
+## Install & run
 
-- **macOS**: unzip `CertConvert-<version>-osx-x64.zip` (Intel) or
-  `...-osx-arm64.zip` (Apple Silicon) and move `CertConvert.app` to
-  Applications. The build is unsigned, so the first launch needs
-  right-click → **Open** (or **System Settings → Privacy & Security → Open
-  Anyway**) to get past Gatekeeper.
-- **Windows**: unzip `CertConvert-<version>-win-x64.zip` and run
-  `CertConvert.exe`.
+### From a release (no .NET needed)
+
+Grab the latest zip from [Releases](https://github.com/jermainewalkes/certconvert/releases)
+— the .NET runtime is bundled.
+
+| Platform | File |
+|---|---|
+| macOS (Intel) | `CertConvert-<version>-osx-x64.zip` |
+| macOS (Apple Silicon) | `CertConvert-<version>-osx-arm64.zip` |
+| Windows x64 | `CertConvert-<version>-win-x64.zip` |
+
+Unzip; on macOS move `CertConvert.app` to Applications, on Windows run
+`CertConvert.exe`. Releases are currently unsigned — see Troubleshooting for
+the one-time first-launch step on each platform.
 
 ### From source
 
@@ -63,7 +89,6 @@ Needs the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 git clone https://github.com/jermainewalkes/certconvert.git
 cd certconvert
 dotnet run --project src/CertConvert    # launches the GUI
-dotnet test                             # runs the test suite
 ```
 
 ## Command line
@@ -87,19 +112,36 @@ certconvert gen selfsigned --new-key p256 --key-out dev.key \
 Exit codes: `0` success, `1` usage error, `2` failure (including an invalid
 chain or a key that does not match).
 
-On Windows the executable is a GUI-subsystem binary that attaches to the
-calling console when run with arguments; if the shell prompt returns before
-the output prints, press Enter.
+## Troubleshooting
 
-## Building packages
+- **macOS: "CertConvert can't be opened"** — the build is unsigned;
+  right-click the app → **Open** (one-time), or allow it under
+  System Settings → Privacy & Security.
+- **Windows: "Windows protected your PC"** — SmartScreen on an unsigned
+  binary; **More info → Run anyway** (one-time).
+- **"…is password-protected"** — the file is an encrypted PFX or key; type
+  the password in the password field and use Unlock (GUI) or `--password`
+  (CLI). Errors always name the file that needs it.
+- **Windows CLI output interleaves with the prompt** — the exe is a GUI
+  program attaching to your console; press Enter to get the prompt back.
+- **Which build am I running?** — `certconvert --version` prints the version
+  plus the exact git commit it was built from.
 
-```bash
-build/publish.sh              # osx-x64, osx-arm64 and win-x64
-build/publish.sh osx-arm64    # just one target
+## Development
+
+```
+src/CertConvert.Core/   all certificate/key logic — no UI dependencies
+src/CertConvert/        Avalonia GUI + CLI (Cli/) in one executable
+tests/                  Core unit tests (incl. OpenSSL interop fixtures)
+                        and headless Avalonia UI tests
+build/                  publish scripts, icon generation, dev-run helper
 ```
 
-Artifacts (single-file self-contained builds, macOS `.app` zips and a Windows
-zip) land in `artifacts/`.
+```bash
+dotnet test                   # full suite
+build/publish.sh              # self-contained builds: osx-x64, osx-arm64, win-x64
+build/run-dev-app.sh          # macOS: run the Debug build as a bundled .app
+```
 
 ## Accessibility
 
@@ -112,10 +154,9 @@ problems are treated as bugs.
 ## Support
 
 CertConvert is free and open source under the [MIT licence](LICENSE). If it
-saves you time, a coffee is appreciated — see the Ko-fi link on the About tab.
+saves you time, you can [buy me a coffee on Ko-fi](https://ko-fi.com/jwalkes) ☕
 
 ## Roadmap
 
-Not yet done, tracked for later: signed and notarised macOS builds, a Windows
-installer, automated release builds, and a universal (Intel + Apple Silicon)
-macOS binary.
+Signed and notarised macOS builds, a Windows installer, automated release
+builds, signing CSRs with your own CA, and a universal macOS binary.
