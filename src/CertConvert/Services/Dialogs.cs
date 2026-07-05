@@ -47,10 +47,14 @@ public static class Dialogs
     public static async Task<string?> SaveFileAsync(string title, string suggestedName)
     {
         if (Top?.StorageProvider is not { } storage) return null;
+        // Derive the default extension from the suggested name so the platform
+        // dialog prefills and appends it when the user doesn't type one.
+        var ext = System.IO.Path.GetExtension(suggestedName).TrimStart('.');
         var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = title,
             SuggestedFileName = suggestedName,
+            DefaultExtension = ext.Length > 0 ? ext : null,
             ShowOverwritePrompt = true,
         });
         return file?.TryGetLocalPath();

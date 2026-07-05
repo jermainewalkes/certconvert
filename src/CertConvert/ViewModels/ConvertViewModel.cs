@@ -12,7 +12,7 @@ using CertConvert.Services;
 
 namespace CertConvert.ViewModels;
 
-public sealed record FormatOption(string Label, CertOutputFormat Value)
+public sealed record FormatOption(string Label, CertOutputFormat Value, string Extension)
 {
     public override string ToString() => Label;
 }
@@ -23,11 +23,14 @@ public partial class ConvertViewModel : ViewModelBase
 
     public IReadOnlyList<FormatOption> Formats { get; } =
     [
-        new("PEM (.pem, .crt)", CertOutputFormat.Pem),
-        new("DER (.cer, .der)", CertOutputFormat.Der),
-        new("PKCS #7 (.p7b)", CertOutputFormat.Pkcs7Der),
-        new("PKCS #7, PEM Armoured", CertOutputFormat.Pkcs7Pem),
-        new("PKCS #12 (.pfx, .p12)", CertOutputFormat.Pkcs12),
+        new("PEM Certificate (.pem)", CertOutputFormat.Pem, "pem"),
+        new("PEM Certificate (.crt)", CertOutputFormat.Pem, "crt"),
+        new("DER Certificate (.cer)", CertOutputFormat.Der, "cer"),
+        new("DER Certificate (.der)", CertOutputFormat.Der, "der"),
+        new("PKCS #7 Bundle (.p7b)", CertOutputFormat.Pkcs7Der, "p7b"),
+        new("PKCS #7 Bundle, PEM (.pem)", CertOutputFormat.Pkcs7Pem, "pem"),
+        new("PKCS #12 (.pfx)", CertOutputFormat.Pkcs12, "pfx"),
+        new("PKCS #12 (.p12)", CertOutputFormat.Pkcs12, "p12"),
     ];
 
     [ObservableProperty] private FormatOption _selectedFormat;
@@ -135,15 +138,8 @@ public partial class ConvertViewModel : ViewModelBase
                 Encryption = LegacyCiphers ? Pkcs12Encryption.Legacy : Pkcs12Encryption.Modern,
             });
 
-            string suggested = Path.GetFileNameWithoutExtension(InputFiles[0]) + format switch
-            {
-                CertOutputFormat.Pem => ".pem",
-                CertOutputFormat.Der => ".cer",
-                CertOutputFormat.Pkcs7Der => ".p7b",
-                CertOutputFormat.Pkcs7Pem => ".p7b",
-                CertOutputFormat.Pkcs12 => ".pfx",
-                _ => ".out",
-            };
+            string suggested =
+                $"{Path.GetFileNameWithoutExtension(InputFiles[0])}.{SelectedFormat.Extension}";
             var outPath = await Dialogs.SaveFileAsync("Save Converted File", suggested);
             if (outPath is null)
             {

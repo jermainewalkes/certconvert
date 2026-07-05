@@ -24,9 +24,9 @@ public partial class ChainViewModel : ViewModelBase
 
     public IReadOnlyList<FormatOption> ExportFormats { get; } =
     [
-        new("PEM Bundle (.pem)", CertOutputFormat.Pem),
-        new("PKCS #7 (.p7b)", CertOutputFormat.Pkcs7Der),
-        new("PKCS #12 (.pfx) With Key", CertOutputFormat.Pkcs12),
+        new("PEM Bundle (.pem)", CertOutputFormat.Pem, "pem"),
+        new("PKCS #7 (.p7b)", CertOutputFormat.Pkcs7Der, "p7b"),
+        new("PKCS #12 (.pfx) With Key", CertOutputFormat.Pkcs12, "pfx"),
     ];
 
     [ObservableProperty] private FormatOption _selectedExportFormat;
@@ -151,13 +151,7 @@ public partial class ChainViewModel : ViewModelBase
                 PrivateKey = pfxKey,
             });
 
-            string suggested = "chain" + format switch
-            {
-                CertOutputFormat.Pem => ".pem",
-                CertOutputFormat.Pkcs7Der => ".p7b",
-                CertOutputFormat.Pkcs12 => ".pfx",
-                _ => ".out",
-            };
+            string suggested = $"chain.{SelectedExportFormat.Extension}";
             var outPath = await Dialogs.SaveFileAsync("Export Chain", suggested);
             if (outPath is null)
             {
