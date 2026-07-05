@@ -4,6 +4,7 @@
     <Project Path="src/CertConvert/CertConvert.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/CertConvert.App.Tests/CertConvert.App.Tests.csproj" />
     <Project Path="tests/CertConvert.Core.Tests/CertConvert.Core.Tests.csproj" />
   </Folder>
 </Solution>

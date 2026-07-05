@@ -1,0 +1,76 @@
+using System.IO;
+using System.Linq;
+using System.Text;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.VisualTree;
+using CertConvert.Core;
+using CertConvert.ViewModels;
+using CertConvert.Views;
+
+namespace CertConvert.Gui.Tests;
+
+/// <summary>
+/// Renders the real window on the headless platform so the whole XAML/binding/
+/// view-locator graph is exercised without a display — this is what proves the
+/// GUI actually comes up, beyond "the build compiled".
+/// </summary>
+public class MainWindowTests
+{
+    [AvaloniaFact]
+    public void Window_Renders_WithAllSixTabs()
+    {
+        var window = new MainWindow { DataContext = new MainWindowViewModel() };
+        window.Show();
+
+        var tabs = window.GetVisualDescendants()
+            .OfType<TabControl>()
+            .Single();
+        var headers = tabs.Items
+            .OfType<TabItem>()
+            .Select(t => t.Header?.ToString())
+            .ToArray();
+
+        Assert.Equal(
+            new[] { "Inspect", "Convert", "Chain", "Keys", "Generate", "About" },
+            headers);
+    }
+
+    [AvaloniaFact]
+    public void InspectView_ShowsCertificateDroppedInViaViewModel()
+    {
+        var vm = new MainWindowViewModel();
+        var window = new MainWindow { DataContext = vm };
+        window.Show();
+
+        // Write a throwaway self-signed cert and load it as the drop handler would.
+        using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
+        using var cert = Generator.CreateSelfSigned(key.Key, new CertSpec
+        {
+            CommonName = "headless.test.local",
+            ValidityDays = 30,
+        });
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".pem");
+        File.WriteAllText(path, cert.ExportCertificatePem());
+        try
+        {
+            vm.Inspect.LoadPath(path);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        Assert.Single(vm.Inspect.Certificates);
+        Assert.Equal("headless.test.local", vm.Inspect.Certificates[0].Info.DisplayName);
+        Assert.Contains("1 certificate", vm.Inspect.Detected);
+    }
+
+    [AvaloniaFact]
+    public void AboutView_ExposesKoFiCommand()
+    {
+        var vm = new MainWindowViewModel();
+        Assert.NotNull(vm.About.OpenKoFiCommand);
+        Assert.Contains("never connects to the network", vm.About.SecurityStatement);
+    }
+}

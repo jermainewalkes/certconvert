@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CertConvert.ViewModels"
+             x:Class="CertConvert.Views.ChainView"
+             x:DataType="vm:ChainViewModel">
+  <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto" Margin="16" RowSpacing="12">
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+      <Button Content="Add Certificates…" Command="{Binding AddFilesCommand}"/>
+      <Button Content="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
+      <Button Content="Clear" Command="{Binding ClearFilesCommand}"/>
+      <TextBox Width="200" Watermark="Input Password (If Needed)" PasswordChar="•"
+               Text="{Binding Password}"
+               AutomationProperties.Name="Password for encrypted input files"/>
+    </StackPanel>
+
+    <ListBox Grid.Row="1" ItemsSource="{Binding InputFiles}"
+             SelectedItem="{Binding SelectedInput}" MinHeight="90"
+             AutomationProperties.Name="Chain certificate files"/>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+      <Button Content="Validate Chain" Command="{Binding ValidateChainCommand}" Classes="accent"/>
+      <CheckBox Content="Trust System Roots" IsChecked="{Binding TrustSystemRoots}"/>
+    </StackPanel>
+
+    <ItemsControl Grid.Row="3" ItemsSource="{Binding Results}"
+                  AutomationProperties.Name="Validation results">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:ChainRow">
+          <StackPanel Margin="0,2">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding StatusMark}" FontWeight="Bold" Width="40"/>
+              <TextBlock Text="{Binding Name}"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Issues}" Margin="48,0,0,0" TextWrapping="Wrap"
+                       IsVisible="{Binding HasIssues}"/>
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="Export as" VerticalAlignment="Center"/>
+      <ComboBox MaxWidth="300" ItemsSource="{Binding ExportFormats}"
+                SelectedItem="{Binding SelectedExportFormat}"
+                AutomationProperties.Name="Chain export format"/>
+      <Button Content="Export Chain…" Command="{Binding ExportChainCommand}"/>
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsPfx}">
+        <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"/>
+        <TextBox Width="150" Watermark="Key Password" PasswordChar="•"
+                 Text="{Binding KeyPassword}"
+                 AutomationProperties.Name="Password for the key file"/>
+        <TextBox Width="150" Watermark="PFX Password" PasswordChar="•"
+                 Text="{Binding OutPassword}"
+                 AutomationProperties.Name="Password for the new PFX file"/>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock Grid.Row="5" Text="{Binding Status}" TextWrapping="Wrap"
+               AutomationProperties.LiveSetting="Polite"/>
+  </Grid>
+</UserControl>

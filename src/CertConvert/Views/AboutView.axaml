@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CertConvert.ViewModels"
+             x:Class="CertConvert.Views.AboutView"
+             x:DataType="vm:AboutViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="14" MaxWidth="640" HorizontalAlignment="Left">
+      <TextBlock Text="CertConvert" FontSize="28" FontWeight="Bold"/>
+      <TextBlock Text="{Binding Version}"/>
+      <TextBlock TextWrapping="Wrap"
+                 Text="Convert, chain, inspect and generate certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
+
+      <TextBlock Text="Security" FontWeight="SemiBold" FontSize="16"/>
+      <TextBlock TextWrapping="Wrap" Text="{Binding SecurityStatement}"/>
+
+      <TextBlock Text="Command line" FontWeight="SemiBold" FontSize="16"/>
+      <TextBlock TextWrapping="Wrap" Text="{Binding CliHint}"/>
+
+      <TextBlock Text="Accessibility" FontWeight="SemiBold" FontSize="16"/>
+      <TextBlock TextWrapping="Wrap" Text="{Binding AccessibilityStatement}"/>
+
+      <TextBlock Text="Support" FontWeight="SemiBold" FontSize="16"/>
+      <TextBlock TextWrapping="Wrap"
+                 Text="CertConvert is free and open source (MIT licence). If it saves you time, a coffee is always appreciated."/>
+      <Button Content="Buy Me A Coffee On Ko-fi" Command="{Binding OpenKoFiCommand}"
+              Classes="accent"
+              AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

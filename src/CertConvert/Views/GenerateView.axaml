@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CertConvert.ViewModels"
+             x:Class="CertConvert.Views.GenerateView"
+             x:DataType="vm:GenerateViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="12">
+
+      <TextBlock Text="1 — Key" FontWeight="SemiBold" FontSize="16"/>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox MaxWidth="220" ItemsSource="{Binding Algorithms}"
+                  SelectedItem="{Binding SelectedAlgorithm}"
+                  AutomationProperties.Name="Key algorithm"/>
+        <TextBox Width="200" Watermark="Key Password (Optional)" PasswordChar="•"
+                 Text="{Binding KeyPassword}"
+                 AutomationProperties.Name="Password to encrypt the key file, also used when loading"/>
+        <Button Content="Generate Key And Save…" Command="{Binding GenerateKeyAndSaveCommand}"/>
+        <Button Content="Load Existing Key…" Command="{Binding LoadExistingKeyCommand}"/>
+        <TextBlock Text="{Binding KeyDescription}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+      </StackPanel>
+
+      <TextBlock Text="2 — Subject" FontWeight="SemiBold" FontSize="16"/>
+      <Grid ColumnDefinitions="180,300" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+            RowSpacing="8" ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Text="Common name (CN) *" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CommonName}"
+                 Watermark="device.example.com"
+                 AutomationProperties.Name="Common name"/>
+        <TextBlock Grid.Row="1" Text="Organisation (O)" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Organization}"
+                 AutomationProperties.Name="Organisation"/>
+        <TextBlock Grid.Row="2" Text="Unit (OU)" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OrganizationalUnit}"
+                 AutomationProperties.Name="Organisational unit"/>
+        <TextBlock Grid.Row="3" Text="Country (two letters)" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Country}" Watermark="GB"
+                 AutomationProperties.Name="Country code"/>
+        <TextBlock Grid.Row="4" Text="State or county" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding State}"
+                 AutomationProperties.Name="State or county"/>
+        <TextBlock Grid.Row="5" Text="Locality" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Locality}"
+                 AutomationProperties.Name="Locality"/>
+      </Grid>
+
+      <TextBlock Text="3 — Names And Options" FontWeight="SemiBold" FontSize="16"/>
+      <Grid ColumnDefinitions="180,300" RowDefinitions="Auto,Auto,Auto,Auto"
+            RowSpacing="8" ColumnSpacing="8">
+        <TextBlock Grid.Row="0" Text="DNS names (comma-separated)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding DnsNames}"
+                 Watermark="a.example.com, b.example.com"
+                 AutomationProperties.Name="DNS subject alternative names"/>
+        <TextBlock Grid.Row="1" Text="IP addresses (comma-separated)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IpAddresses}"
+                 Watermark="10.0.0.36"
+                 AutomationProperties.Name="IP subject alternative names"/>
+        <TextBlock Grid.Row="2" Text="Validity (days)" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ValidityDays}"
+                 AutomationProperties.Name="Validity in days"/>
+        <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="Certificate Authority (CA)"
+                  IsChecked="{Binding IsCa}"/>
+      </Grid>
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="Save CSR…" Command="{Binding SaveCsrCommand}"
+                IsEnabled="{Binding HasKey}" Classes="accent"/>
+        <Button Content="Save Self-Signed Certificate…" Command="{Binding SaveSelfSignedCommand}"
+                IsEnabled="{Binding HasKey}" Classes="accent"/>
+      </StackPanel>
+
+      <TextBlock Text="{Binding Status}" TextWrapping="Wrap"
+                 AutomationProperties.LiveSetting="Polite"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CertConvert.ViewModels"
+             x:Class="CertConvert.Views.KeysView"
+             x:DataType="vm:KeysViewModel">
+  <StackPanel Margin="16" Spacing="16">
+
+    <TextBlock Text="Private key" FontWeight="SemiBold" FontSize="16"/>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button Content="Open Key…" Command="{Binding OpenKeyCommand}"/>
+      <TextBox Width="200" Watermark="Key Password (If Needed)" PasswordChar="•"
+               Text="{Binding Password}"
+               AutomationProperties.Name="Password for the key file"/>
+      <Button Content="Unlock" Command="{Binding LoadKeyCommand}"
+              AutomationProperties.HelpText="Reload the key using the password"/>
+      <TextBlock Text="{Binding KeyDescription}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+    </StackPanel>
+
+    <Separator/>
+
+    <TextBlock Text="Convert format" FontWeight="SemiBold" FontSize="16"/>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <ComboBox MaxWidth="320" ItemsSource="{Binding Formats}"
+                SelectedItem="{Binding SelectedFormat}"
+                AutomationProperties.Name="Key output format"/>
+      <TextBox Width="200" Watermark="New Password" PasswordChar="•"
+               Text="{Binding OutPassword}" IsVisible="{Binding NeedsOutPassword}"
+               AutomationProperties.Name="Password for the converted key"/>
+      <Button Content="Save Converted Key…" Command="{Binding SaveConvertedCommand}" Classes="accent"/>
+    </StackPanel>
+
+    <Separator/>
+
+    <TextBlock Text="Does this key match a certificate?" FontWeight="SemiBold" FontSize="16"/>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button Content="Choose Certificate…" Command="{Binding PickCertCommand}"/>
+      <TextBlock Text="{Binding CertFile}" VerticalAlignment="Center" MaxWidth="300"
+                 TextTrimming="CharacterEllipsis"/>
+      <Button Content="Check Match" Command="{Binding CheckMatchCommand}"/>
+    </StackPanel>
+    <TextBlock Text="{Binding MatchResult}" FontWeight="SemiBold"
+               IsVisible="{Binding MatchResult.Length}"/>
+
+    <TextBlock Text="{Binding Status}" TextWrapping="Wrap"
+               AutomationProperties.LiveSetting="Polite"/>
+  </StackPanel>
+</UserControl>
