@@ -16,14 +16,14 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Input files"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <Button Content="Add Files…" Command="{Binding AddFilesCommand}"/>
             <Button Content="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
             <Button Content="Clear" Command="{Binding ClearFilesCommand}"/>
             <TextBox Width="210" PlaceholderText="Input Password (If Needed)" PasswordChar="•"
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
-          </StackPanel>
+          </WrapPanel>
           <Panel MinHeight="150" IsVisible="{Binding !InputFiles.Count}">
             <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
                        StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
@@ -55,9 +55,9 @@
                       AutomationProperties.Name="Target format"/>
           </StackPanel>
 
-          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsPfx}">
+          <WrapPanel Classes="toolbar" IsVisible="{Binding IsPfx}">
             <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"/>
-            <TextBlock Text="{Binding KeyFile}" VerticalAlignment="Center" MaxWidth="230"
+            <TextBlock Text="{Binding KeyFile}" MaxWidth="230"
                        TextTrimming="CharacterEllipsis" Classes="secondary"/>
             <TextBox Width="160" PlaceholderText="Key Password" PasswordChar="•"
                      Text="{Binding KeyPassword}"
@@ -66,7 +66,7 @@
                      Text="{Binding OutPassword}"
                      AutomationProperties.Name="Password for the new PFX file"/>
             <CheckBox Content="Legacy Ciphers (Old Importers)" IsChecked="{Binding LegacyCiphers}"/>
-          </StackPanel>
+          </WrapPanel>
 
           <Button Content="Convert And Save…" Classes="accent" HorizontalAlignment="Left"
                   Command="{Binding ConvertAndSaveCommand}"/>

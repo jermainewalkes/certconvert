@@ -16,14 +16,14 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Certificates"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <Button Content="Add Certificates…" Command="{Binding AddFilesCommand}"/>
             <Button Content="Remove Selected" Command="{Binding RemoveSelectedCommand}"/>
             <Button Content="Clear" Command="{Binding ClearFilesCommand}"/>
             <TextBox Width="210" PlaceholderText="Input Password (If Needed)" PasswordChar="•"
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for encrypted input files"/>
-          </StackPanel>
+          </WrapPanel>
           <Panel MinHeight="150" IsVisible="{Binding !InputFiles.Count}">
             <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
                        StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
@@ -83,21 +83,20 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Export"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <ComboBox MinWidth="230" ItemsSource="{Binding ExportFormats}"
                       SelectedItem="{Binding SelectedExportFormat}"
                       AutomationProperties.Name="Chain export format"/>
-            <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsPfx}">
-              <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"/>
-              <TextBox Width="150" PlaceholderText="Key Password" PasswordChar="•"
-                       Text="{Binding KeyPassword}"
-                       AutomationProperties.Name="Password for the key file"/>
-              <TextBox Width="150" PlaceholderText="PFX Password" PasswordChar="•"
-                       Text="{Binding OutPassword}"
-                       AutomationProperties.Name="Password for the new PFX file"/>
-            </StackPanel>
+            <Button Content="Add Key File…" Command="{Binding PickKeyFileCommand}"
+                    IsVisible="{Binding IsPfx}"/>
+            <TextBox Width="150" PlaceholderText="Key Password" PasswordChar="•"
+                     Text="{Binding KeyPassword}" IsVisible="{Binding IsPfx}"
+                     AutomationProperties.Name="Password for the key file"/>
+            <TextBox Width="150" PlaceholderText="PFX Password" PasswordChar="•"
+                     Text="{Binding OutPassword}" IsVisible="{Binding IsPfx}"
+                     AutomationProperties.Name="Password for the new PFX file"/>
             <Button Content="Export Chain…" Classes="accent" Command="{Binding ExportChainCommand}"/>
-          </StackPanel>
+          </WrapPanel>
         </StackPanel>
       </Border>
 

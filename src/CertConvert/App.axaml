@@ -83,6 +83,12 @@
             <Setter Property="CornerRadius" Value="8"/>
         </Style>
 
+        <!-- Toolbar rows that wrap instead of overflowing their card. -->
+        <Style Selector="WrapPanel.toolbar > :is(Control)">
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
         <!-- Surfaces -->
         <Style Selector="Border.card">
             <Setter Property="Background" Value="{DynamicResource AppCardBackground}"/>

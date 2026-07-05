@@ -16,15 +16,15 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Private key"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <Button Content="Open Key…" Classes="accent" Command="{Binding OpenKeyCommand}"/>
             <TextBox Width="210" PlaceholderText="Key Password (If Needed)" PasswordChar="•"
                      Text="{Binding Password}"
                      AutomationProperties.Name="Password for the key file"/>
             <Button Content="Unlock" Command="{Binding LoadKeyCommand}"
                     AutomationProperties.HelpText="Reload the key using the password"/>
-            <TextBlock Text="{Binding KeyDescription}" VerticalAlignment="Center" FontWeight="SemiBold"/>
-          </StackPanel>
+            <TextBlock Text="{Binding KeyDescription}" FontWeight="SemiBold"/>
+          </WrapPanel>
           <Panel MinHeight="150" IsVisible="{Binding !KeyDescription.Length}">
             <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
                        StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
@@ -44,7 +44,7 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Convert format"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <ComboBox MinWidth="280" ItemsSource="{Binding Formats}"
                       SelectedItem="{Binding SelectedFormat}"
                       AutomationProperties.Name="Key output format"/>
@@ -52,19 +52,19 @@
                      Text="{Binding OutPassword}" IsVisible="{Binding NeedsOutPassword}"
                      AutomationProperties.Name="Password for the converted key"/>
             <Button Content="Save Converted Key…" Command="{Binding SaveConvertedCommand}"/>
-          </StackPanel>
+          </WrapPanel>
         </StackPanel>
       </Border>
 
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Does this key match a certificate?"/>
-          <StackPanel Orientation="Horizontal" Spacing="8">
+          <WrapPanel Classes="toolbar">
             <Button Content="Choose Certificate…" Command="{Binding PickCertCommand}"/>
-            <TextBlock Text="{Binding CertFile}" VerticalAlignment="Center" MaxWidth="300"
+            <TextBlock Text="{Binding CertFile}" MaxWidth="300"
                        TextTrimming="CharacterEllipsis" Classes="secondary"/>
             <Button Content="Check Match" Command="{Binding CheckMatchCommand}"/>
-          </StackPanel>
+          </WrapPanel>
           <TextBlock Text="{Binding MatchResult}" FontWeight="SemiBold"
                      IsVisible="{Binding MatchResult.Length}"/>
         </StackPanel>
