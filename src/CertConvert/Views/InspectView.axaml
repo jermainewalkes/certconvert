@@ -10,7 +10,7 @@
       <StackPanel Spacing="4" Margin="0,0,0,4">
         <TextBlock Classes="pageTitle" Text="Inspect"/>
         <TextBlock Classes="pageSub"
-                   Text="Decode any certificate, key, CSR or bundle — nothing ever leaves this machine."/>
+                   Text="Decode any Certificate, Key, CSR or Bundle"/>
       </StackPanel>
 
       <Border Classes="card">
@@ -42,6 +42,7 @@
 
           <StackPanel Spacing="4">
             <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                       IsVisible="{Binding Status.Length}"
                        AutomationProperties.LiveSetting="Polite"/>
             <TextBlock Classes="status" Text="{Binding KeysSummary}" TextWrapping="Wrap"
                        IsVisible="{Binding KeysSummary.Length}"/>

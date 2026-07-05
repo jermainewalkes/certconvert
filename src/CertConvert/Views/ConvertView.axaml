@@ -9,7 +9,7 @@
       <StackPanel Spacing="4" Margin="0,0,0,4">
         <TextBlock Classes="pageTitle" Text="Convert"/>
         <TextBlock Classes="pageSub"
-                   Text="Re-encode certificates between PEM, DER, PKCS #7 and PKCS #12 — in both directions."/>
+                   Text="Re-encode certificates between PEM, DER, PKCS #7 and PKCS #12."/>
       </StackPanel>
 
       <Border Classes="card">
@@ -59,6 +59,7 @@
       </Border>
 
       <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                 IsVisible="{Binding Status.Length}"
                  AutomationProperties.LiveSetting="Polite"/>
     </StackPanel>
   </ScrollViewer>

@@ -38,7 +38,7 @@ public partial class ConvertViewModel : ViewModelBase
     [ObservableProperty] private string _outPassword = "";
     [ObservableProperty] private bool _legacyCiphers;
     [ObservableProperty] private bool _isPfx;
-    [ObservableProperty] private string _status = "Add input files, choose the target format, then Convert And Save.";
+    [ObservableProperty] private string _status = "";
 
     public ConvertViewModel()
     {

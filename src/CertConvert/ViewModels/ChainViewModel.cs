@@ -38,8 +38,7 @@ public partial class ChainViewModel : ViewModelBase
     [ObservableProperty] private bool _trustSystemRoots;
     [ObservableProperty] private bool _isPfx;
     [ObservableProperty] private string _verdict = "";
-    [ObservableProperty] private string _status =
-        "Add the device, intermediate and root certificates in any order.";
+    [ObservableProperty] private string _status = "";
 
     public ChainViewModel()
     {

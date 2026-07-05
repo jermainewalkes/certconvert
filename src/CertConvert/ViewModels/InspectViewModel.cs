@@ -14,7 +14,7 @@ public partial class InspectViewModel : ViewModelBase
     [ObservableProperty] private string _fileName = "";
     [ObservableProperty] private string _password = "";
     [ObservableProperty] private string _detected = "";
-    [ObservableProperty] private string _status = "Open a file or drag one anywhere onto this tab.";
+    [ObservableProperty] private string _status = "";
     [ObservableProperty] private string _keysSummary = "";
     [ObservableProperty] private bool _hasCsr;
 

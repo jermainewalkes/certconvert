@@ -34,7 +34,7 @@ public partial class KeysViewModel : ViewModelBase
     [ObservableProperty] private bool _needsOutPassword;
     [ObservableProperty] private string _certFile = "";
     [ObservableProperty] private string _matchResult = "";
-    [ObservableProperty] private string _status = "Load a private key to convert it or check it against a certificate.";
+    [ObservableProperty] private string _status = "";
 
     private PrivateKeyEntry? _loaded;
 

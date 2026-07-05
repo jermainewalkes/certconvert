@@ -43,8 +43,7 @@ public partial class GenerateViewModel : ViewModelBase
     [ObservableProperty] private string _ipAddresses = "";
     [ObservableProperty] private string _validityDays = "365";
     [ObservableProperty] private bool _isCa;
-    [ObservableProperty] private string _status =
-        "Generate or load a key, fill in the subject, then save a CSR or self-signed certificate.";
+    [ObservableProperty] private string _status = "";
 
     private PrivateKeyEntry? _key;
 

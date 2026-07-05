@@ -57,6 +57,7 @@
       </Border>
 
       <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                 IsVisible="{Binding Status.Length}"
                  AutomationProperties.LiveSetting="Polite"/>
     </StackPanel>
   </ScrollViewer>
