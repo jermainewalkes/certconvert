@@ -6,6 +6,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>CertConvert</AssemblyName>
+    <ApplicationIcon>Assets/certconvert.ico</ApplicationIcon>
     <Version>0.1.0</Version>
     <InformationalVersion>0.1.0</InformationalVersion>
     <Company>Jermaine Walkes</Company>
@@ -19,7 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" />
+    <!-- The .icns is only consumed by the macOS bundling script; keep it out of the assembly. -->
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\CertConvert.icns" />
   </ItemGroup>
 
   <ItemGroup>

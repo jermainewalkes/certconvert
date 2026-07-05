@@ -6,7 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="CertConvert.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/certconvert.ico"
         Width="1060" Height="720" MinWidth="860" MinHeight="580"
         ExtendClientAreaToDecorationsHint="True"
         Background="{DynamicResource AppPageBackground}"

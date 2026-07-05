@@ -14,6 +14,7 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
 # Move the whole self-contained payload into the bundle; the executable is CertConvert.
 cp -R "$publish_dir/." "$app/Contents/MacOS/"
+cp src/CertConvert/Assets/CertConvert.icns "$app/Contents/Resources/"
 
 cat > "$app/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -25,6 +26,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
     <key>CFBundleIdentifier</key><string>uk.jermainewalkes.certconvert</string>
     <key>CFBundleExecutable</key><string>CertConvert</string>
     <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleIconFile</key><string>CertConvert</string>
     <key>CFBundleShortVersionString</key><string>$version</string>
     <key>CFBundleVersion</key><string>$version</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
