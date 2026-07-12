@@ -28,9 +28,13 @@
           <TextBlock Classes="status" Text="{Binding UpdateStatus}" TextWrapping="Wrap"
                      IsVisible="{Binding UpdateStatus.Length}"
                      AutomationProperties.LiveSetting="Polite"/>
-          <ProgressBar Minimum="0" Maximum="1" Value="{Binding DownloadProgress}"
-                       IsVisible="{Binding IsDownloading}"
-                       AutomationProperties.Name="Download progress"/>
+          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsDownloading}">
+            <ProgressBar Minimum="0" Maximum="1" Value="{Binding DownloadProgress}"
+                         Width="240" VerticalAlignment="Center"
+                         AutomationProperties.Name="Download progress"/>
+            <Button Content="Cancel" Command="{Binding CancelDownloadCommand}"
+                    IsVisible="{Binding CanCancel}"/>
+          </StackPanel>
           <WrapPanel Classes="toolbar">
             <Button Content="Download And Install…" Classes="accent"
                     Command="{Binding DownloadAndInstallCommand}" IsVisible="{Binding CanInstall}"/>

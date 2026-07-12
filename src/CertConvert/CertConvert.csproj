@@ -7,8 +7,8 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>CertConvert</AssemblyName>
     <ApplicationIcon>Assets/certconvert.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
-    <InformationalVersion>1.0.0</InformationalVersion>
+    <Version>1.0.1</Version>
+    <InformationalVersion>1.0.1</InformationalVersion>
     <Company>Jermaine Walkes</Company>
     <Product>CertConvert</Product>
     <!-- Trimming is unsafe here: the ViewLocator and BCL crypto use reflection.

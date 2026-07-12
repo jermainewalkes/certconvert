@@ -265,7 +265,7 @@ internal static class Commands
 
     public static int Update(string[] args)
     {
-        var opts = new ArgReader(args, "--install", "--check");
+        var opts = new ArgReader(args, "--install");
         var service = new Services.UpdateService();
 
         var result = service.CheckAsync().GetAwaiter().GetResult();
@@ -308,15 +308,15 @@ internal static class Commands
         string zip = service.DownloadAsync(result.AssetUrl, result.AssetName, progress)
             .GetAwaiter().GetResult();
 
-        bool? verified = service
+        var verified = service
             .VerifyChecksumAsync(zip, result.ChecksumsUrl, result.AssetName)
             .GetAwaiter().GetResult();
-        if (verified == false)
+        if (verified == Services.ChecksumResult.Failed)
         {
             Console.Error.WriteLine("Checksum verification FAILED — update aborted.");
             return CliRunner.ExitFailure;
         }
-        Console.WriteLine(verified is null
+        Console.WriteLine(verified == Services.ChecksumResult.NoChecksumFile
             ? "This release publishes no checksum; applying the download as-is (TLS-protected)."
             : "Checksum verified.");
 

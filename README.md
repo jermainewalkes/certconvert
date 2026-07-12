@@ -144,7 +144,7 @@ chain or a key that does not match).
   [Releases](https://github.com/jermainewalkes/certconvert/releases) and replace
   the app manually. If a self-update was interrupted, a recovery copy of the
   previous version is kept beside the app (`CertConvert.app.bak` on macOS,
-  `CertConvert.exe.old` on Windows) until the next successful launch.
+  `CertConvert.exe.old` on Windows) until the next launch.
 - **"Check For Updates" can't reach GitHub** — that check needs internet; on an
   offline machine it simply reports the failure and changes nothing. Everything
   else works offline.

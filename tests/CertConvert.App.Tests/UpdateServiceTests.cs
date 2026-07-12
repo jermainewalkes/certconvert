@@ -115,4 +115,69 @@ public class UpdateServiceTests
     [Fact]
     public void ParseVersion_RejectsGarbage() =>
         Assert.Null(UpdateService.ParseVersion("not-a-version"));
+
+    // ---------- checksum verification ----------
+
+    private static string WriteTempZip(byte[] content, out string sha256Hex)
+    {
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".zip");
+        File.WriteAllBytes(path, content);
+        sha256Hex = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(content));
+        return path;
+    }
+
+    [Fact]
+    public async Task Checksum_NoFile_ReturnsNoChecksumFile()
+    {
+        var svc = new UpdateService(new FakeHandler(_ => Json("")));
+        string zip = WriteTempZip([1, 2, 3], out _);
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, null, "x.zip");
+            Assert.Equal(ChecksumResult.NoChecksumFile, result);
+        }
+        finally { File.Delete(zip); }
+    }
+
+    [Fact]
+    public async Task Checksum_MatchingEntry_ReturnsVerified()
+    {
+        string zip = WriteTempZip([9, 8, 7, 6], out string hex);
+        // shasum -a 256 format: "<hex>  <filename>" (two spaces).
+        var svc = new UpdateService(new FakeHandler(_ => Json($"{hex}  build.zip\n")));
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, "https://x/SHA256SUMS.txt", "build.zip");
+            Assert.Equal(ChecksumResult.Verified, result);
+        }
+        finally { File.Delete(zip); }
+    }
+
+    [Fact]
+    public async Task Checksum_Mismatch_ReturnsFailed()
+    {
+        string zip = WriteTempZip([1, 1, 1], out _);
+        var svc = new UpdateService(new FakeHandler(_ =>
+            Json("0000000000000000000000000000000000000000000000000000000000000000  build.zip\n")));
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, "https://x/SHA256SUMS.txt", "build.zip");
+            Assert.Equal(ChecksumResult.Failed, result);
+        }
+        finally { File.Delete(zip); }
+    }
+
+    [Fact]
+    public async Task Checksum_FilePresentButAssetUnlisted_FailsClosed()
+    {
+        string zip = WriteTempZip([4, 2], out string hex);
+        // Sums file lists a different asset only — ours is absent.
+        var svc = new UpdateService(new FakeHandler(_ => Json($"{hex}  other.zip\n")));
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, "https://x/SHA256SUMS.txt", "build.zip");
+            Assert.Equal(ChecksumResult.Failed, result); // NOT NoChecksumFile
+        }
+        finally { File.Delete(zip); }
+    }
 }

@@ -21,6 +21,16 @@ public enum UpdateStatus
     CheckFailed,
 }
 
+public enum ChecksumResult
+{
+    /// <summary>The release publishes no SHA256SUMS.txt; integrity rests on TLS.</summary>
+    NoChecksumFile,
+    /// <summary>The download matches the published checksum.</summary>
+    Verified,
+    /// <summary>Mismatch, or the checksum file does not list this asset — do not apply.</summary>
+    Failed,
+}
+
 public sealed record UpdateCheckResult(
     UpdateStatus Status,
     string CurrentVersion,
@@ -172,14 +182,16 @@ public sealed class UpdateService
 
     /// <summary>
     /// Verifies the download against the release's SHA256SUMS.txt.
-    /// Returns null when the release carries no checksum file (integrity then
-    /// rests on TLS alone); true/false when it does.
+    /// NoChecksumFile when the release carries no SHA256SUMS.txt (integrity then
+    /// rests on TLS alone); Verified/Failed when it does. A checksum file that is
+    /// present but does not list this asset is treated as Failed — failing closed,
+    /// since our releases always checksum every zip, so a missing entry is anomalous.
     /// </summary>
-    public async Task<bool?> VerifyChecksumAsync(
+    public async Task<ChecksumResult> VerifyChecksumAsync(
         string zipPath, string? checksumsUrl, string assetName, CancellationToken ct = default)
     {
         if (checksumsUrl is null)
-            return null;
+            return ChecksumResult.NoChecksumFile;
         string sums = await _http.GetStringAsync(checksumsUrl, ct);
         string? expected = sums
             .Split('\n')
@@ -187,12 +199,14 @@ public sealed class UpdateService
             .Where(l => l.EndsWith(assetName, StringComparison.OrdinalIgnoreCase))
             .Select(l => l.Split(' ', 2)[0].Trim())
             .FirstOrDefault();
-        if (expected is null)
-            return null;
+        if (string.IsNullOrEmpty(expected))
+            return ChecksumResult.Failed; // file present but asset unlisted → fail closed
 
         await using var stream = File.OpenRead(zipPath);
         string actual = Convert.ToHexString(await SHA256.HashDataAsync(stream, ct));
-        return actual.Equals(expected, StringComparison.OrdinalIgnoreCase);
+        return actual.Equals(expected, StringComparison.OrdinalIgnoreCase)
+            ? ChecksumResult.Verified
+            : ChecksumResult.Failed;
     }
 
     // ---------- apply ----------
@@ -302,7 +316,7 @@ public sealed class UpdateService
                 $"{reason} The update has been saved to {dest} — unzip it and replace the app manually.",
                 FallbackSavedTo: dest);
         }
-        catch (IOException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             return new ApplyResult(false,
                 $"{reason} Download the update manually from the releases page.");

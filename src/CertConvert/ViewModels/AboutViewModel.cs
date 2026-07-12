@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -54,10 +55,12 @@ public partial class AboutViewModel : ViewModelBase
     [ObservableProperty] private double _downloadProgress;
     [ObservableProperty] private bool _canInstall;
     [ObservableProperty] private bool _canRestart;
+    [ObservableProperty] private bool _canCancel;
     [ObservableProperty] private bool _checkOnLaunch;
 
     private UpdateCheckResult? _lastCheck;
     private string? _restartPath;
+    private CancellationTokenSource? _downloadCts;
 
     partial void OnCheckOnLaunchChanged(bool value)
     {
@@ -112,24 +115,29 @@ public partial class AboutViewModel : ViewModelBase
             return;
         IsBusy = true;
         IsDownloading = true;
+        CanCancel = true;
         DownloadProgress = 0;
         CanInstall = false;
+        _downloadCts = new CancellationTokenSource();
+        var ct = _downloadCts.Token;
         try
         {
             UpdateStatus = $"Downloading {name}…";
             string zip = await _updates.DownloadAsync(
-                url, name, new Progress<double>(p => DownloadProgress = p));
+                url, name, new Progress<double>(p => DownloadProgress = p), ct);
             IsDownloading = false;
+            CanCancel = false;
 
             UpdateStatus = "Verifying the download…";
-            bool? verified = await _updates.VerifyChecksumAsync(zip, _lastCheck.ChecksumsUrl, name);
-            if (verified == false)
+            var verified = await _updates.VerifyChecksumAsync(zip, _lastCheck.ChecksumsUrl, name, ct);
+            if (verified == ChecksumResult.Failed)
             {
                 UpdateStatus = "Verification failed — the download does not match the " +
                                "published checksum. Update aborted.";
+                CanInstall = true;
                 return;
             }
-            UpdateStatus = verified is null
+            UpdateStatus = verified == ChecksumResult.NoChecksumFile
                 ? "Applying update (this release publishes no checksum — integrity rests on TLS)…"
                 : "Checksum verified. Applying update…";
 
@@ -141,6 +149,11 @@ public partial class AboutViewModel : ViewModelBase
                 CanRestart = true;
             }
         }
+        catch (OperationCanceledException)
+        {
+            UpdateStatus = "Download cancelled.";
+            CanInstall = true;
+        }
         catch (Exception e)
         {
             UpdateStatus = $"Update failed: {e.Message}";
@@ -150,8 +163,14 @@ public partial class AboutViewModel : ViewModelBase
         {
             IsBusy = false;
             IsDownloading = false;
+            CanCancel = false;
+            _downloadCts?.Dispose();
+            _downloadCts = null;
         }
     }
+
+    [RelayCommand]
+    private void CancelDownload() => _downloadCts?.Cancel();
 
     [RelayCommand]
     private void RestartNow()
