@@ -37,6 +37,14 @@
                                 IsVisible="{Binding UpdateAvailable}"
                                 Command="{Binding GoToAboutCommand}"
                                 AutomationProperties.HelpText="A newer version is available — opens the About page"/>
+                        <Button Classes="kofi" Command="{Binding About.OpenKoFiCommand}"
+                                AutomationProperties.Name="Support CertConvert on Ko-fi"
+                                AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <PathIcon Data="{StaticResource IconHeart}" Width="13" Height="13"/>
+                                <TextBlock Text="Support on Ko-fi" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                         <TextBlock Text="{Binding About.Version}" FontSize="11" Classes="secondary"
                                    TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
