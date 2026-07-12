@@ -29,6 +29,18 @@ run `CertConvert.exe`. No .NET install needed. Expect SmartScreen's
 - [ ] `CertConvert.exe chain verify <the .pem>` reports on it
 - [ ] Double-clicking `CertConvert.exe` still opens the GUI (no console window)
 
+## Self-update (needs a newer release published to test the full apply)
+
+- [ ] About → Updates: "Check For Updates" against the live release reports
+      up-to-date (or offers the newer version)
+- [ ] "Check For Updates On Launch" toggle persists across a restart
+      (stored in %APPDATA%\CertConvert\settings.json)
+- [ ] With a newer release available: Download And Install shows progress,
+      verifies the checksum, applies, offers Restart Now
+- [ ] After restart, `--version` shows the new version and the old
+      `CertConvert.exe.old` is cleaned up on that next launch
+- [ ] CLI: `CertConvert.exe update` prints current vs latest
+
 ## If anything fails
 
 Note the step and any error text; screenshots welcome. `--version` output

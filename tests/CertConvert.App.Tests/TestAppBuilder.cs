@@ -13,12 +13,16 @@ namespace CertConvert.Gui.Tests;
 /// </summary>
 public sealed class TestAppBuilder
 {
-    public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<global::CertConvert.App>()
+    public static AppBuilder BuildAvaloniaApp()
+    {
+        // Tests must never hit the network, whatever the user's settings say.
+        System.Environment.SetEnvironmentVariable("CERTCONVERT_DISABLE_UPDATE_CHECK", "1");
+        return AppBuilder.Configure<global::CertConvert.App>()
             .UseSkia()
             .WithInterFont()
             .UseHeadless(new AvaloniaHeadlessPlatformOptions
             {
                 UseHeadlessDrawing = false,
             });
+    }
 }

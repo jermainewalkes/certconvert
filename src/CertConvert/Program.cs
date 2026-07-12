@@ -12,6 +12,9 @@ sealed class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        // Remove leftovers (.exe.old / .app.bak) from a previous self-update.
+        Services.UpdateService.CleanUpLeftovers();
+
         // macOS can pass process-serial-number style arguments to bundled apps; ignore them.
         var cliArgs = args.Where(a => !a.StartsWith("-psn", StringComparison.Ordinal)).ToArray();
 

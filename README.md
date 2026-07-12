@@ -52,17 +52,29 @@ story:
   (`System.Security.Cryptography`). There is no third-party crypto code. The
   only third-party dependencies are the UI framework (Avalonia) and the MVVM
   helper (CommunityToolkit.Mvvm) — neither touches key material.
-- **It never uses the network.** No telemetry, no update check, no outbound
-  connection of any kind. The only thing that opens a browser is the Ko-fi
-  link on the About tab, and only when you click it.
+- **It never uses the network on its own.** No telemetry, no outbound
+  connection of any kind. The single exception is checking GitHub for a newer
+  version — which is **off by default**, and otherwise happens only when you
+  click **Check For Updates** (or run `certconvert update`). Your certificates
+  and keys are never uploaded anywhere, ever.
 - **Private keys stay in memory.** Keys loaded from PKCS #12 files are handled
   in process and are never imported into the operating-system key store.
-- **It only writes the files you ask it to.**
+- **It only writes the files you ask it to** (plus one small preferences file —
+  see below).
 
 ## Where things live
 
-Nowhere — by design. CertConvert keeps no settings, no cache, no logs and no
-history. The only files it ever creates are the ones you explicitly save.
+Almost nowhere — by design. CertConvert keeps no cache, no logs and no history.
+The only files it ever creates are the ones you explicitly save, plus a single
+small preferences file holding one setting (whether to check for updates on
+launch — nothing sensitive):
+
+| Platform | Preferences file |
+|---|---|
+| macOS | `~/Library/Application Support/CertConvert/settings.json` |
+| Windows | `%APPDATA%\CertConvert\settings.json` |
+
+Delete it any time; the app recreates it with defaults.
 
 ## Install & run
 
@@ -107,6 +119,8 @@ certconvert key convert device.key -o device_pkcs8.key --to pkcs8
 certconvert key match --cert device.pem --key device.key
 certconvert gen selfsigned --new-key p256 --key-out dev.key \
             --cn device.local --dns device.local -o dev.pem
+certconvert update                                      # check GitHub for a newer version
+certconvert update --install                            # download, verify and apply it
 ```
 
 Exit codes: `0` success, `1` usage error, `2` failure (including an invalid
@@ -126,6 +140,14 @@ chain or a key that does not match).
   program attaching to your console; press Enter to get the prompt back.
 - **Which build am I running?** — `certconvert --version` prints the version
   plus the exact git commit it was built from.
+- **Update didn't apply / partially applied** — download the latest zip from
+  [Releases](https://github.com/jermainewalkes/certconvert/releases) and replace
+  the app manually. If a self-update was interrupted, a recovery copy of the
+  previous version is kept beside the app (`CertConvert.app.bak` on macOS,
+  `CertConvert.exe.old` on Windows) until the next successful launch.
+- **"Check For Updates" can't reach GitHub** — that check needs internet; on an
+  offline machine it simply reports the failure and changes nothing. Everything
+  else works offline.
 
 ## Development
 

@@ -35,4 +35,7 @@ for rid in "${RIDS[@]}"; do
     echo "    done: $dest"
 done
 
+# Checksums file — uploaded with releases so the in-app updater can verify downloads.
+( cd "$OUT" && shasum -a 256 *.zip > SHA256SUMS.txt )
+
 echo "All artifacts in $OUT/ (version $VERSION)."

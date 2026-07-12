@@ -93,4 +93,23 @@ public class MainWindowTests
         Assert.NotNull(vm.About.OpenKoFiCommand);
         Assert.Contains("never connects to the network", vm.About.SecurityStatement);
     }
+
+    [AvaloniaFact]
+    public void AboutView_ExposesUpdateControls()
+    {
+        var vm = new MainWindowViewModel();
+        Assert.NotNull(vm.About.CheckForUpdatesCommand);
+        Assert.NotNull(vm.About.DownloadAndInstallCommand);
+        Assert.False(vm.About.UpdateAvailable);
+        Assert.False(vm.UpdateAvailable);
+    }
+
+    [AvaloniaFact]
+    public void GoToAbout_NavigatesToAboutPage()
+    {
+        var vm = new MainWindowViewModel();
+        vm.SelectedIndex = 0;
+        vm.GoToAboutCommand.Execute(null);
+        Assert.Same(vm.About, vm.CurrentPage);
+    }
 }

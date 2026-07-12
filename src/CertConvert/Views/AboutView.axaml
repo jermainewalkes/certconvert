@@ -18,6 +18,31 @@
                  Text="Convert, chain, inspect and generate certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
 
       <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="Updates"/>
+          <WrapPanel Classes="toolbar">
+            <Button Content="Check For Updates" Command="{Binding CheckForUpdatesCommand}"/>
+            <CheckBox Content="Check For Updates On Launch" IsChecked="{Binding CheckOnLaunch}"
+                      AutomationProperties.HelpText="When enabled, CertConvert contacts GitHub once at startup to look for a newer version"/>
+          </WrapPanel>
+          <TextBlock Classes="status" Text="{Binding UpdateStatus}" TextWrapping="Wrap"
+                     IsVisible="{Binding UpdateStatus.Length}"
+                     AutomationProperties.LiveSetting="Polite"/>
+          <ProgressBar Minimum="0" Maximum="1" Value="{Binding DownloadProgress}"
+                       IsVisible="{Binding IsDownloading}"
+                       AutomationProperties.Name="Download progress"/>
+          <WrapPanel Classes="toolbar">
+            <Button Content="Download And Install…" Classes="accent"
+                    Command="{Binding DownloadAndInstallCommand}" IsVisible="{Binding CanInstall}"/>
+            <Button Content="View Release Notes"
+                    Command="{Binding ViewReleaseNotesCommand}" IsVisible="{Binding UpdateAvailable}"/>
+            <Button Content="Restart Now" Classes="accent"
+                    Command="{Binding RestartNowCommand}" IsVisible="{Binding CanRestart}"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
         <StackPanel Spacing="8">
           <TextBlock Classes="section" Text="Security"/>
           <TextBlock TextWrapping="Wrap" Text="{Binding SecurityStatement}"/>

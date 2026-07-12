@@ -7,8 +7,8 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>CertConvert</AssemblyName>
     <ApplicationIcon>Assets/certconvert.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
-    <InformationalVersion>0.1.0</InformationalVersion>
+    <Version>1.0.0</Version>
+    <InformationalVersion>1.0.0</InformationalVersion>
     <Company>Jermaine Walkes</Company>
     <Product>CertConvert</Product>
     <!-- Trimming is unsafe here: the ViewLocator and BCL crypto use reflection.
@@ -38,5 +38,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CertConvert.Core\CertConvert.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CertConvert.App.Tests" />
   </ItemGroup>
 </Project>

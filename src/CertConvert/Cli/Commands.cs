@@ -261,6 +261,70 @@ internal static class Commands
         return CliRunner.ExitOk;
     }
 
+    // ---------- update ----------
+
+    public static int Update(string[] args)
+    {
+        var opts = new ArgReader(args, "--install", "--check");
+        var service = new Services.UpdateService();
+
+        var result = service.CheckAsync().GetAwaiter().GetResult();
+        switch (result.Status)
+        {
+            case Services.UpdateStatus.CheckFailed:
+                Console.Error.WriteLine($"Update check failed: {result.Message}");
+                return CliRunner.ExitFailure;
+            case Services.UpdateStatus.UpToDate:
+                Console.WriteLine($"Up to date — {result.CurrentVersion} is the latest version.");
+                return CliRunner.ExitOk;
+        }
+
+        Console.WriteLine(
+            $"Update available: {result.LatestVersion} (you have {result.CurrentVersion}).");
+        if (result.ReleaseUrl is { Length: > 0 })
+            Console.WriteLine($"Release notes: {result.ReleaseUrl}");
+        if (!opts.Has("--install"))
+        {
+            Console.WriteLine("Run \"certconvert update --install\" to download and apply it.");
+            return CliRunner.ExitOk;
+        }
+        if (result.AssetUrl is null || result.AssetName is null)
+        {
+            Console.Error.WriteLine("No build for this platform is attached to the release.");
+            return CliRunner.ExitFailure;
+        }
+
+        Console.WriteLine($"Downloading {result.AssetName}…");
+        int lastReported = -10;
+        var progress = new Progress<double>(p =>
+        {
+            int pct = (int)(p * 100);
+            if (pct >= lastReported + 10)
+            {
+                lastReported = pct;
+                Console.WriteLine($"  {pct}%");
+            }
+        });
+        string zip = service.DownloadAsync(result.AssetUrl, result.AssetName, progress)
+            .GetAwaiter().GetResult();
+
+        bool? verified = service
+            .VerifyChecksumAsync(zip, result.ChecksumsUrl, result.AssetName)
+            .GetAwaiter().GetResult();
+        if (verified == false)
+        {
+            Console.Error.WriteLine("Checksum verification FAILED — update aborted.");
+            return CliRunner.ExitFailure;
+        }
+        Console.WriteLine(verified is null
+            ? "This release publishes no checksum; applying the download as-is (TLS-protected)."
+            : "Checksum verified.");
+
+        var apply = service.ApplyAsync(zip).GetAwaiter().GetResult();
+        Console.WriteLine(apply.Message);
+        return apply.Ok ? CliRunner.ExitOk : CliRunner.ExitFailure;
+    }
+
     // ---------- shared helpers ----------
 
     private static (List<X509Certificate2> Certs, List<PrivateKeyEntry> Keys) LoadInputs(

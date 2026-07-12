@@ -51,6 +51,7 @@ public static class CliRunner
         "chain" => DispatchChain(args[1..]),
         "key" => DispatchKey(args[1..]),
         "gen" => DispatchGen(args[1..]),
+        "update" => Commands.Update(args[1..]),
         _ => Usage($"Unknown command \"{args[0]}\"."),
     };
 
@@ -134,10 +135,14 @@ public static class CliRunner
               certconvert gen selfsigned (--key <file> | --new-key <alg> --key-out <file>)
                                   --cn <name> -o <out> [--days <n>] [--ca] [same subject options]
 
+              certconvert update [--install]
+                  Check GitHub for a newer release; --install downloads, verifies and
+                  applies it. This is the only command that uses the network.
+
             Exit codes: 0 success · 1 usage error · 2 failure (including an invalid chain
             or a key that does not match).
 
-            Everything runs locally; no data ever leaves this machine.
+            Everything else runs locally; certificate data never leaves this machine.
             """);
         return ExitOk;
     }

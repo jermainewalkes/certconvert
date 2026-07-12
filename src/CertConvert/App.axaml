@@ -83,6 +83,15 @@
             <Setter Property="CornerRadius" Value="8"/>
         </Style>
 
+        <!-- Quiet text-style button (sidebar update hint). -->
+        <Style Selector="Button.link">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentBrush}"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
         <!-- Toolbar rows that wrap instead of overflowing their card. -->
         <Style Selector="WrapPanel.toolbar > :is(Control)">
             <Setter Property="Margin" Value="0,0,8,8"/>
