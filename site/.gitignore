@@ -1,0 +1,5 @@
+# Live mail configuration holds SMTP settings and must never be committed.
+mail.config.php
+
+# Local cruft.
+.DS_Store

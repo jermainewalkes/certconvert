@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CertConvert — offline certificate toolbox for macOS &amp; Windows</title>
+  <meta name="description" content="Convert PEM to PFX without OpenSSL, order a certificate chain and inspect certificates offline. A free, self-contained certificate toolbox for macOS and Windows.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="CertConvert — offline certificate toolbox for macOS &amp; Windows">
+  <meta property="og:description" content="Convert PEM, DER, P7B and PFX, order and validate chains and inspect certificates — entirely offline. Free and open source.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CertConvert — offline certificate toolbox">
+  <meta name="twitter:description" content="Convert PEM to PFX without OpenSSL, order chains and inspect certificates offline. Free and open source.">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://certconvert.com/#org",
+        "name": "CertConvert",
+        "url": "https://certconvert.com/",
+        "logo": "https://certconvert.com/img/certconvert-lockup.svg"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://certconvert.com/#website",
+        "name": "CertConvert",
+        "url": "https://certconvert.com/",
+        "publisher": { "@id": "https://certconvert.com/#org" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "CertConvert",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS (Intel and Apple Silicon), Windows",
+        "description": "Offline certificate toolbox: convert PEM, DER, PKCS#7 and PKCS#12, order and validate certificate chains, inspect certificates, convert key formats and generate keys, CSRs and self-signed certificates. GUI and CLI in one binary. Free and open source.",
+        "url": "https://certconvert.com/",
+        "downloadUrl": "https://github.com/jermainewalkes/certconvert/releases/latest",
+        "softwareVersion": "1.0.2",
+        "screenshot": "https://certconvert.com/img/screenshots/inspect-light.png",
+        "license": "https://github.com/jermainewalkes/certconvert/blob/main/LICENSE",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+        "publisher": { "@id": "https://certconvert.com/#org" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a>
+      <a href="download.html">Download</a>
+      <a href="docs.html">Docs</a>
+      <a href="changelog.html">Changelog</a>
+      <a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="download.html">Download</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <span class="pill" style="background:rgba(165,180,252,0.16); color:#c7d2fe;">Certificate Toolbox</span>
+    <h1 style="margin-top:14px;">Convert, chain and inspect certificates — offline</h1>
+    <p class="lead">CertConvert is a self-contained desktop app and command-line tool for X.509 certificates. Convert <strong style="color:#fff;">PEM to PFX without OpenSSL</strong>, order and validate a certificate chain, inspect any certificate, key or bundle, and generate keys, CSRs and self-signed certificates — all on your own machine, with no shell commands to memorise.</p>
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="download.html">Download for macOS &amp; Windows</a>
+      <a class="btn btn-ghost-light btn-lg" href="features.html">See what it does</a>
+    </div>
+    <p class="sub">Free and open source (MIT). Runs fully offline — your keys never leave your machine.</p>
+    <div class="hero-shot shot">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="img/screenshots/inspect-dark.png">
+        <img src="img/screenshots/inspect-light.png" alt="CertConvert inspecting a certificate: subject, issuer, validity, SANs, key usage and SHA-256 fingerprint decoded from a PEM file">
+      </picture>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="eyebrow">Why CertConvert</div>
+    <h2>One tool for the certificate jobs OpenSSL is overkill for</h2>
+    <p class="sub">Formats are detected from file content, not extensions, so the <code>.cer</code> that is secretly PEM just works. Everything runs locally — there is no online converter to paste your key into.</p>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3><span class="ico">&#8644;</span> Convert formats</h3>
+        <p>PEM, DER (<code>.cer</code>/<code>.der</code>), PKCS #7 (<code>.p7b</code>) and PKCS #12 (<code>.pfx</code>/<code>.p12</code>), in both directions — including a p7b to pem converter that works offline.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">&#128279;</span> Order &amp; verify chains</h3>
+        <p>Drop root, intermediate and device certs in any order; this certificate chain order tool sorts them automatically, validates the chain offline and exports a PEM bundle, P7B or PFX.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">&#128269;</span> Inspect anything</h3>
+        <p>Read subject, issuer, validity, SANs, key usage and fingerprints from any certificate, key, CSR or bundle. Drag it in and read it.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">&#128273;</span> Keys</h3>
+        <p>Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">&#10133;</span> Generate</h3>
+        <p>Create keys, CSRs and self-signed certificates (RSA or ECDSA) with SANs and CA options — the <code>openssl req</code> workflows, without OpenSSL.</p>
+      </div>
+      <div class="card">
+        <h3><span class="ico">&#9002;_</span> GUI and CLI in one</h3>
+        <p>The same binary is a desktop app when you open it and a command-line tool when you pass it arguments. Script it, or click it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Security posture</div>
+        <h2 style="text-align:left;">Your keys never leave your machine</h2>
+        <p>Unlike an online certificate converter, CertConvert does its work entirely on your own computer. It never uses the network on its own — no telemetry, no outbound connection of any kind. The single exception is an <strong>optional</strong> check for a newer version on GitHub, which is off by default.</p>
+        <p>All cryptography is the .NET platform&rsquo;s own libraries. There is no third-party crypto code, and private keys are handled in process — never imported into the operating-system key store.</p>
+        <a class="btn" href="features.html#security">Read the security posture</a>
+      </div>
+      <div class="card">
+        <h3>What leaves your machine</h3>
+        <p style="margin-bottom:10px;"><strong>Nothing</strong>, unless you ask for an update check.</p>
+        <ul style="color:var(--text-2); padding-left:20px; margin:0;">
+          <li>No telemetry or analytics in the app</li>
+          <li>Certificates and keys are never uploaded</li>
+          <li>Only files you explicitly save are written</li>
+          <li>One small local settings file, nothing sensitive</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section center">
+  <div class="container">
+    <h2>Free and open source</h2>
+    <p class="sub">CertConvert is MIT-licensed and free. Grab a build for macOS or Windows &mdash; the .NET runtime is bundled, so there is nothing else to install.</p>
+    <div class="actions" style="justify-content:center; display:flex; gap:12px; flex-wrap:wrap;">
+      <a class="btn btn-primary btn-lg" href="download.html">Download</a>
+      <a class="kofi" href="https://ko-fi.com/jwalkes">&#9829; Support on Ko-fi</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="img/certconvert-lockup-ondark.svg" alt="CertConvert">
+        <p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="features.html">Features</a>
+        <a href="download.html">Download</a>
+        <a href="changelog.html">Changelog</a>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <a href="docs.html">Documentation</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy</a>
+        <a href="accessibility.html">Accessibility</a>
+        <a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span>
+      <span>Made in the UK</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

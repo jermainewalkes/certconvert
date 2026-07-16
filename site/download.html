@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Download CertConvert — free certificate toolbox for macOS &amp; Windows</title>
+  <meta name="description" content="Download CertConvert free for macOS (Intel and Apple Silicon) and Windows. Self-contained builds on GitHub Releases — the .NET runtime is bundled, nothing else to install.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/download.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Download CertConvert">
+  <meta property="og:description" content="Free builds for macOS (Intel and Apple Silicon) and Windows on GitHub Releases.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/download.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CertConvert",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "macOS (Intel and Apple Silicon), Windows",
+    "description": "Offline certificate toolbox: convert PEM, DER, PKCS#7 and PKCS#12, order and validate chains, inspect certificates, convert keys and generate CSRs. Free and open source.",
+    "url": "https://certconvert.com/download.html",
+    "downloadUrl": "https://github.com/jermainewalkes/certconvert/releases/latest",
+    "softwareVersion": "1.0.2",
+    "screenshot": "https://certconvert.com/img/screenshots/inspect-light.png",
+    "license": "https://github.com/jermainewalkes/certconvert/blob/main/LICENSE",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+    "publisher": { "@type": "Organization", "name": "CertConvert", "url": "https://certconvert.com/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="#get">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="container center">
+    <h1>Download CertConvert</h1>
+    <p class="lead">Free and open source. Self-contained builds for macOS and Windows &mdash; the .NET runtime is bundled, so there is nothing else to install.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top:24px;" id="get">
+  <div class="container">
+    <div class="download-box">
+      <div class="dl-row"><span class="k">Latest version</span><span class="v">1.0.2</span></div>
+      <div class="dl-row"><span class="k">Platforms</span><span class="v">macOS (Intel &amp; Apple Silicon), Windows x64</span></div>
+      <div class="dl-row"><span class="k">Licence</span><span class="v">MIT &mdash; free and open source</span></div>
+      <div style="margin-top:22px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="btn btn-primary btn-lg" href="https://github.com/jermainewalkes/certconvert/releases/latest">Get it on GitHub Releases</a>
+        <a class="btn btn-lg" href="changelog.html">Release notes</a>
+      </div>
+      <p class="muted" style="margin-top:14px; font-size:14px;">Downloads are hosted on GitHub Releases, where each zip is listed with its SHA-256 checksum. Older versions are available there too.</p>
+    </div>
+
+    <!--
+      STORE BADGES PLACEHOLDER — not yet published to the app stores.
+      When Mac App Store / Microsoft Store listings go live, drop the official
+      badge images + links here (and remove this comment). Suggested markup:
+        <a href="MAC_APP_STORE_URL"><img src="img/badges/mac-app-store.svg" alt="Download on the Mac App Store"></a>
+        <a href="MICROSOFT_STORE_URL"><img src="img/badges/microsoft-store.svg" alt="Get it from Microsoft Store"></a>
+    -->
+
+    <div class="prose" style="margin-top:48px;">
+      <h2 id="files">Per-platform downloads</h2>
+      <p>Grab the zip that matches your machine from the <a href="https://github.com/jermainewalkes/certconvert/releases/latest">latest release</a> (replace <code>&lt;version&gt;</code> with the version above):</p>
+      <table>
+        <thead><tr><th>Platform</th><th>File</th></tr></thead>
+        <tbody>
+          <tr><td>macOS (Apple Silicon)</td><td class="mono">CertConvert-&lt;version&gt;-osx-arm64.zip</td></tr>
+          <tr><td>macOS (Intel)</td><td class="mono">CertConvert-&lt;version&gt;-osx-x64.zip</td></tr>
+          <tr><td>Windows x64</td><td class="mono">CertConvert-&lt;version&gt;-win-x64.zip</td></tr>
+        </tbody>
+      </table>
+      <p>Unzip it. On macOS, move <code>CertConvert.app</code> to Applications; on Windows, run <code>CertConvert.exe</code>. Each release lists the SHA-256 of every zip so you can verify your download.</p>
+
+      <h2 id="first-launch">First launch on an unsigned build</h2>
+      <div class="callout callout-warn">
+        <strong>Heads up:</strong> current builds are not yet code-signed, so both operating systems will warn you the first time you open the app. This is expected &mdash; here is the one-time step for each.
+      </div>
+      <h3>macOS &mdash; &ldquo;CertConvert can&rsquo;t be opened&rdquo;</h3>
+      <p>Because the build is unsigned, Gatekeeper blocks the first open. Right-click (or Control-click) <code>CertConvert.app</code> and choose <strong>Open</strong>, then confirm &mdash; you only need to do this once. Alternatively, allow it under <strong>System Settings &rarr; Privacy &amp; Security</strong> after the first attempt.</p>
+      <h3>Windows &mdash; &ldquo;Windows protected your PC&rdquo;</h3>
+      <p>SmartScreen shows this for any unsigned binary. Click <strong>More info &rarr; Run anyway</strong> &mdash; once &mdash; to launch <code>CertConvert.exe</code>.</p>
+
+      <h2 id="from-source">Build from source</h2>
+      <p>Prefer to build it yourself? You need the <a href="https://dotnet.microsoft.com/download/dotnet/10.0">.NET 10 SDK</a>.</p>
+      <pre><code>git clone https://github.com/jermainewalkes/certconvert.git
+cd certconvert
+dotnet run --project src/CertConvert    # launches the GUI</code></pre>
+      <p>Self-contained release builds for all three targets (<code>osx-x64</code>, <code>osx-arm64</code>, <code>win-x64</code>) are produced by <code>build/publish.sh</code>. See the repository README for the full development notes.</p>
+
+      <h2 id="requirements">System requirements</h2>
+      <ul>
+        <li><strong>macOS:</strong> a recent macOS on Intel or Apple Silicon. The build is self-contained &mdash; no separate .NET install.</li>
+        <li><strong>Windows:</strong> 64-bit Windows 10 or 11. Self-contained &mdash; no separate .NET install.</li>
+        <li><strong>Network:</strong> none required. The app runs fully offline; the only optional network use is a manual check for updates on GitHub.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

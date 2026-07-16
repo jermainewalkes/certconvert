@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact — CertConvert</title>
+  <meta name="description" content="Get in touch about CertConvert. Send a message and we will get back to you.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/contact.html">
+  <!--
+    Cloudflare Turnstile (spam protection; no tracking cookies) — DISABLED by default.
+    To enable: (1) uncomment the script tag below and the .cf-turnstile div in the form,
+    (2) set data-sitekey to your Turnstile site key, and (3) set 'turnstile_secret' in
+    mail.config.php on the server. Until then the honeypot + per-IP rate limit protect the form.
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Contact — CertConvert">
+  <meta property="og:description" content="Get in touch about CertConvert.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/contact.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+  <style>
+    .contact-form { max-width: 560px; }
+    .contact-form .field { margin-bottom: 18px; }
+    .contact-form label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .contact-form input, .contact-form textarea {
+      width: 100%; box-sizing: border-box; padding: 11px 13px; font: inherit;
+      border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: inherit;
+    }
+    .contact-form input:focus, .contact-form textarea:focus {
+      outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(79,70,229,0.18);
+    }
+    .contact-form textarea { resize: vertical; }
+    /* Honeypot: hidden from people, tempting to bots. */
+    .hp { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    .cf-banner { padding: 14px 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; }
+    .cf-ok  { background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok-text); }
+    .cf-err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container center">
+  <h1>Contact</h1>
+  <p class="lead">Have a question, an idea, or found a bug? Send a message and we will get back to you.</p>
+</div></div>
+
+<section class="section" style="padding-top:24px;">
+  <div class="container prose">
+    <div id="cf-banner"></div>
+
+    <form class="contact-form" method="post" action="contact.php">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" maxlength="100" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" maxlength="150" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="subject">Subject (optional)</label>
+        <input id="subject" name="subject" type="text" maxlength="150">
+      </div>
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label>Company<input name="company" type="text" tabindex="-1" autocomplete="off"></label>
+      </div>
+      <!-- Turnstile widget (disabled by default; see the head comment to enable):
+      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY" style="margin-bottom:18px;"></div>
+      -->
+      <button class="btn btn-primary btn-lg" type="submit">Send Message</button>
+    </form>
+
+    <p class="muted" style="margin-top:22px;">Prefer the issue tracker? Feature ideas and bug reports are welcome on
+    <a href="https://github.com/jermainewalkes/certconvert/issues">GitHub</a>.</p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var banner = document.getElementById('cf-banner');
+  if (!banner) return;
+  if (params.get('sent')) {
+    banner.className = 'cf-banner cf-ok';
+    banner.textContent = 'Thanks — your message has been sent. We will get back to you soon.';
+  } else if (params.get('error')) {
+    var messages = {
+      missing: 'Please fill in your name, email and message.',
+      email:   'That email address does not look valid.',
+      length:  'One of the fields is too long. Please shorten your message and try again.',
+      invalid: 'Your message could not be processed. Please remove any unusual characters and try again.',
+      send:    'Sorry, the message could not be sent right now. Please try again later.',
+      config:  'The contact form is not available right now. Please try again later.',
+      rate:    'You have sent several messages already. Please wait a little while before trying again.',
+      captcha: 'Please complete the verification below and try again.',
+      method:  'Please use the form below to send your message.'
+    };
+    banner.className = 'cf-banner cf-err';
+    banner.textContent = messages[params.get('error')] || 'Sorry, something went wrong. Please try again.';
+  }
+})();
+</script>
+
+</body>
+</html>

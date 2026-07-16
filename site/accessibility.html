@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accessibility — CertConvert</title>
+  <meta name="description" content="CertConvert accessibility statement: keyboard access, screen-reader labels and live status announcements. Accessibility problems are treated as bugs.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/accessibility.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Accessibility — CertConvert">
+  <meta property="og:description" content="Keyboard access, screen-reader labels and live status. Accessibility problems are treated as bugs.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/accessibility.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container">
+  <h1>Accessibility</h1>
+  <p class="lead">Accessibility is a launch requirement for CertConvert, not an afterthought.</p>
+</div></div>
+
+<section class="section" style="padding-top:24px;">
+  <div class="container prose">
+
+    <h2>The app</h2>
+    <p>CertConvert is built so it can be used comfortably with assistive technology:</p>
+    <ul>
+      <li><strong>Full keyboard access.</strong> Every control is reachable and operable by keyboard &mdash; you do not need a mouse to inspect, convert, chain, work with keys or generate certificates.</li>
+      <li><strong>Screen-reader labels.</strong> Icon-only and otherwise ambiguous controls carry text labels so a screen reader announces what they do.</li>
+      <li><strong>Live status announcements.</strong> The result of an operation &mdash; a successful conversion, a chain that validates or fails, a key that does or doesn&rsquo;t match &mdash; is announced through a live region rather than shown only visually.</li>
+    </ul>
+
+    <h2>This website</h2>
+    <p>The site uses semantic HTML, keeps a readable text size and colour contrast, respects your system light or dark theme, and works without JavaScript for reading content. If any page is awkward to use, please tell us.</p>
+
+    <h2>Found a barrier?</h2>
+    <p>Accessibility problems are treated as bugs. If anything in the app or on this site is awkward with a keyboard, a screen reader or any other assistive technology, please raise it &mdash; open an issue on the <a href="https://github.com/jermainewalkes/certconvert/issues">GitHub issue tracker</a> or <a href="contact.html">get in touch</a>, and it will be looked at.</p>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

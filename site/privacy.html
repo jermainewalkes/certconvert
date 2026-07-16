@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy — CertConvert</title>
+  <meta name="description" content="CertConvert privacy statement: the app collects nothing and runs offline; how this website and the contact form handle data.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Privacy — CertConvert">
+  <meta property="og:description" content="The app collects nothing and runs offline. Plain-English privacy statement.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/privacy.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container">
+  <h1>Privacy</h1>
+  <p class="lead">Plain and short, because the app collects nothing.</p>
+</div></div>
+
+<section class="section" style="padding-top:24px;">
+  <div class="container prose">
+
+    <h3>The app collects nothing</h3>
+    <p>CertConvert runs entirely on your own computer. It has <strong>no analytics and no telemetry</strong>, and it does not send your certificates, keys or any usage information anywhere. There are no accounts and no sign-in. The certificates and keys you open are read in memory and are never uploaded.</p>
+
+    <h3>What it stores locally</h3>
+    <p>The only file CertConvert creates on its own is a single small settings file that holds one preference &mdash; whether to check for updates on launch. Nothing sensitive is kept in it, and you can delete it at any time; the app recreates it with defaults.</p>
+    <table>
+      <thead><tr><th>Platform</th><th>Settings file</th></tr></thead>
+      <tbody>
+        <tr><td>macOS</td><td class="mono">~/Library/Application Support/CertConvert/settings.json</td></tr>
+        <tr><td>Windows</td><td class="mono">%APPDATA%\CertConvert\settings.json</td></tr>
+      </tbody>
+    </table>
+    <p>Beyond that, CertConvert writes only the files you explicitly save. It keeps no cache, no logs and no history.</p>
+
+    <h3>The one network action: checking for updates</h3>
+    <p>The only time the app uses the network is when it checks GitHub for a newer version. This is <strong>off by default</strong> and otherwise happens only when you choose <strong>Check For Updates</strong> (or run <code>certconvert update</code>). The check contacts GitHub&rsquo;s public releases API to compare version numbers and, if you ask it to, download a release; GitHub processes that request under its own privacy policy. No personal data is sent, and this is the only outbound connection the app ever makes.</p>
+    <p>This update check is present only in the builds distributed from <strong>GitHub Releases</strong>. Copies obtained from an app store receive updates through the store itself and do not perform their own update check.</p>
+
+    <h3>This website</h3>
+    <p>By default this website loads <strong>no analytics and sets no cookies</strong>. If Google Analytics (GA4) is later enabled, it runs under Consent Mode with everything denied until you accept, a cookie banner appears, and you can change your choice at any time via <a href="#" onclick="if(window.ccResetConsent){ccResetConsent();}return false;">this link</a>. Even then it is used only to understand which pages are viewed &mdash; not for advertising, and never to identify you personally. Standard server logs may be kept by the hosting provider for security and reliability.</p>
+
+    <h3>Contact form</h3>
+    <p>If you message us through the <a href="contact.html">contact form</a>, the name, email address and message you provide are emailed to our support mailbox and used only to read and reply to your enquiry. We don&rsquo;t add you to any mailing list. The form may be protected by Cloudflare Turnstile, which checks the submission isn&rsquo;t automated; where enabled, Cloudflare processes limited technical data for this under its own privacy policy and sets no tracking cookies.</p>
+
+    <h3>Downloads and donations</h3>
+    <p>Downloads are hosted on GitHub Releases; when you download a build, GitHub processes the request under its own privacy policy. Donations are handled by Ko-fi; any payment details are processed by Ko-fi and its payment providers under their own privacy policies &mdash; they are never seen or stored by CertConvert.</p>
+
+    <h3>Contact</h3>
+    <p>Questions about privacy? Email <a href="mailto:privacy@certconvert.com">privacy@certconvert.com</a>.</p>
+
+    <h3>Governing law</h3>
+    <p>This privacy statement is governed by the laws of England and Wales.</p>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

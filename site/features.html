@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Features — Offline certificate conversion, chaining &amp; inspection | CertConvert</title>
+  <meta name="description" content="What CertConvert does: convert PEM, DER, P7B and PFX, order and validate certificate chains, inspect certificates, convert key formats and generate keys, CSRs and self-signed certificates — with a matching CLI.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/features.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Features — CertConvert">
+  <meta property="og:description" content="Convert formats, order and validate chains, inspect certificates, convert keys and generate CSRs — offline, GUI and CLI.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/features.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container center">
+  <h1>Everything X.509, without OpenSSL</h1>
+  <p class="lead">Five focused jobs &mdash; inspect, convert, chain, keys and generate &mdash; in one self-contained app, with a matching command-line tool for scripts.</p>
+</div></div>
+
+<section class="section">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Inspect</div>
+        <h2 style="text-align:left;">Read any certificate, key or bundle</h2>
+        <p>Drag in a certificate, private key, CSR or bundle and CertConvert decodes it: subject, issuer, validity, serial, public-key algorithm, SANs, key usage, extended key usage and SHA-256 / SHA-1 fingerprints. Formats are detected from file <em>content</em>, so a misnamed <code>.cer</code> that is really PEM opens without complaint.</p>
+        <ul>
+          <li>Works on PEM, DER, PKCS #7 and PKCS #12 input</li>
+          <li>Copy the PEM or the SHA-256 fingerprint with one click</li>
+          <li>Password-protected PFX and keys prompt for the password</li>
+        </ul>
+      </div>
+      <figure><div class="shot">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="img/screenshots/inspect-dark.png">
+          <img src="img/screenshots/inspect-light.png" alt="CertConvert Inspect view showing a decoded certificate: subject, issuer, validity, SANs, key usage and fingerprints">
+        </picture>
+      </div></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Convert</div>
+        <h2 style="text-align:left;">Between every common format</h2>
+        <p>Convert PEM, DER (<code>.cer</code>/<code>.der</code>), PKCS #7 (<code>.p7b</code>) and PKCS #12 (<code>.pfx</code>/<code>.p12</code>) in both directions. Turn a <code>.pem</code> into a <code>.cer</code>, run a p7b to pem conversion offline, or bundle a key and certificate into a <code>.pfx</code> &mdash; the jobs you would otherwise reach for OpenSSL to do.</p>
+      </div>
+      <div class="card">
+        <h3>Round trips it handles</h3>
+        <ul style="color:var(--text-2); padding-left:20px; margin:0;">
+          <li>PEM &harr; DER (<code>.cer</code>)</li>
+          <li>PKCS #7 (<code>.p7b</code>) &harr; PEM</li>
+          <li>PKCS #12 (<code>.pfx</code>) &harr; PEM / key + certs</li>
+          <li>Certificate + key &rarr; PFX, with an export password</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Chain</div>
+        <h2 style="text-align:left;">Build and verify a chain, in any order</h2>
+        <p>Drop your root, intermediate and device certificates in whatever order you have them. CertConvert orders them into a valid root &rarr; intermediate &rarr; device chain automatically, validates it offline, then exports it as a PEM bundle, a P7B, or a PFX with the matching key.</p>
+        <ul>
+          <li>Automatic chain ordering &mdash; no more guessing the sequence</li>
+          <li>Offline validation, with a clear pass or fail and the reason</li>
+          <li>Export the assembled chain as PEM, P7B or PFX</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>A certificate chain order tool</h3>
+        <p>Getting the order wrong is the classic reason a server rejects a bundle. CertConvert sorts the certificates by their issuer/subject relationships so the exported bundle is always correctly ordered.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Keys</div>
+        <h2 style="text-align:left;">Convert key formats and check a match</h2>
+        <p>Convert private-key formats between PKCS #8, PKCS #1 and SEC 1, encrypted or not. And when you are staring at a certificate and a key wondering whether they belong together, check whether a key matches a certificate &mdash; CertConvert compares the public keys and tells you.</p>
+      </div>
+      <div class="card">
+        <h3>Key jobs</h3>
+        <ul style="color:var(--text-2); padding-left:20px; margin:0;">
+          <li>PKCS #8 &harr; PKCS #1 / SEC 1</li>
+          <li>Add or remove key encryption (a passphrase)</li>
+          <li>Confirm a key matches a certificate</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Generate</div>
+        <h2 style="text-align:left;">Keys, CSRs and self-signed certificates</h2>
+        <p>Generate a new RSA or ECDSA key, produce a certificate signing request, or mint a self-signed certificate &mdash; with subject fields, SANs (DNS names and IP addresses) and CA options. These are the <code>openssl req</code> workflows, in a form you fill in rather than a command you look up.</p>
+        <ul>
+          <li>RSA or ECDSA (for example P-256) keys</li>
+          <li>CSRs with a full subject and SANs</li>
+          <li>Self-signed certificates with a validity period and CA flag</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Good for lab and IoT certs</h3>
+        <p>Spin up a self-signed device certificate with the right DNS and IP SANs for a test rig or an internal service in seconds, then export the key and certificate in whatever format you need.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
+        <div class="eyebrow" style="text-align:left;">Command line</div>
+        <h2 style="text-align:left;">The same binary, scriptable</h2>
+        <p>Pass arguments and CertConvert runs as a CLI instead of opening a window &mdash; ideal for build pipelines and one-off shell work. Every GUI job has a verb: <code>inspect</code>, <code>convert</code>, <code>chain</code>, <code>key</code> and <code>gen</code>.</p>
+        <p>Exit codes make it easy to script: <code>0</code> success, <code>1</code> usage error, <code>2</code> failure (including an invalid chain or a key that does not match). See the <a href="docs.html#cli">CLI reference</a> for worked examples.</p>
+      </div>
+      <div>
+<pre><code>certconvert convert device.pem -o device.cer
+certconvert convert bundle.p7b -o bundle.pem
+certconvert chain build device.pem ca.pem root.pem \
+            -o chain.pfx --key device.key \
+            --out-password secret
+certconvert key match --cert device.pem --key device.key</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="security">
+  <div class="container">
+    <div class="eyebrow">Security posture</div>
+    <h2>Built for a tool that handles private keys</h2>
+    <p class="sub">For software that touches key material, the dependency surface is the whole story. CertConvert keeps it as small as it can.</p>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Platform crypto only</h3>
+        <p>All cryptography is the .NET platform&rsquo;s own libraries. There is no third-party crypto code &mdash; the only other dependencies are the UI framework and an MVVM helper, neither of which touches key material.</p>
+      </div>
+      <div class="card">
+        <h3>No network of its own</h3>
+        <p>No telemetry, no outbound connection. The one exception is checking GitHub for a newer version, which is off by default and otherwise happens only when you ask. Your certificates and keys are never uploaded.</p>
+      </div>
+      <div class="card">
+        <h3>Keys stay in memory</h3>
+        <p>Keys loaded from PKCS #12 files are handled in process and never imported into the operating-system key store. The app writes only the files you ask it to, plus one small settings file.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft center">
+  <div class="container">
+    <h2>Ready to try it?</h2>
+    <p class="sub">It is free and open source. Download a build for macOS or Windows &mdash; nothing else to install.</p>
+    <a class="btn btn-primary btn-lg" href="download.html">Download CertConvert</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

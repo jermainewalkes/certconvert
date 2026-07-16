@@ -1,0 +1,15 @@
+# Consolidate duplicate URLs so Google indexes a single canonical version.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # www.certconvert.com -> certconvert.com (keep HTTPS, preserve the path)
+    RewriteCond %{HTTP_HOST} ^www\.certconvert\.com$ [NC]
+    RewriteRule ^(.*)$ https://certconvert.com/$1 [R=301,L]
+
+    # /index.html -> / (avoid the home page being reachable at two URLs)
+    RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+    RewriteRule ^index\.html$ / [R=301,L]
+</IfModule>
+
+# Serve the branded not-found page.
+ErrorDocument 404 /404.html

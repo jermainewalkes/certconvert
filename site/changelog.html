@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changelog — CertConvert</title>
+  <meta name="description" content="CertConvert release notes and version history: 1.0.0, 1.0.1 and 1.0.2.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/changelog.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Changelog — CertConvert">
+  <meta property="og:description" content="Release notes and version history.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/changelog.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container center">
+  <h1>Changelog</h1>
+  <p class="lead">Release notes for public versions. Every download &mdash; with its SHA-256 checksums &mdash; is on <a href="https://github.com/jermainewalkes/certconvert/releases">GitHub Releases</a>.</p>
+</div></div>
+
+<section class="section" style="padding-top:24px;">
+  <div class="container prose">
+
+    <h2>1.0.2 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 12 July 2026</span></h2>
+    <p>A small release that adds a persistent <strong>Support on Ko-fi</strong> link in the sidebar footer, so you can support development from anywhere in the app. No functional changes to certificate handling.</p>
+
+    <h2>1.0.1 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 12 July 2026</span></h2>
+    <p>A maintenance release hardening the self-update feature after a code review.</p>
+    <ul>
+      <li><strong>Update checksum verification now fails closed.</strong> If a release publishes a <code>SHA256SUMS.txt</code> that does not list the downloaded file, the update is aborted rather than applied &mdash; previously that was indistinguishable from &ldquo;no checksum published&rdquo;. Checksum verification is now covered by tests.</li>
+      <li><strong>In-app downloads are cancellable</strong> &mdash; a Cancel button appears during a download.</li>
+      <li>Minor: broader error handling on the save-to-Downloads fallback, corrected recovery-copy wording and internal cleanup.</li>
+    </ul>
+    <p>No functional changes to certificate conversion, chaining, inspection or generation.</p>
+
+    <h2>1.0.0 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; initial public release, 12 July 2026</span></h2>
+    <p>The first publicly available build &mdash; an offline certificate toolbox for macOS and Windows. What it does at launch:</p>
+    <ul>
+      <li><strong>Inspect</strong> any certificate, key, CSR or bundle &mdash; drag it in, with formats detected from content.</li>
+      <li><strong>Convert</strong> between PEM, DER (<code>.cer</code>/<code>.der</code>), PKCS #7 (<code>.p7b</code>) and PKCS #12 (<code>.pfx</code>/<code>.p12</code>), in both directions.</li>
+      <li><strong>Chain</strong>: drop root, intermediate and device certs in any order, auto-sort, validate offline and export as PEM, P7B or PFX.</li>
+      <li><strong>Keys</strong>: convert PKCS #8 / PKCS #1 / SEC 1 / encrypted formats, and check whether a key matches a certificate.</li>
+      <li><strong>Generate</strong> keys (RSA or ECDSA), CSRs and self-signed certificates with SANs and CA options.</li>
+      <li>The same executable is a <strong>CLI</strong> when run with arguments (<code>--help</code> for the verbs).</li>
+      <li><strong>In-app updates</strong>: an opt-in check of GitHub that can download, verify (SHA-256) and apply a newer version in place. Off by default &mdash; the only time the app touches the network.</li>
+    </ul>
+
+    <div class="callout">
+      Looking for a specific version or older download? They are all on
+      <a href="https://github.com/jermainewalkes/certconvert/releases">GitHub Releases</a>, each with its <code>SHA256SUMS.txt</code>.
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

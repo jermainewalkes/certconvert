@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Analytics is gated in js/analytics.js: nothing loads until a GA4 ID is set there. -->
+  <script src="js/analytics.js"></script>
+  <script src="js/consent.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentation — CertConvert GUI walkthrough &amp; CLI reference</title>
+  <meta name="description" content="How to use CertConvert: a brief walkthrough of the Inspect, Convert, Chain, Keys and Generate views, the command-line verbs with examples, and troubleshooting.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="canonical" href="https://certconvert.com/docs.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CertConvert">
+  <meta property="og:title" content="Documentation — CertConvert">
+  <meta property="og:description" content="GUI walkthrough, CLI reference with examples, and troubleshooting.">
+  <meta property="og:image" content="https://certconvert.com/img/og.png">
+  <meta property="og:url" content="https://certconvert.com/docs.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://certconvert.com/img/og.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="nav-logo" href="index.html"><picture><source media="(prefers-color-scheme: dark)" srcset="img/certconvert-lockup-ondark.svg"><img src="img/certconvert-lockup.svg" alt="CertConvert"></picture></a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a><a href="download.html">Download</a><a href="docs.html">Docs</a><a href="changelog.html">Changelog</a><a href="donate.html">Donate</a>
+    </nav>
+    <div class="nav-cta"><a class="btn btn-primary" href="download.html">Download</a></div>
+  </div>
+</header>
+
+<div class="page-head"><div class="container">
+  <h1>Documentation</h1>
+  <p class="lead">A quick tour of the app, the command-line verbs with worked examples, and answers to the common snags. Run <code>certconvert --help</code> for the full CLI list.</p>
+</div></div>
+
+<section class="section" style="padding-top:24px;">
+  <div class="container prose">
+
+    <h2 id="gui">Using the app</h2>
+    <p>CertConvert opens on a sidebar with five views. Most jobs are drag-and-drop: point a view at a file and it detects the format from the file&rsquo;s content, not its extension.</p>
+
+    <h3>Inspect</h3>
+    <p>Open or drag in any certificate, key, CSR or bundle. CertConvert decodes it and shows the subject, issuer, validity, serial, public-key algorithm, SANs, key usage and SHA-256 / SHA-1 fingerprints. Use <strong>Copy PEM</strong> or <strong>Copy SHA-256</strong> to grab either. If the file is a password-protected PFX or key, type the password and choose <strong>Unlock</strong>.</p>
+
+    <h3>Convert</h3>
+    <p>Load a file, pick the target format &mdash; PEM, DER (<code>.cer</code>), PKCS #7 (<code>.p7b</code>) or PKCS #12 (<code>.pfx</code>) &mdash; and save. To build a PFX you can supply the matching private key and set an export password.</p>
+
+    <h3>Chain</h3>
+    <p>Add your root, intermediate and device certificates in any order. CertConvert arranges them into a valid chain, validates it offline and reports pass or fail with a reason. Export the assembled chain as a PEM bundle, a P7B, or a PFX with the key attached.</p>
+
+    <h3>Keys</h3>
+    <p>Convert a private key between PKCS #8, PKCS #1 and SEC 1 formats, add or remove a passphrase, or check whether a key matches a certificate &mdash; CertConvert compares their public keys and tells you yes or no.</p>
+
+    <h3>Generate</h3>
+    <p>Create a new RSA or ECDSA key, a certificate signing request, or a self-signed certificate. Fill in the subject fields, add SANs (DNS names and IP addresses) and set CA options and a validity period, then export in whatever format you need.</p>
+
+    <h2 id="cli">Command-line reference</h2>
+    <p>The same executable is a CLI when given arguments and a GUI when not. A few worked examples:</p>
+    <pre><code>certconvert inspect device.pem
+certconvert convert device.pem -o device.cer            # PEM &rarr; DER
+certconvert convert bundle.p7b -o bundle.pem            # PKCS#7 &rarr; PEM
+certconvert chain build device.pem ca.pem root.pem -o chain.pfx \
+            --key device.key --out-password secret
+certconvert chain verify chain.p7b
+certconvert key convert device.key -o device_pkcs8.key --to pkcs8
+certconvert key match --cert device.pem --key device.key
+certconvert gen selfsigned --new-key p256 --key-out dev.key \
+            --cn device.local --dns device.local -o dev.pem
+certconvert update                                      # check GitHub for a newer version
+certconvert update --install                            # download, verify and apply it</code></pre>
+    <p><strong>Exit codes:</strong> <code>0</code> success, <code>1</code> usage error, <code>2</code> failure (including an invalid chain or a key that does not match). That makes CertConvert easy to drop into a build pipeline or a shell script.</p>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <h3>macOS: &ldquo;CertConvert can&rsquo;t be opened&rdquo;</h3>
+    <p>The build is unsigned, so Gatekeeper blocks the first open. Right-click the app and choose <strong>Open</strong> (one time), or allow it under <strong>System Settings &rarr; Privacy &amp; Security</strong>.</p>
+
+    <h3>Windows: &ldquo;Windows protected your PC&rdquo;</h3>
+    <p>SmartScreen on an unsigned binary. Choose <strong>More info &rarr; Run anyway</strong> (one time).</p>
+
+    <h3>&ldquo;&hellip;is password-protected&rdquo;</h3>
+    <p>The file is an encrypted PFX or key. Type the password in the password field and use <strong>Unlock</strong> in the app, or <code>--password</code> on the CLI. Errors always name the file that needs it.</p>
+
+    <h3>Windows CLI output interleaves with the prompt</h3>
+    <p>The executable is a GUI program attaching to your console, so output can arrive after the prompt returns. Press <strong>Enter</strong> to get the prompt back.</p>
+
+    <h3>Which build am I running?</h3>
+    <p>Run <code>certconvert --version</code>; it prints the version plus the exact git commit it was built from.</p>
+
+    <h3>Update didn&rsquo;t apply, or partially applied</h3>
+    <p>Download the latest zip from <a href="https://github.com/jermainewalkes/certconvert/releases">Releases</a> and replace the app manually. If a self-update was interrupted, a recovery copy of the previous version is kept beside the app (<code>CertConvert.app.bak</code> on macOS, <code>CertConvert.exe.old</code> on Windows) until the next launch.</p>
+
+    <h3>&ldquo;Check For Updates&rdquo; can&rsquo;t reach GitHub</h3>
+    <p>That check needs internet; on an offline machine it simply reports the failure and changes nothing. Everything else works offline.</p>
+
+    <div class="callout">
+      Still stuck? <a href="contact.html">Get in touch</a>, or raise it on the
+      <a href="https://github.com/jermainewalkes/certconvert/issues">GitHub issue tracker</a>.
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
+      <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
+      <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Jermaine Walkes. CertConvert is free and open source under the MIT licence.</span><span>Made in the UK</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

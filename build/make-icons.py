@@ -8,10 +8,15 @@ Produces:
   src/CertConvert/Assets/CertConvert.icns macOS icon — squircle at 82% of the
       canvas with a soft shadow, per Apple's icon grid, so it sits at the same
       visual size as every other Dock icon.
+
+Run with --site to (re)generate only the product-website Open Graph image
+(site/img/og.png) from the existing design/icon-1024.png master — this leaves
+the app icons untouched.
 """
 import os
+import sys
 import subprocess
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
@@ -68,6 +73,64 @@ def make_macos_icon(tile_1024: Image.Image) -> Image.Image:
     small = tile_1024.resize((art, art), Image.LANCZOS)
     canvas.alpha_composite(small, (off, off))
     return canvas
+
+
+# ---------------------------------------------------------------------------
+# Product-website assets
+# ---------------------------------------------------------------------------
+
+SITE_FONT = '/System/Library/Fonts/SFNS.ttf'
+OG_BG_TOP = (49, 46, 129)      # indigo-900
+OG_BG_BOTTOM = (79, 70, 229)   # indigo-600 (brand accent)
+
+
+def _vertical_gradient(size, top, bottom):
+    w, h = size
+    grad = Image.new('RGB', (1, h))
+    for y in range(h):
+        t = y / max(1, h - 1)
+        grad.putpixel((0, y), tuple(int(top[c] + (bottom[c] - top[c]) * t) for c in range(3)))
+    return grad.resize((w, h))
+
+
+def make_site_og(tile_1024: Image.Image):
+    """1200x630 Open Graph card: app tile + name + strapline on a brand background."""
+    W, H = 1200, 630
+    canvas = _vertical_gradient((W, H), OG_BG_TOP, OG_BG_BOTTOM).convert('RGBA')
+
+    # App tile, left of centre, with a soft drop shadow.
+    tile_px = 300
+    tx, ty = 120, (H - tile_px) // 2
+    tile = tile_1024.convert('RGBA').resize((tile_px, tile_px), Image.LANCZOS)
+    shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    sd.rounded_rectangle([tx + 8, ty + 16, tx + tile_px + 8, ty + tile_px + 16],
+                         radius=int(tile_px * 0.224), fill=(0, 0, 0, 90))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(20))
+    canvas.alpha_composite(shadow)
+    canvas.alpha_composite(tile, (tx, ty))
+
+    d = ImageDraw.Draw(canvas)
+    name_font = ImageFont.truetype(SITE_FONT, 104)
+    strap_font = ImageFont.truetype(SITE_FONT, 50)
+    sub_font = ImageFont.truetype(SITE_FONT, 33)
+
+    text_x = tx + tile_px + 70
+    d.text((text_x, 208), 'CertConvert', font=name_font, fill=(255, 255, 255, 255))
+    d.text((text_x, 330), 'Certificate Toolbox', font=strap_font, fill=(199, 210, 254, 255))
+    d.text((text_x, 402), 'Convert, chain, inspect and generate',
+           font=sub_font, fill=(165, 180, 252, 255))
+    d.text((text_x, 442), 'X.509 certificates — entirely offline.',
+           font=sub_font, fill=(165, 180, 252, 255))
+
+    os.makedirs('site/img', exist_ok=True)
+    canvas.convert('RGB').save('site/img/og.png')
+    print('wrote site/img/og.png')
+
+
+if '--site' in sys.argv:
+    make_site_og(Image.open('design/icon-1024.png'))
+    sys.exit(0)
 
 
 src = Image.open('design/icon-source.png').convert('RGB')
