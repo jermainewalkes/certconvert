@@ -77,6 +77,9 @@
                   AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser"/>
         </StackPanel>
       </Border>
+
+      <TextBlock Classes="secondary" FontSize="12" TextWrapping="Wrap" Margin="4,4,4,0"
+                 Text="OpenSSL is a trademark of the OpenSSL Software Foundation. CertConvert is an independent project, not affiliated with or endorsed by it."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
