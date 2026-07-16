@@ -68,7 +68,12 @@ public static class Dialogs
 
     public static async Task OpenUrlAsync(string url)
     {
+        // Some callers pass URLs that arrived over the network (e.g. a release's
+        // html_url from the GitHub API) — only ever hand web schemes to the OS.
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
+            return;
         if (Top is { } top)
-            await top.Launcher.LaunchUriAsync(new Uri(url));
+            await top.Launcher.LaunchUriAsync(uri);
     }
 }

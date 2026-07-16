@@ -124,7 +124,7 @@ public partial class GenerateViewModel : ViewModelBase
         }
     }
 
-    private void SetKey(PrivateKeyEntry entry)
+    internal void SetKey(PrivateKeyEntry entry)
     {
         _key?.Dispose();
         _key = entry;
@@ -192,7 +192,10 @@ public partial class GenerateViewModel : ViewModelBase
 
     private CertSpec ReadSpec()
     {
-        if (!int.TryParse(ValidityDays, out int days))
+        // A CSR carries no validity (the signing CA sets it), and the Validity
+        // field is hidden in CSR mode — don't let an invisible field block it.
+        int days = 365;
+        if (Output == CertOutput.SelfSigned && !int.TryParse(ValidityDays, out days))
             throw new CertConvertException("Validity days must be a number.");
         return new CertSpec
         {

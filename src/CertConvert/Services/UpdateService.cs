@@ -164,12 +164,14 @@ public sealed class UpdateService
     /// Version check for when GitHub hosts no binary releases (the store-only
     /// model): read the tag list, take the highest version and, if newer, tell the
     /// user where to get it. Tags survive release deletion, so this keeps working.
+    /// Tags are not returned in semver order, so we ask for the maximum page size
+    /// and take the semver-max; correct until the repo exceeds 100 tags.
     /// </summary>
     private async Task<UpdateCheckResult> CheckViaTagsAsync(CancellationToken ct)
     {
         try
         {
-            using var response = await _http.GetAsync(TagsApi, ct);
+            using var response = await _http.GetAsync(TagsApi + "?per_page=100", ct);
             if (!response.IsSuccessStatusCode)
                 return Failed($"GitHub responded with {(int)response.StatusCode}.");
 

@@ -144,6 +144,29 @@ public class UpdateServiceTests
         Assert.NotNull(result.Message);
     }
 
+    [Fact]
+    public async Task NoReleases_TagsEndpointRateLimited_ReportsCheckFailed()
+    {
+        var svc = new UpdateService(new FakeHandler(req =>
+            req.RequestUri!.AbsoluteUri == UpdateService.LatestReleaseApi
+                ? new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("Not Found") }
+                : new HttpResponseMessage(HttpStatusCode.Forbidden) { Content = new StringContent("rate limited") }));
+        var result = await svc.CheckAsync();
+        Assert.Equal(UpdateStatus.CheckFailed, result.Status);
+    }
+
+    [Fact]
+    public async Task NoReleases_MixedTags_HighestParseableStableWins()
+    {
+        // Prereleases and non-version tags are skipped (Version.TryParse rejects
+        // them); the semver-max is taken across the list, not the first entry.
+        var svc = new UpdateService(NoReleasesButTags(
+            """[{"name":"v2.0.0-beta"},{"name":"docs-freeze"},{"name":"v1.5.0"},{"name":"v9.9.9"},{"name":"v3.0.0"}]"""));
+        var result = await svc.CheckAsync();
+        Assert.Equal(UpdateStatus.UpdateAvailable, result.Status);
+        Assert.Equal("9.9.9", result.LatestVersion);
+    }
+
     [Theory]
     [InlineData("v1.0.0", "1.0.0")]
     [InlineData("1.2", "1.2.0")]

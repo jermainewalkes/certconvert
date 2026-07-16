@@ -130,6 +130,27 @@ public class MainWindowTests
         Assert.NotNull(vm.GenerateAndSaveCommand);
     }
 
+    [AvaloniaFact]
+    public async System.Threading.Tasks.Task GenerateCsr_IgnoresInvalidHiddenValidityField()
+    {
+        // Regression: a leftover invalid Validity value (field hidden in CSR mode)
+        // must not block CSR generation. Headless has no TopLevel, so the save
+        // dialog returns null — reaching "Save cancelled." proves ReadSpec passed.
+        var vm = new GenerateViewModel();
+        vm.SetKey(Generator.CreateKey(KeyAlgorithmChoice.EcP256));
+        vm.CommonName = "test.example";
+        vm.ValidityDays = "abc";
+        vm.Output = CertOutput.Csr;
+
+        await vm.GenerateAndSaveCommand.ExecuteAsync(null);
+        Assert.Equal("Save cancelled.", vm.Status);
+
+        // The same invalid value still fails fast where the field is visible.
+        vm.Output = CertOutput.SelfSigned;
+        await vm.GenerateAndSaveCommand.ExecuteAsync(null);
+        Assert.Equal("Error: Validity days must be a number.", vm.Status);
+    }
+
     // The test project compiles against the normal (non-store) variant, so these
     // assertions pin down the full GitHub-build surface: the store variant is
     // verified separately by the gate build and the store-flag CLI smoke run.
