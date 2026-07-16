@@ -23,6 +23,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PROJECT="src/CertConvert/CertConvert.csproj"
 VERSION="$(grep -oE '<Version>[^<]+' "$PROJECT" | head -1 | sed 's/<Version>//')"
+# CFBundleVersion (the build number) must be unique and higher on every upload,
+# and at most three period-separated integers. It's independent of the marketing
+# version (CFBundleShortVersionString stays $VERSION). Default to $VERSION; to
+# re-upload the same marketing version, pass e.g. MAS_BUILD=1.1.1.
+BUILD_VERSION="${MAS_BUILD:-$VERSION}"
 
 # --- configuration (override via env) ---------------------------------------
 RID="${MAS_RID:-osx-arm64}"                       # arm64 only for now (see universal note below)
@@ -76,7 +81,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleIconFile</key><string>CertConvert</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
-  <key>CFBundleVersion</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$BUILD_VERSION</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>LSApplicationCategoryType</key><string>public.app-category.developer-tools</string>
@@ -98,6 +103,11 @@ cat > "$ENT" <<ENTS
   <key>com.apple.security.files.user-selected.read-write</key><true/>
 </dict></plist>
 ENTS
+
+# Strip extended attributes before signing. The provisioning profile is
+# downloaded through a browser and carries com.apple.quarantine; the App Store
+# rejects any package containing quarantined files (ITMS-91109).
+xattr -cr "$APP"
 
 # --- sign: each dylib, then the apphost (entitled), then the bundle ---------
 echo "==> Signing"
