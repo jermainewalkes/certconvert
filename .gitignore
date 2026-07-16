@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 *.swp
 bin-dev/
 design/marketing-plan.md
+
+# Apple provisioning profiles: account-specific, expire yearly — regenerate
+# from the Developer portal (see build/RELEASING.md), never commit.
+design/*.provisionprofile

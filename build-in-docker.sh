@@ -18,7 +18,10 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-IMAGE="mcr.microsoft.com/dotnet/sdk:10.0"
+# Pinned by digest so the verification gate is reproducible — a floating
+# :10.0 tag can change SDK patch level between runs. To bump: pull the tag,
+# then `docker image inspect --format '{{index .RepoDigests 0}}'` it.
+IMAGE="${CC_SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0@sha256:ed034a8bf0b24ded0cbbac07e17825d8e9ebfe21e308191d0f7421eaf5ad4664}"
 # Isolated, gitignored (under artifacts/) home for the container's obj/bin.
 ARTIFACTS_PATH="artifacts/docker-build"
 

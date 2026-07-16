@@ -28,7 +28,12 @@ if [ ${#RIDS[@]} -eq 0 ]; then
     RIDS=(osx-x64 osx-arm64 win-x64)
 fi
 
-rm -rf "$OUT"
+# Clean only this script's own outputs. artifacts/ is shared: the store
+# packagers write artifacts/mas and artifacts/msix (signed, expensive to
+# rebuild) and the docker gate caches under artifacts/docker-build.
+mkdir -p "$OUT"
+rm -rf "$OUT"/osx-x64 "$OUT"/osx-arm64 "$OUT"/win-x64 \
+       "$OUT"/CertConvert-*.zip "$OUT"/SHA256SUMS.txt
 for rid in "${RIDS[@]}"; do
     echo "==> Publishing $rid"
     dest="$OUT/$rid"

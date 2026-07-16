@@ -3,8 +3,8 @@
 #
 #   build/make-mas-pkg.sh
 #
-# Produces artifacts/mas/CertConvert.pkg, signed and ready to upload to App
-# Store Connect (Transporter or `xcrun altool`/`notarytool`-adjacent tools).
+# Produces artifacts/mas/CertConvert-<version>.pkg, signed and ready to upload
+# to App Store Connect (Transporter or `xcrun altool`/`notarytool`-adjacent tools).
 #
 # WHY THIS IS FIDDLY (learned the hard way — see build/RELEASING.md):
 #   * Avalonia under App Sandbox aborts at launch (issue #6529: no LaunchServices
@@ -28,6 +28,11 @@ VERSION="$(grep -oE '<Version>[^<]+' "$PROJECT" | head -1 | sed 's/<Version>//')
 # version (CFBundleShortVersionString stays $VERSION). Default to $VERSION; to
 # re-upload the same marketing version, pass e.g. MAS_BUILD=1.1.1.
 BUILD_VERSION="${MAS_BUILD:-$VERSION}"
+# Fail fast on the format Apple rejects only after a full upload cycle
+# (e.g. the four-part "1.1.0.1" — see commit 3b2ffd6).
+[[ "$BUILD_VERSION" =~ ^[0-9]+(\.[0-9]+){0,2}$ ]] || {
+  echo "ERROR: CFBundleVersion '$BUILD_VERSION' must be 1-3 period-separated integers" >&2
+  echo "  (e.g. MAS_BUILD=1.1.2). Apple rejects anything else at upload." >&2; exit 1; }
 
 # --- configuration (override via env) ---------------------------------------
 RID="${MAS_RID:-osx-arm64}"                       # arm64 only for now (see universal note below)
@@ -67,6 +72,13 @@ echo "==> Assembling $APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$PUB/CertConvert" "$APP/Contents/MacOS/"
 cp "$PUB"/*.dylib "$APP/Contents/MacOS/"
+# The no-self-extract recipe depends on exactly these natives sitting loose so
+# each gets its own signature; a framework bump changing the set needs review.
+for lib in libAvaloniaNative libSkiaSharp libHarfBuzzSharp; do
+  [ -f "$APP/Contents/MacOS/$lib.dylib" ] || {
+    echo "ERROR: expected native library $lib.dylib missing from the publish output;" >&2
+    echo "  the single-file/no-self-extract sandbox recipe may no longer hold." >&2; exit 1; }
+done
 cp src/CertConvert/Assets/CertConvert.icns "$APP/Contents/Resources/"
 cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
 

@@ -26,10 +26,12 @@ The updater compares against `InformationalVersion`, so they must match.
 ./build-in-docker.sh
 ```
 
-Runs both test suites and a Release build in the `mcr.microsoft.com/dotnet/sdk:10.0`
-Linux container — no host SDK required. It must be green before you go on. The
-container writes its obj/bin under `artifacts/docker-build/` (gitignored) so it
-never clashes with in-tree host builds.
+Runs both test suites plus **two** Release builds — the normal variant and the
+store variant (`-p:StoreBuild=true`) — in the .NET 10 SDK Linux container
+(pinned by digest in `build-in-docker.sh`; bump deliberately, not by drift).
+No host SDK required. It must be green before you go on. The container writes
+its obj/bin under `artifacts/docker-build/` (gitignored) so it never clashes
+with in-tree host builds.
 
 ## 3. Build the artifacts
 
@@ -137,10 +139,25 @@ Prerequisites (one-off, in the Apple Developer portal): App ID
 capability); Apple Distribution + Mac Installer Distribution certs (with their
 private keys, and the current WWDR G3 intermediate — an expired WWDR breaks the
 chain silently); a **Mac App Store** provisioning profile saved at
-`design/CertConvert_Mac_App_Store.provisionprofile`.
+`design/CertConvert_Mac_App_Store.provisionprofile`. The profile is
+**gitignored** (account-specific, expires yearly): regenerate it in the portal
+under Profiles → + → Distribution → Mac App Store Connect, select the App ID
+and the Apple Distribution cert, download and save to that path. The script
+strips extended attributes from the whole bundle before signing — a
+browser-downloaded profile carries `com.apple.quarantine`, which Apple rejects
+after upload (ITMS-91109).
 
 ```bash
 build/make-mas-pkg.sh          # → artifacts/mas/CertConvert-<version>.pkg
+```
+
+`CFBundleVersion` (the build number) defaults to the marketing version. Apple
+requires it **unique and higher on every upload** and at most three
+period-separated integers, so to re-upload the same marketing version, bump
+only the build number:
+
+```bash
+MAS_BUILD=1.1.2 build/make-mas-pkg.sh   # marketing stays <version>, build 1.1.2
 ```
 
 Then create the app record in App Store Connect (name, bundle id
