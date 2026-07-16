@@ -11,13 +11,9 @@
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/contact.html">
-  <!--
-    Cloudflare Turnstile (spam protection; no tracking cookies) — DISABLED by default.
-    To enable: (1) uncomment the script tag below and the .cf-turnstile div in the form,
-    (2) set data-sitekey to your Turnstile site key, and (3) set 'turnstile_secret' in
-    mail.config.php on the server. Until then the honeypot + per-IP rate limit protect the form.
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  -->
+  <!-- Cloudflare Turnstile spam protection (no tracking cookies). Site key is public;
+       the matching secret lives in mail.config.php on the server. -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="CertConvert">
   <meta property="og:title" content="Contact — CertConvert">
@@ -86,9 +82,7 @@
       <div class="hp" aria-hidden="true">
         <label>Company<input name="company" type="text" tabindex="-1" autocomplete="off"></label>
       </div>
-      <!-- Turnstile widget (disabled by default; see the head comment to enable):
-      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY" style="margin-bottom:18px;"></div>
-      -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAD3Ze-oPxwqOYlsZ" style="margin-bottom:18px;"></div>
       <button class="btn btn-primary btn-lg" type="submit">Send Message</button>
     </form>
 
