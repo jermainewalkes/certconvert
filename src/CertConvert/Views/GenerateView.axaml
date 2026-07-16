@@ -22,10 +22,29 @@
             <TextBox Width="200" PlaceholderText="Key Password (Optional)" PasswordChar="•"
                      Text="{Binding KeyPassword}"
                      AutomationProperties.Name="Password to encrypt the key file, also used when loading"/>
-            <Button Content="Generate Key And Save…" Command="{Binding GenerateKeyAndSaveCommand}"/>
+            <Button Content="Generate Key And Save…" Classes="accent"
+                    Command="{Binding GenerateKeyAndSaveCommand}"/>
             <Button Content="Load Existing Key…" Command="{Binding LoadExistingKeyCommand}"/>
             <TextBlock Text="{Binding KeyDescription}" FontWeight="SemiBold"/>
           </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="Output"/>
+          <StackPanel Classes="segmented">
+            <RadioButton Classes="segment" GroupName="output" Content="Self-Signed Certificate"
+                         IsChecked="{Binding Output, Mode=TwoWay,
+                                     Converter={StaticResource EnumBool}, ConverterParameter=SelfSigned}"
+                         AutomationProperties.Name="Produce a self-signed certificate"/>
+            <RadioButton Classes="segment" GroupName="output" Content="Signing Request (CSR)"
+                         IsChecked="{Binding Output, Mode=TwoWay,
+                                     Converter={StaticResource EnumBool}, ConverterParameter=Csr}"
+                         AutomationProperties.Name="Produce a certificate signing request"/>
+          </StackPanel>
+          <TextBlock Classes="secondary" FontSize="12" TextWrapping="Wrap"
+                     Text="A self-signed certificate is ready to use immediately. A signing request (CSR) is sent to a certificate authority to be signed — it carries no validity of its own."/>
         </StackPanel>
       </Border>
 
@@ -60,7 +79,7 @@
       <Border Classes="card">
         <StackPanel Spacing="12">
           <TextBlock Classes="section" Text="Names and options"/>
-          <Grid ColumnDefinitions="190,320" RowDefinitions="Auto,Auto,Auto,Auto"
+          <Grid ColumnDefinitions="190,320" RowDefinitions="Auto,Auto"
                 RowSpacing="10" ColumnSpacing="10">
             <TextBlock Grid.Row="0" Classes="secondary" Text="DNS names (comma-separated)"
                        VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -72,21 +91,24 @@
             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IpAddresses}"
                      PlaceholderText="10.0.0.36"
                      AutomationProperties.Name="IP subject alternative names"/>
-            <TextBlock Grid.Row="2" Classes="secondary" Text="Validity (days)" VerticalAlignment="Center"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ValidityDays}"
-                     AutomationProperties.Name="Validity in days"/>
-            <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="Certificate Authority (CA)"
-                      IsChecked="{Binding IsCa}"/>
           </Grid>
 
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Save CSR…" Command="{Binding SaveCsrCommand}"
-                    IsEnabled="{Binding HasKey}" Classes="accent"/>
-            <Button Content="Save Self-Signed Certificate…" Command="{Binding SaveSelfSignedCommand}"
-                    IsEnabled="{Binding HasKey}" Classes="accent"/>
-          </StackPanel>
+          <!-- Validity only applies to a self-signed certificate. -->
+          <Grid ColumnDefinitions="190,320" ColumnSpacing="10"
+                IsVisible="{Binding ShowValidity}">
+            <TextBlock Classes="secondary" Text="Validity (days)" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" Text="{Binding ValidityDays}"
+                     AutomationProperties.Name="Validity in days"/>
+          </Grid>
+
+          <CheckBox Content="Certificate Authority (CA)" IsChecked="{Binding IsCa}"/>
         </StackPanel>
       </Border>
+
+      <Button Classes="accent" HorizontalAlignment="Left"
+              Content="{Binding PrimaryActionLabel}"
+              Command="{Binding GenerateAndSaveCommand}"
+              IsEnabled="{Binding HasKey}"/>
 
       <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
                  IsVisible="{Binding Status.Length}"

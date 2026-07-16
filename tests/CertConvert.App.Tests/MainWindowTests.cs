@@ -113,6 +113,23 @@ public class MainWindowTests
         Assert.Same(vm.About, vm.CurrentPage);
     }
 
+    [AvaloniaFact]
+    public void GeneratePage_OutputToggle_DrivesValidityAndLabel()
+    {
+        var vm = new MainWindowViewModel().Generate;
+
+        // Default: self-signed → validity shown, certificate label.
+        Assert.Equal(CertOutput.SelfSigned, vm.Output);
+        Assert.True(vm.ShowValidity);
+        Assert.Contains("Certificate", vm.PrimaryActionLabel);
+
+        // Switch to CSR → validity hidden, label changes, one command drives both.
+        vm.Output = CertOutput.Csr;
+        Assert.False(vm.ShowValidity);
+        Assert.Contains("CSR", vm.PrimaryActionLabel);
+        Assert.NotNull(vm.GenerateAndSaveCommand);
+    }
+
     // The test project compiles against the normal (non-store) variant, so these
     // assertions pin down the full GitHub-build surface: the store variant is
     // verified separately by the gate build and the store-flag CLI smoke run.

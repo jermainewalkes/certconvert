@@ -16,6 +16,10 @@ public sealed record AlgorithmOption(string Label, KeyAlgorithmChoice Value)
     public override string ToString() => Label;
 }
 
+/// <summary>What the Generate page produces. Chosen first, so the form shows
+/// only the fields that output uses (a CSR has no validity — the CA sets it).</summary>
+public enum CertOutput { SelfSigned, Csr }
+
 public partial class GenerateViewModel : ViewModelBase
 {
     public IReadOnlyList<AlgorithmOption> Algorithms { get; } =
@@ -44,6 +48,18 @@ public partial class GenerateViewModel : ViewModelBase
     [ObservableProperty] private string _validityDays = "365";
     [ObservableProperty] private bool _isCa;
     [ObservableProperty] private string _status = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowValidity))]
+    [NotifyPropertyChangedFor(nameof(PrimaryActionLabel))]
+    private CertOutput _output = CertOutput.SelfSigned;
+
+    /// <summary>Validity applies to self-signed certificates only.</summary>
+    public bool ShowValidity => Output == CertOutput.SelfSigned;
+
+    public string PrimaryActionLabel => Output == CertOutput.SelfSigned
+        ? "Generate And Save Certificate…"
+        : "Generate And Save CSR…";
 
     private PrivateKeyEntry? _key;
 
@@ -117,16 +133,24 @@ public partial class GenerateViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task SaveCsr()
+    private async Task GenerateAndSave()
     {
         if (_key is null)
         {
             Status = "Generate or load a key first.";
             return;
         }
+        if (Output == CertOutput.Csr)
+            await SaveCsr();
+        else
+            await SaveSelfSigned();
+    }
+
+    private async Task SaveCsr()
+    {
         try
         {
-            string csr = Generator.CreateCsrPem(_key.Key, ReadSpec());
+            string csr = Generator.CreateCsrPem(_key!.Key, ReadSpec());
             var outPath = await Dialogs.SaveFileAsync("Save Certificate Request", "request.csr");
             if (outPath is null)
             {
@@ -142,17 +166,12 @@ public partial class GenerateViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
     private async Task SaveSelfSigned()
     {
-        if (_key is null)
-        {
-            Status = "Generate or load a key first.";
-            return;
-        }
         try
         {
-            using var cert = Generator.CreateSelfSigned(_key.Key, ReadSpec());
+            var spec = ReadSpec();
+            using var cert = Generator.CreateSelfSigned(_key!.Key, spec);
             var outPath = await Dialogs.SaveFileAsync(
                 "Save Self-Signed Certificate", "certificate.pem");
             if (outPath is null)
@@ -163,7 +182,7 @@ public partial class GenerateViewModel : ViewModelBase
             File.WriteAllBytes(outPath,
                 Encoding.ASCII.GetBytes(cert.ExportCertificatePem() + "\n"));
             Status = $"Wrote {Path.GetFileName(outPath)} — " +
-                     $"{Inspector.Inspect(cert).DisplayName}, valid {ReadSpec().ValidityDays} days.";
+                     $"{Inspector.Inspect(cert).DisplayName}, valid {spec.ValidityDays} days.";
         }
         catch (Exception e)
         {
