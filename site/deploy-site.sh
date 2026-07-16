@@ -52,13 +52,19 @@ while IFS= read -r f; do
     echo "  would upload  $rel"
     continue
   fi
-  # --disable-epsv (plain PASV is more NAT/firewall-tolerant) + retries: Fasthosts' FTPS data
-  # channel intermittently drops mid-transfer on larger files (curl error 56), so retry.
-  if curl --netrc-file "$NETRC" --ssl-reqd --disable-epsv --ftp-create-dirs \
-          --retry 8 --retry-all-errors --retry-delay 2 \
-          --connect-timeout 30 --max-time 240 \
-          -fsS -T "$f" "${base}${rel}"; then
+  # Fasthosts' FTPS *data* channel intermittently drops mid-transfer on larger
+  # binary files (curl error 56) even with retries. Try full TLS first; if that
+  # fails, fall back to control-channel TLS only (login stays encrypted, file
+  # bytes go over a plain data channel). That's fine for public web assets, but
+  # NEVER for mail.config.php, which carries the Turnstile secret.
+  common=(--netrc-file "$NETRC" --disable-epsv --ftp-create-dirs
+          --retry 6 --retry-all-errors --retry-delay 2
+          --connect-timeout 30 --max-time 240 -fsS)
+  if curl "${common[@]}" --ssl-reqd -T "$f" "${base}${rel}"; then
     echo "  ok    $rel"
+  elif [ "$rel" != "mail.config.php" ] && \
+       curl "${common[@]}" --ftp-ssl-control -T "$f" "${base}${rel}"; then
+    echo "  ok    $rel (control-channel TLS)"
   else
     echo "  FAIL  $rel"; fail=1
   fi
