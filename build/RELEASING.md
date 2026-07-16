@@ -149,6 +149,29 @@ Connect API, and test through TestFlight (a profile-embedded build cannot be
 launched locally by design — "launchd job spawn failed" — TestFlight is the
 correct test surface). Currently arm64-only; universal (Intel) is deferred.
 
+## Microsoft Store (build/make-msix.ps1)
+
+Runs on Windows (needs the Windows SDK's `MakeAppx.exe`) — the Fusion VM or a
+GitHub Actions `windows-latest` runner. Produces
+`artifacts/msix/CertConvert-<version>.msix`, an **unsigned** store package (the
+Store re-signs on submission — do not sign it).
+
+```powershell
+pwsh build/make-msix.ps1
+```
+
+It publishes the store variant (`-p:StoreBuild=true`, self-contained win-x64),
+lays the payload plus `build/msix/assets` and `build/msix/AppxManifest.xml` into
+a package layout, stamps the manifest version to `<version>.0` (the Store needs
+a 4-part version with revision 0), and packs the `.msix`.
+
+The manifest identity is fixed to the Partner Center values (Product Identity
+page) and must not change: `Name=JermaineWalkes.CertConvert`,
+`Publisher=CN=2F7BAB54-DD4D-405B-A67E-4539A9971265`,
+`PublisherDisplayName=Jermaine Walkes` (Store ID `9NT6HCG0JBFV`). Tile assets
+come from `build/make-icons.py --msix`. Upload at Partner Center → CertConvert →
+Submissions → Packages.
+
 ## Host builds after a container run
 
 The container writes only into `artifacts/docker-build/` (via `--artifacts-path`),

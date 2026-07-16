@@ -128,6 +128,27 @@ def make_site_og(tile_1024: Image.Image):
     print('wrote site/img/og.png')
 
 
+def make_msix_tiles(tile_1024: Image.Image):
+    """Microsoft Store tile assets from the full-bleed app tile → build/msix/assets."""
+    out = 'build/msix/assets'
+    os.makedirs(out, exist_ok=True)
+    # Square logos: the tile resized directly.
+    for name, px in [('Square44x44Logo', 44), ('Square71x71Logo', 71),
+                     ('Square150x150Logo', 150), ('Square310x310Logo', 310),
+                     ('StoreLogo', 50)]:
+        tile_1024.resize((px, px), Image.LANCZOS).save(f'{out}/{name}.png')
+    # Wide tile: icon centred on a transparent canvas.
+    wide = Image.new('RGBA', (310, 150), (0, 0, 0, 0))
+    logo = tile_1024.resize((130, 130), Image.LANCZOS)
+    wide.alpha_composite(logo, ((310 - 130) // 2, (150 - 130) // 2))
+    wide.save(f'{out}/Wide310x150Logo.png')
+    print(f'wrote MSIX tiles to {out}')
+
+
+if '--msix' in sys.argv:
+    make_msix_tiles(Image.open('design/icon-1024.png'))
+    sys.exit(0)
+
 if '--site' in sys.argv:
     make_site_og(Image.open('design/icon-1024.png'))
     sys.exit(0)
