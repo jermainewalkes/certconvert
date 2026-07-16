@@ -42,18 +42,39 @@ public static class CliRunner
         }
     }
 
-    private static int Dispatch(string[] args) => args[0].ToLowerInvariant() switch
+    private static int Dispatch(string[] args)
     {
-        "-h" or "--help" or "help" => PrintHelp(),
-        "-v" or "--version" or "version" => PrintVersion(),
-        "inspect" => Commands.Inspect(args[1..]),
-        "convert" => Commands.Convert(args[1..]),
-        "chain" => DispatchChain(args[1..]),
-        "key" => DispatchKey(args[1..]),
-        "gen" => DispatchGen(args[1..]),
-        "update" => Commands.Update(args[1..]),
-        _ => Usage($"Unknown command \"{args[0]}\"."),
-    };
+        string verb = args[0].ToLowerInvariant();
+
+        // --version and --help always work, in every variant.
+        if (verb is "-h" or "--help" or "help")
+            return PrintHelp();
+        if (verb is "-v" or "--version" or "version")
+            return PrintVersion();
+
+#if STORE_BUILD
+        // A sandboxed store process cannot open arbitrary command-line paths, and
+        // updates come from the store — intercept every remaining verb centrally.
+        if (verb == "update")
+        {
+            Console.WriteLine("Updates are delivered by the store.");
+            return ExitOk;
+        }
+        Console.Error.WriteLine(AppInfo.StoreCliPointer);
+        return ExitFailure;
+#else
+        return verb switch
+        {
+            "inspect" => Commands.Inspect(args[1..]),
+            "convert" => Commands.Convert(args[1..]),
+            "chain" => DispatchChain(args[1..]),
+            "key" => DispatchKey(args[1..]),
+            "gen" => DispatchGen(args[1..]),
+            "update" => Commands.Update(args[1..]),
+            _ => Usage($"Unknown command \"{args[0]}\"."),
+        };
+#endif
+    }
 
     private static int DispatchChain(string[] rest) => rest.FirstOrDefault()?.ToLowerInvariant() switch
     {
@@ -144,6 +165,13 @@ public static class CliRunner
 
             Everything else runs locally; certificate data never leaves this machine.
             """);
+#if STORE_BUILD
+        Console.WriteLine();
+        Console.WriteLine(
+            "Note: this Store build is sandboxed and cannot open files given on the " +
+            "command line. For command-line use install the direct download: " +
+            "https://github.com/jermainewalkes/certconvert/releases");
+#endif
         return ExitOk;
     }
 

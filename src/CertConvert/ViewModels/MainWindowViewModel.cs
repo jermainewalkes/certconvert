@@ -20,6 +20,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private ViewModelBase _currentPage;
     [ObservableProperty] private bool _updateAvailable;
 
+    /// <summary>Store builds hide the sidebar Ko-fi footer button.</summary>
+    public bool ShowKoFi => !AppInfo.IsStoreBuild;
+
     public MainWindowViewModel()
     {
         var settings = AppSettings.Load();
@@ -30,7 +33,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _currentPage = Inspect;
 
         // Opt-in only; the env var lets tests construct this VM without network access.
-        if (settings.CheckForUpdatesOnLaunch &&
+        // Store builds never self-check regardless of the saved setting.
+        if (!AppInfo.IsStoreBuild &&
+            settings.CheckForUpdatesOnLaunch &&
             Environment.GetEnvironmentVariable("CERTCONVERT_DISABLE_UPDATE_CHECK") is null)
         {
             _ = About.CheckForUpdates();

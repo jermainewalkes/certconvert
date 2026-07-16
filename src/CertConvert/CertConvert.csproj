@@ -16,6 +16,14 @@
          not set here, so the test project can still reference this project. -->
     <PublishTrimmed>false</PublishTrimmed>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- App Store / Microsoft Store variant: pass -p:StoreBuild=true at build/publish
+         time to strip the self-updater and Ko-fi links (stores forbid self-updating
+         and paid store customers get updates through the store). -->
+    <StoreBuild Condition="'$(StoreBuild)' == ''">false</StoreBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(StoreBuild)' == 'true'">
+    <DefineConstants>$(DefineConstants);STORE_BUILD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

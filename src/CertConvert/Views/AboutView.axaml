@@ -17,7 +17,7 @@
       <TextBlock TextWrapping="Wrap" Classes="secondary"
                  Text="Convert, chain, inspect and generate certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
 
-      <Border Classes="card">
+      <Border Classes="card" IsVisible="{Binding ShowUpdates}">
         <StackPanel Spacing="10">
           <TextBlock Classes="section" Text="Updates"/>
           <WrapPanel Classes="toolbar">
@@ -67,7 +67,7 @@
         </StackPanel>
       </Border>
 
-      <Border Classes="card">
+      <Border Classes="card" IsVisible="{Binding ShowSupport}">
         <StackPanel Spacing="10">
           <TextBlock Classes="section" Text="Support"/>
           <TextBlock TextWrapping="Wrap"

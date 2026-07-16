@@ -32,7 +32,9 @@ case "$MODE" in
       dotnet test  tests/CertConvert.Core.Tests --nologo -v q --artifacts-path '"$ARTIFACTS_PATH"'
       dotnet test  tests/CertConvert.App.Tests  --nologo -v q --artifacts-path '"$ARTIFACTS_PATH"'
       dotnet build src/CertConvert -c Release    --nologo -v q --artifacts-path '"$ARTIFACTS_PATH"'
-      echo "Gate passed — both suites green, Release build ok."
+      # The store variant (self-updater and Ko-fi stripped) must stay green too.
+      dotnet build src/CertConvert -c Release -p:StoreBuild=true --nologo -v q --artifacts-path '"$ARTIFACTS_PATH"'
+      echo "Gate passed — both suites green, Release + Store builds ok."
     '
     ;;
   win-x64)

@@ -112,4 +112,24 @@ public class MainWindowTests
         vm.GoToAboutCommand.Execute(null);
         Assert.Same(vm.About, vm.CurrentPage);
     }
+
+    // The test project compiles against the normal (non-store) variant, so these
+    // assertions pin down the full GitHub-build surface: the store variant is
+    // verified separately by the gate build and the store-flag CLI smoke run.
+    [AvaloniaFact]
+    public void NormalBuild_ExposesUpdaterAndKoFiSurface()
+    {
+        Assert.False(CertConvert.AppInfo.IsStoreBuild);
+
+        var vm = new MainWindowViewModel();
+        // Sidebar Ko-fi footer and the whole updater/support surface stay visible.
+        Assert.True(vm.ShowKoFi);
+        Assert.True(vm.About.ShowUpdates);
+        Assert.True(vm.About.ShowSupport);
+        Assert.NotNull(vm.About.OpenKoFiCommand);
+        Assert.NotNull(vm.About.CheckForUpdatesCommand);
+        // The GitHub security statement keeps its opt-in update-check wording.
+        Assert.Contains("checking GitHub for a newer version", vm.About.SecurityStatement);
+        Assert.DoesNotContain("Updates are delivered by the store", vm.About.SecurityStatement);
+    }
 }

@@ -26,14 +26,23 @@ public partial class AboutViewModel : ViewModelBase
 
     public string Version { get; } = "Version " + UpdateService.CurrentVersion;
 
-    public string SecurityStatement { get; } =
-        "CertConvert runs entirely on this machine and never connects to the network " +
-        "on its own. The only network action it can take is checking GitHub for a newer " +
-        "version — which is off by default, and otherwise happens only when you choose " +
-        "Check For Updates. There is no telemetry. All cryptography uses the operating " +
-        "system's .NET platform libraries — no third-party crypto code is involved. " +
-        "Private keys loaded from PKCS #12 files are handled in memory only and are not " +
-        "imported into the system key store.";
+    /// <summary>Store builds hide the self-updater and the Ko-fi support card.</summary>
+    public bool ShowUpdates => !AppInfo.IsStoreBuild;
+    public bool ShowSupport => !AppInfo.IsStoreBuild;
+
+    public string SecurityStatement { get; } = AppInfo.IsStoreBuild
+        ? "CertConvert runs entirely on this machine and never connects to the network " +
+          "on its own. Updates are delivered by the store. There is no telemetry. All " +
+          "cryptography uses the operating system's .NET platform libraries — no " +
+          "third-party crypto code is involved. Private keys loaded from PKCS #12 files " +
+          "are handled in memory only and are not imported into the system key store."
+        : "CertConvert runs entirely on this machine and never connects to the network " +
+          "on its own. The only network action it can take is checking GitHub for a newer " +
+          "version — which is off by default, and otherwise happens only when you choose " +
+          "Check For Updates. There is no telemetry. All cryptography uses the operating " +
+          "system's .NET platform libraries — no third-party crypto code is involved. " +
+          "Private keys loaded from PKCS #12 files are handled in memory only and are not " +
+          "imported into the system key store.";
 
     public string CliHint { get; } =
         "The same executable works from the command line: run it with --help to see " +

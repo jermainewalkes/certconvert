@@ -38,6 +38,7 @@
                                 Command="{Binding GoToAboutCommand}"
                                 AutomationProperties.HelpText="A newer version is available — opens the About page"/>
                         <Button Classes="kofi" Command="{Binding About.OpenKoFiCommand}"
+                                IsVisible="{Binding ShowKoFi}"
                                 AutomationProperties.Name="Support CertConvert on Ko-fi"
                                 AutomationProperties.HelpText="Opens the Ko-fi donation page in your browser">
                             <StackPanel Orientation="Horizontal" Spacing="7">
