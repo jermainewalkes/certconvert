@@ -117,6 +117,38 @@ sentence-case headings, no AI attribution. Include:
   (`shasum -a 256 -c SHA256SUMS.txt`).
 - A Ko-fi link: https://ko-fi.com/jwalkes
 
+## Mac App Store (build/make-mas-pkg.sh)
+
+Store builds are a separate, sandboxed variant — `-p:StoreBuild=true` strips the
+self-updater and Ko-fi links (the store handles updates; buyers have already
+paid). `build/make-mas-pkg.sh` produces `artifacts/mas/CertConvert-<version>.pkg`,
+signed and ready for App Store Connect.
+
+The recipe is fiddly for a reason — see the header comment in the script. Key
+facts: Avalonia under App Sandbox only launches when published **single-file**
+(otherwise it aborts with no LaunchServices ASN), but plain single-file
+**self-extracts** its native dylibs and the sandbox then flags the app
+"damaged" — so we publish single-file with
+`IncludeNativeLibrariesForSelfExtract=false` and sign the three native dylibs in
+place. This recipe is reusable for any Avalonia Mac App Store app.
+
+Prerequisites (one-off, in the Apple Developer portal): App ID
+`com.certconvert.app` (no capabilities needed — sandbox is an entitlement, not a
+capability); Apple Distribution + Mac Installer Distribution certs (with their
+private keys, and the current WWDR G3 intermediate — an expired WWDR breaks the
+chain silently); a **Mac App Store** provisioning profile saved at
+`design/CertConvert_Mac_App_Store.provisionprofile`.
+
+```bash
+build/make-mas-pkg.sh          # → artifacts/mas/CertConvert-<version>.pkg
+```
+
+Then create the app record in App Store Connect (name, bundle id
+`com.certconvert.app`), upload the `.pkg` via Transporter or the App Store
+Connect API, and test through TestFlight (a profile-embedded build cannot be
+launched locally by design — "launchd job spawn failed" — TestFlight is the
+correct test surface). Currently arm64-only; universal (Intel) is deferred.
+
 ## Host builds after a container run
 
 The container writes only into `artifacts/docker-build/` (via `--artifacts-path`),
