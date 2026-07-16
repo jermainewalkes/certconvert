@@ -161,9 +161,12 @@ build/                  publish scripts, icon generation, dev-run helper
 
 ```bash
 dotnet test                   # full suite
+./build-in-docker.sh          # same suites + Release build in Docker — no host SDK needed
 build/publish.sh              # self-contained builds: osx-x64, osx-arm64, win-x64
 build/run-dev-app.sh          # macOS: run the Debug build as a bundled .app
 ```
+
+The release process is documented in [build/RELEASING.md](build/RELEASING.md).
 
 ## Accessibility
 
