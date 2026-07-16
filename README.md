@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/licence-MIT-green" alt="MIT licence"/>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue" alt="Platforms: macOS and Windows"/>
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4" alt=".NET 10"/>
-  <img src="https://img.shields.io/badge/tests-64%20passing-brightgreen" alt="64 tests passing"/>
+  <img src="https://img.shields.io/badge/tests-86%20passing-brightgreen" alt="86 tests passing"/>
   <a href="https://ko-fi.com/jwalkes"><img src="https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white" alt="Support on Ko-fi"/></a>
 </p>
 
