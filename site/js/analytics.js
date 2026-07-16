@@ -11,7 +11,7 @@
  */
 (function () {
   // ── Paste your GA4 Measurement ID here to enable analytics. Empty = off. ──
-  var GA_MEASUREMENT_ID = "";
+  var GA_MEASUREMENT_ID = "G-66Q02ES3BN";
 
   // Expose the state so consent.js knows whether to show the cookie banner.
   window.CC_GA_ID = GA_MEASUREMENT_ID;
