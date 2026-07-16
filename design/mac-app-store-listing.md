@@ -73,14 +73,14 @@ trademarks in this field):
 - **Data collection: None.** Select "Data Not Collected". The store build makes
   no network calls, has no analytics and no account.
 
-## Export compliance — **[DECIDE, legal declaration]**
+## Export compliance — RESOLVED
 
-CertConvert performs cryptography (key generation, signing) but only via the OS
-/ .NET standard algorithms — it implements no custom encryption. This normally
-qualifies for the standard-encryption exemption. If you agree, we set
-`ITSAppUsesNonExemptEncryption = false` in the bundle Info.plist (I can add it to
-make-mas-pkg.sh) so the per-submission question is answered automatically.
-Verify this classification suits you before relying on it.
+`ITSAppUsesNonExemptEncryption = false` is set in the bundle Info.plist (via
+make-mas-pkg.sh), so the per-submission encryption question is answered
+automatically. Basis: CertConvert uses only standard, published algorithms
+(RSA, ECDSA, PKCS) through the platform crypto libraries and implements no
+proprietary encryption — qualifying for the exemption. Refs: Apple "Complying
+with Encryption Export Regulations"; 15 CFR 740.17 / Category 5D002.
 
 ## App Review information
 
@@ -96,9 +96,13 @@ Five 1280×800 PNGs (a valid App Store macOS size), store variant, in
 05-generate. Regenerate with:
 `CERTCONVERT_CAPTURE_DIR=design/appstore-screenshots dotnet test tests/CertConvert.App.Tests --filter StoreShots -p:StoreBuild=true`
 
+## Decisions — all confirmed
+
+- arm64-only: ship. · Price: £8.99 / $9.99. · Export compliance: exempt
+  (`ITSAppUsesNonExemptEncryption=false`, baked into the pkg).
+
 ## Remaining steps (yours, after review)
 
-1. Confirm the **[DECIDE]** items (arm64-only, price, export compliance).
-2. Run the upload command above (or use Transporter) to send the build.
-3. In App Store Connect: paste the text above, upload the screenshots, set
+1. Run the upload command above (or use Transporter) to send the build.
+2. In App Store Connect: paste the text above, upload the screenshots, set
    pricing and privacy, attach the build, and **Submit for Review**.

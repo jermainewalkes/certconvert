@@ -80,6 +80,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>LSApplicationCategoryType</key><string>public.app-category.developer-tools</string>
+  <!-- Only standard, published algorithms via the platform crypto — no proprietary
+       encryption — so it qualifies for the export-compliance exemption. -->
+  <key>ITSAppUsesNonExemptEncryption</key><false/>
 </dict></plist>
 PLIST
 
