@@ -23,7 +23,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <dict>
     <key>CFBundleName</key><string>CertConvert</string>
     <key>CFBundleDisplayName</key><string>CertConvert</string>
-    <key>CFBundleIdentifier</key><string>uk.jermainewalkes.certconvert</string>
+    <key>CFBundleIdentifier</key><string>com.certconvert.app</string>
     <key>CFBundleExecutable</key><string>CertConvert</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleIconFile</key><string>CertConvert</string>
