@@ -13,6 +13,24 @@
  * The choice is stored in localStorage. No third-party consent service is used.
  */
 (function () {
+  // Wire the privacy page's "change your choice" link here (not inline in the
+  // HTML) so the pages carry no inline script and CSP can stay strict. Wired
+  // even when analytics is off, so the href="#" never jumps to the page top.
+  function wireResetLink() {
+    var link = document.getElementById("cc-reset-consent");
+    if (link) {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (window.ccResetConsent) { window.ccResetConsent(); }
+      });
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wireResetLink);
+  } else {
+    wireResetLink();
+  }
+
   if (!window.CC_GA_ID) return;   // analytics disabled -> no cookies -> no banner.
 
   var KEY = "cc_consent";

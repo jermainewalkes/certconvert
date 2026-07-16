@@ -41,8 +41,14 @@ if (!is_file($configFile)) {
 }
 $cfg = require $configFile;
 
-// Cloudflare Turnstile: enforced only when a secret is configured (see mail.config.php).
-if (!cc_turnstile_ok((string)($cfg['turnstile_secret'] ?? ''), (string)($_POST['cf-turnstile-response'] ?? ''), cc_client_ip())) {
+// Cloudflare Turnstile. Always enforced — the widget is baked into
+// contact.html, so a missing secret is a config error, not "Turnstile off".
+$turnstileSecret = (string)($cfg['turnstile_secret'] ?? '');
+if ($turnstileSecret === '') {
+    error_log('contact.php: turnstile_secret is not configured; rejecting submission');
+    cc_redirect('error=config');
+}
+if (!cc_turnstile_ok($turnstileSecret, (string)($_POST['cf-turnstile-response'] ?? ''), cc_client_ip())) {
     cc_redirect('error=captcha');
 }
 

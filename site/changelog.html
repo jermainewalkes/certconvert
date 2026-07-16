@@ -7,7 +7,7 @@
   <script src="js/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Changelog — CertConvert</title>
-  <meta name="description" content="CertConvert release notes and version history: 1.0.0, 1.0.1 and 1.0.2.">
+  <meta name="description" content="CertConvert release notes and version history: 1.0.0 through 1.1.0.">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/changelog.html">
@@ -39,6 +39,15 @@
 
 <section class="section" style="padding-top:24px;">
   <div class="container prose">
+
+    <h2>1.1.0 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 16 July 2026</span></h2>
+    <p>A redesigned <strong>Generate</strong> page that makes the two outputs impossible to mix up.</p>
+    <ul>
+      <li><strong>Choose the output first</strong> &mdash; a segmented toggle picks Self-Signed Certificate or Signing Request (CSR), and the form shows only the fields that output uses. Validity, which a CSR doesn&rsquo;t carry, appears for self-signed certificates only.</li>
+      <li><strong>One primary action</strong> &mdash; a single Generate And Save button whose label follows the chosen output, replacing the two competing save buttons.</li>
+      <li>Consistent button emphasis on the key card: Generate Key And Save is now the primary action, Load Existing Key the secondary.</li>
+    </ul>
+    <p>No changes to certificate conversion, chaining or inspection.</p>
 
     <h2>1.0.2 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 12 July 2026</span></h2>
     <p>A small release that adds a persistent <strong>Support on Ko-fi</strong> link in the sidebar footer, so you can support development from anywhere in the app. No functional changes to certificate handling.</p>

@@ -65,7 +65,11 @@ function cc_rate_ok(string $ip, int $max, int $windowSec): bool
 function cc_turnstile_ok(string $secret, string $response, string $ip): bool
 {
     if ($secret === '') {
-        return true; // not configured yet -> skip the check.
+        // Fail CLOSED: the sitekey is baked into contact.html, so the widget
+        // always renders — an empty secret here would silently disable
+        // verification while the page still looks protected.
+        error_log('contact form: turnstile_secret is not configured; rejecting submission');
+        return false;
     }
     if ($response === '') {
         return false; // configured, but the visitor sent no token.
@@ -87,5 +91,8 @@ function cc_turnstile_ok(string $secret, string $response, string $ip): bool
         return false;
     }
     $j = json_decode($res, true);
-    return is_array($j) && !empty($j['success']);
+    // The token must be genuine AND minted for this site — the hostname check
+    // stops tokens replayed from a challenge solved on another domain.
+    return is_array($j) && !empty($j['success'])
+        && ($j['hostname'] ?? '') === 'certconvert.com';
 }

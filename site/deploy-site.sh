@@ -60,10 +60,11 @@ while IFS= read -r f; do
   common=(--netrc-file "$NETRC" --disable-epsv --ftp-create-dirs
           --retry 6 --retry-all-errors --retry-delay 2
           --connect-timeout 30 --max-time 240 -fsS)
-  if curl "${common[@]}" --ssl-reqd -T "$f" "${base}${rel}"; then
+  # </dev/null keeps curl off the loop's stdin (the find pipe feeding the file list).
+  if curl "${common[@]}" --ssl-reqd -T "$f" "${base}${rel}" </dev/null; then
     echo "  ok    $rel"
   elif [ "$rel" != "mail.config.php" ] && \
-       curl "${common[@]}" --ftp-ssl-control -T "$f" "${base}${rel}"; then
+       curl "${common[@]}" --ftp-ssl-control -T "$f" "${base}${rel}" </dev/null; then
     echo "  ok    $rel (control-channel TLS)"
   else
     echo "  FAIL  $rel"; fail=1

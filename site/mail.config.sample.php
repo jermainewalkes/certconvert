@@ -25,7 +25,8 @@ return [
     'mail_to'   => 'support@certconvert.com',    // where contact messages are delivered
     'mail_from' => 'support@certconvert.com',    // From address
 
-    // Cloudflare Turnstile secret key. Leave empty to disable the CAPTCHA check; set it
-    // (and add the matching site key to contact.html) to enforce Turnstile on submission.
+    // Cloudflare Turnstile secret key — REQUIRED. The matching site key is baked
+    // into contact.html, so the form fails closed (error=config) if this is
+    // empty; verification also checks the token's hostname is certconvert.com.
     'turnstile_secret' => '',
 ];

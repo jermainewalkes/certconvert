@@ -13,3 +13,21 @@
 
 # Serve the branded not-found page.
 ErrorDocument 404 /404.html
+
+# Security headers. HSTS is NOT set here — the host (nginx front) already
+# sends it; duplicating the header is worse than one short value.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Allow-list: our own assets, the Turnstile widget (script + iframe) and
+    # consent-gated GA4. Inline STYLE attributes are used by the pages;
+    # scripts need no inline allowance.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://*.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net; img-src 'self' data: https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+</IfModule>
+
+# The mail config carries the Turnstile secret. PHP execution normally hides
+# the source, but never rely on that alone — deny it over HTTP outright.
+<FilesMatch "^mail\.config.*\.php$">
+    Require all denied
+</FilesMatch>
