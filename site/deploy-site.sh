@@ -46,6 +46,7 @@ while IFS= read -r f; do
     .DS_Store|*/.DS_Store) continue;;
     .gitignore) continue;;
     deploy-site.sh) continue;;
+    setup-ftp-credentials.sh) continue;;   # local credential helper, not web content
     mail.config.php) continue;;   # live SMTP config: uploaded manually, never from here
   esac
   if [ "${CC_DRYRUN:-0}" = "1" ]; then
