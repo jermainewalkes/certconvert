@@ -103,6 +103,47 @@ public class UpdateServiceTests
         Assert.NotNull(result.Message);
     }
 
+    // ---------- store-only fallback: no binary releases, check tags instead ----------
+
+    /// <summary>404 from releases/latest, a tag list from the tags endpoint.</summary>
+    private static FakeHandler NoReleasesButTags(string tagsJson) => new(req =>
+        req.RequestUri!.AbsoluteUri == UpdateService.LatestReleaseApi
+            ? new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("Not Found") }
+            : Json(tagsJson));
+
+    [Fact]
+    public async Task NoReleases_FallsBackToTags_ReportsSourceOnlyUpdate()
+    {
+        var svc = new UpdateService(NoReleasesButTags(
+            """[{"name":"v9.9.9"},{"name":"v0.0.1"}]"""));
+
+        var result = await svc.CheckAsync();
+
+        Assert.Equal(UpdateStatus.UpdateAvailable, result.Status);
+        Assert.Equal("9.9.9", result.LatestVersion);
+        Assert.Null(result.AssetUrl); // nothing to download — store or source only
+        Assert.Equal(UpdateService.ReleasesPageUrl, result.ReleaseUrl);
+        Assert.NotNull(result.Message);
+    }
+
+    [Fact]
+    public async Task NoReleases_TagsNotNewer_ReportsUpToDate()
+    {
+        var svc = new UpdateService(NoReleasesButTags(
+            $$"""[{"name":"v{{UpdateService.CurrentVersion}}"},{"name":"v0.0.1"}]"""));
+        var result = await svc.CheckAsync();
+        Assert.Equal(UpdateStatus.UpToDate, result.Status);
+    }
+
+    [Fact]
+    public async Task NoReleases_NoTags_ReportsCheckFailed()
+    {
+        var svc = new UpdateService(NoReleasesButTags("[]"));
+        var result = await svc.CheckAsync();
+        Assert.Equal(UpdateStatus.CheckFailed, result.Status);
+        Assert.NotNull(result.Message);
+    }
+
     [Theory]
     [InlineData("v1.0.0", "1.0.0")]
     [InlineData("1.2", "1.2.0")]

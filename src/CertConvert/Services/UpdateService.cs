@@ -57,6 +57,10 @@ public sealed class UpdateService
 {
     public const string LatestReleaseApi =
         "https://api.github.com/repos/jermainewalkes/certconvert/releases/latest";
+    public const string TagsApi =
+        "https://api.github.com/repos/jermainewalkes/certconvert/tags";
+    public const string ReleasesPageUrl =
+        "https://github.com/jermainewalkes/certconvert/releases";
 
     private readonly HttpClient _http;
 
@@ -95,6 +99,12 @@ public sealed class UpdateService
         try
         {
             using var response = await _http.GetAsync(LatestReleaseApi, ct);
+            // GitHub returns 404 from releases/latest when a repo publishes no binary
+            // releases. Builds are distributed through the app stores now, so fall
+            // back to the tag list: a from-source build can still tell the user a
+            // newer version exists and point them at GitHub to rebuild.
+            if ((int)response.StatusCode == 404)
+                return await CheckViaTagsAsync(ct);
             if (!response.IsSuccessStatusCode)
                 return Failed($"GitHub responded with {(int)response.StatusCode}.");
 
@@ -135,9 +145,7 @@ public sealed class UpdateService
             return new UpdateCheckResult(
                 UpdateStatus.UpdateAvailable, CurrentVersion, latest.ToString(),
                 releaseUrl, assetName, assetUrl, checksumsUrl,
-                assetUrl is null
-                    ? "No build for this platform was attached to the release."
-                    : null);
+                assetUrl is null ? SourceOnlyMessage() : null);
         }
         catch (Exception e) when (
             e is HttpRequestException or TaskCanceledException or JsonException
@@ -147,10 +155,60 @@ public sealed class UpdateService
                 ? "Timed out contacting GitHub."
                 : $"Could not reach GitHub: {e.Message}");
         }
-
-        UpdateCheckResult Failed(string message) =>
-            new(UpdateStatus.CheckFailed, CurrentVersion, Message: message);
     }
+
+    private static UpdateCheckResult Failed(string message) =>
+        new(UpdateStatus.CheckFailed, CurrentVersion, Message: message);
+
+    /// <summary>
+    /// Version check for when GitHub hosts no binary releases (the store-only
+    /// model): read the tag list, take the highest version and, if newer, tell the
+    /// user where to get it. Tags survive release deletion, so this keeps working.
+    /// </summary>
+    private async Task<UpdateCheckResult> CheckViaTagsAsync(CancellationToken ct)
+    {
+        try
+        {
+            using var response = await _http.GetAsync(TagsApi, ct);
+            if (!response.IsSuccessStatusCode)
+                return Failed($"GitHub responded with {(int)response.StatusCode}.");
+
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));
+            var current = ParseVersion(CurrentVersion);
+            if (current is null)
+                return Failed($"Could not parse the running version \"{CurrentVersion}\".");
+
+            Version? latest = null;
+            foreach (var tag in doc.RootElement.EnumerateArray())
+            {
+                var v = ParseVersion(tag.GetProperty("name").GetString() ?? "");
+                if (v is not null && (latest is null || v > latest))
+                    latest = v;
+            }
+            if (latest is null)
+                return Failed("No release tags were found on GitHub.");
+            if (latest <= current)
+                return new UpdateCheckResult(
+                    UpdateStatus.UpToDate, CurrentVersion, latest.ToString(), ReleasesPageUrl);
+
+            return new UpdateCheckResult(
+                UpdateStatus.UpdateAvailable, CurrentVersion, latest.ToString(),
+                ReleasesPageUrl, Message: SourceOnlyMessage());
+        }
+        catch (Exception e) when (
+            e is HttpRequestException or TaskCanceledException or JsonException
+              or KeyNotFoundException or InvalidOperationException)
+        {
+            return Failed(e is TaskCanceledException
+                ? "Timed out contacting GitHub."
+                : $"Could not reach GitHub: {e.Message}");
+        }
+    }
+
+    /// <summary>Shown when a newer version exists but no downloadable build does.</summary>
+    private static string SourceOnlyMessage() =>
+        "Install it from the Mac App Store or Microsoft Store, or build it from " +
+        "source on GitHub.";
 
     public async Task<string> DownloadAsync(
         string url, string fileName, IProgress<double>? progress = null,
