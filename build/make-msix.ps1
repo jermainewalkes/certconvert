@@ -35,7 +35,9 @@ Write-Host "==> Assembling package layout"
 Copy-Item 'build/msix/assets' (Join-Path $layout 'assets') -Recurse -Force
 # Stamp the manifest version and drop it into the layout root.
 $manifest = Get-Content 'build/msix/AppxManifest.xml' -Raw
-$manifest = $manifest -replace 'Version="[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"', "Version=`"$msixVersion`""
+# (?<![A-Za-z]) keeps this off MinVersion/MaxVersionTested — only the bare
+# Version attribute on <Identity> may be stamped.
+$manifest = $manifest -replace '(?<![A-Za-z])Version="[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"', "Version=`"$msixVersion`""
 Set-Content (Join-Path $layout 'AppxManifest.xml') $manifest -Encoding UTF8
 
 Write-Host "==> Locating MakeAppx.exe"
