@@ -90,6 +90,14 @@ capture flow (`CERTCONVERT_CAPTURE_SIZE=1920x1080`; note the capture dir is
 resolved against the TEST RUNNER's working directory, so pass an absolute path
 or fetch from `tests/.../bin/Debug/net10.0/design/msstore-screenshots`).
 
+## Store logos
+
+In `design/msstore-logos/`: **boxart-1080.png** (1:1 box art) and
+**poster-1440x2160.png** (2:3 poster art). Regenerate with
+`python3 build/make-icons.py --msstore-logos`. These are the LISTING images —
+the package tile assets in build/msix/assets are separate and already inside
+the MSIX.
+
 ## Notes
 
 - Nothing in the listing mentions other stores or the GitHub build (kept

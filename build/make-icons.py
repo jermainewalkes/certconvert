@@ -145,6 +145,42 @@ def make_msix_tiles(tile_1024: Image.Image):
     print(f'wrote MSIX tiles to {out}')
 
 
+def make_msstore_logos(tile_1024: Image.Image):
+    """Partner Center listing logos (1:1 box art + 2:3 poster) → design/msstore-logos.
+    These are the STORE LISTING images, distinct from the package tile assets."""
+    out = 'design/msstore-logos'
+    os.makedirs(out, exist_ok=True)
+
+    def compose(W, H, tile_px, name_size, strap_size, path):
+        canvas = _vertical_gradient((W, H), OG_BG_TOP, OG_BG_BOTTOM).convert('RGBA')
+        tx, ty = (W - tile_px) // 2, int(H * 0.30) - tile_px // 2
+        shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        sd = ImageDraw.Draw(shadow)
+        sd.rounded_rectangle([tx + 8, ty + 20, tx + tile_px + 8, ty + tile_px + 20],
+                             radius=int(tile_px * 0.224), fill=(0, 0, 0, 90))
+        shadow = shadow.filter(ImageFilter.GaussianBlur(24))
+        canvas.alpha_composite(shadow)
+        canvas.alpha_composite(
+            tile_1024.convert('RGBA').resize((tile_px, tile_px), Image.LANCZOS), (tx, ty))
+        d = ImageDraw.Draw(canvas)
+        name_font = ImageFont.truetype(SITE_FONT, name_size)
+        strap_font = ImageFont.truetype(SITE_FONT, strap_size)
+        for text, font, fill, dy in [
+                ('CertConvert', name_font, (255, 255, 255, 255), 0.66),
+                ('Certificate Toolbox', strap_font, (199, 210, 254, 255), 0.76)]:
+            tw = d.textlength(text, font=font)
+            d.text(((W - tw) / 2, int(H * dy)), text, font=font, fill=fill)
+        canvas.convert('RGB').save(path)
+        print(f'wrote {path}')
+
+    compose(1080, 1080, 520, 96, 48, f'{out}/boxart-1080.png')      # 1:1
+    compose(1440, 2160, 760, 128, 64, f'{out}/poster-1440x2160.png')  # 2:3
+
+
+if '--msstore-logos' in sys.argv:
+    make_msstore_logos(Image.open('design/icon-1024.png'))
+    sys.exit(0)
+
 if '--msix' in sys.argv:
     make_msix_tiles(Image.open('design/icon-1024.png'))
     sys.exit(0)
