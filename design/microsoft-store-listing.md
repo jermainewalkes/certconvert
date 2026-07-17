@@ -81,23 +81,14 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **Additional licence terms:** leave as Standard Application Licence Terms.
 
-## Screenshots — ACTION NEEDED before submitting
+## Screenshots — READY
 
-Partner Center wants desktop screenshots of **at least 1366×768**; the existing
-store captures are 1280×800 (`StoreScreenshots.cs` hardcodes the window size),
-so they miss the width minimum. To produce compliant ones:
-
-1. Make the capture size env-overridable in
-   `tests/CertConvert.App.Tests/StoreScreenshots.cs` (read
-   `CERTCONVERT_CAPTURE_SIZE`, default 1280×800).
-2. Run the capture on the Windows VM at 1920×1080 so the styling matches the
-   shipped Windows build:
-   ```
-   ssh winbuild "cd C:\build\CertConvert; $env:CERTCONVERT_CAPTURE_DIR='design\msstore-screenshots'; $env:CERTCONVERT_CAPTURE_SIZE='1920x1080'; dotnet test tests/CertConvert.App.Tests --filter StoreShots -p:StoreBuild=true"
-   ```
-   then tar the PNGs back (same channel as build-on-windows.sh).
-3. Upload the five captures (Inspect, Convert, Chain, Keys, Generate) in that
-   order — Inspect first, it's the strongest opener.
+Five 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
+variant, captured on the build VM 17 Jul): 01-inspect … 05-generate. Upload in
+that order — Inspect first, it's the strongest opener. Regenerate with the VM
+capture flow (`CERTCONVERT_CAPTURE_SIZE=1920x1080`; note the capture dir is
+resolved against the TEST RUNNER's working directory, so pass an absolute path
+or fetch from `tests/.../bin/Debug/net10.0/design/msstore-screenshots`).
 
 ## Notes
 
