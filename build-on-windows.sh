@@ -17,7 +17,13 @@ NL="$HOME/Claude/NewLaptop"
 PROJ="CertConvert"
 DST="C:/build/$PROJ"
 
-"$NL/winvm.sh" start
+# vmrun cold-boot of this encrypted VM fails ("operation is not supported") on
+# Fusion 13.5/macOS 26 — same breakage class as its snapshot ops. Fall back to
+# booting through the Fusion GUI, which handles the encryption itself.
+"$NL/winvm.sh" start || {
+  echo "vmrun start failed — booting via the Fusion GUI instead"
+  open -a "VMware Fusion" "$HOME/Virtual Machines.localized/Windows 11 64-bit Arm.vmwarevm/Windows 11 64-bit Arm.vmx"
+}
 "$NL/winvm.sh" wait-ssh
 
 echo "== sync working tree -> VM ($DST)"
