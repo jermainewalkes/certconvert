@@ -20,8 +20,16 @@ public class StoreShots
         if (string.IsNullOrEmpty(dir)) return;
         Directory.CreateDirectory(dir);
 
+        // Default 1280x800 suits the Mac App Store; the Microsoft Store needs
+        // >=1366x768, so CERTCONVERT_CAPTURE_SIZE=1920x1080 overrides it.
+        int width = 1280, height = 800;
+        var size = Environment.GetEnvironmentVariable("CERTCONVERT_CAPTURE_SIZE");
+        if (!string.IsNullOrEmpty(size) && size.Split('x') is [var ws, var hs]
+            && int.TryParse(ws, out int pw) && int.TryParse(hs, out int ph))
+            (width, height) = (pw, ph);
+
         var vm = new MainWindowViewModel();
-        var window = new MainWindow { DataContext = vm, Width = 1280, Height = 800 };
+        var window = new MainWindow { DataContext = vm, Width = width, Height = height };
         window.Show();
 
         // 1 — Inspect a real cert.
