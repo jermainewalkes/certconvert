@@ -102,6 +102,13 @@ In `design/msstore-logos/`: **boxart-1080.png** (1:1 box art) and
 the package tile assets in build/msix/assets are separate and already inside
 the MSIX.
 
+## Hero banner
+
+`design/msstore-logos/hero-3840x2160.png` — the 16:9 "super hero art" slot.
+Deliberately carries NO product title (Store rule: the listing overlays the
+name); only the tile and the "Certificate Toolbox" strapline. Regenerate with
+`python3 build/make-icons.py --msstore-hero`.
+
 ## Notes
 
 - Nothing in the listing mentions other stores or the GitHub build (kept

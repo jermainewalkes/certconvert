@@ -177,6 +177,40 @@ def make_msstore_logos(tile_1024: Image.Image):
     compose(1440, 2160, 760, 128, 64, f'{out}/poster-1440x2160.png')  # 2:3
 
 
+def make_msstore_hero(tile_1024: Image.Image):
+    """16:9 'super hero art' banner → design/msstore-logos/hero-3840x2160.png.
+    Store rule: must NOT contain the product's title (the Store overlays it),
+    so only the tile artwork and the strapline appear."""
+    W, H = 3840, 2160
+    canvas = _vertical_gradient((W, H), OG_BG_TOP, OG_BG_BOTTOM).convert('RGBA')
+
+    tile_px = 900
+    tx, ty = (W - tile_px) // 2, int(H * 0.40) - tile_px // 2
+    shadow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    sd.rounded_rectangle([tx + 12, ty + 30, tx + tile_px + 12, ty + tile_px + 30],
+                         radius=int(tile_px * 0.224), fill=(0, 0, 0, 90))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(36))
+    canvas.alpha_composite(shadow)
+    canvas.alpha_composite(
+        tile_1024.convert('RGBA').resize((tile_px, tile_px), Image.LANCZOS), (tx, ty))
+
+    d = ImageDraw.Draw(canvas)
+    strap_font = ImageFont.truetype(SITE_FONT, 110)
+    text = 'Certificate Toolbox'
+    tw = d.textlength(text, font=strap_font)
+    d.text(((W - tw) / 2, int(H * 0.80)), text, font=strap_font, fill=(199, 210, 254, 255))
+
+    out = 'design/msstore-logos'
+    os.makedirs(out, exist_ok=True)
+    canvas.convert('RGB').save(f'{out}/hero-3840x2160.png')
+    print(f'wrote {out}/hero-3840x2160.png')
+
+
+if '--msstore-hero' in sys.argv:
+    make_msstore_hero(Image.open('design/icon-1024.png'))
+    sys.exit(0)
+
 if '--msstore-logos' in sys.argv:
     make_msstore_logos(Image.open('design/icon-1024.png'))
     sys.exit(0)
