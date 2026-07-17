@@ -83,8 +83,8 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 ## Screenshots — READY
 
-Five 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
-variant, captured on the build VM 17 Jul): 01-inspect … 05-generate. Upload in
+Seven 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
+variant, captured on the build VM 17 Jul): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded. Upload in
 that order — Inspect first, it's the strongest opener. Regenerate with the VM
 capture flow (`CERTCONVERT_CAPTURE_SIZE=1920x1080`; note the capture dir is
 resolved against the TEST RUNNER's working directory, so pass an absolute path
