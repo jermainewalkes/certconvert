@@ -116,6 +116,6 @@ name); only the tile and the "Certificate Toolbox" strapline. Regenerate with
 - No OpenSSL mention anywhere in Store copy (trademark caution, same call as
   the Mac keywords).
 - **runFullTrust justification** (required field on the submission page; the
-  field truncates around 600 characters — this version fits at 578):
+  field limit is 500 characters — this version fits at 495):
 
-  > CertConvert is a Win32 desktop app (.NET/Avalonia) packaged as MSIX; runFullTrust is the standard capability for running a packaged Win32 desktop app, and no other restricted capability is used. It is an offline X.509 certificate utility: convert PEM, DER, PKCS #7 and PKCS #12, validate chains, inspect certificates, generate keys and CSRs. All processing is local via the OS cryptography libraries — no network connections, no data collection, no background services, no elevation, no drivers. File access happens only through user-invoked open/save dialogs and drag-and-drop.
+  > CertConvert is a Win32 desktop app (.NET/Avalonia) packaged as MSIX; runFullTrust is the standard capability for a packaged Win32 desktop app; no other restricted capability is used. It is an offline X.509 certificate utility: convert PEM, DER, PKCS #7 and PKCS #12, validate chains, inspect certificates, generate keys and CSRs. All processing is local via the OS crypto libraries — no network, no data collection, no services, no elevation; file access only via user dialogs and drag-and-drop.
