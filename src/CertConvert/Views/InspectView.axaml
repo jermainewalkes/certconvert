@@ -48,9 +48,11 @@
                        IsVisible="{Binding Status.Length}"
                        AutomationProperties.LiveSetting="Polite"/>
             <TextBlock Classes="status" Text="{Binding KeysSummary}" TextWrapping="Wrap"
-                       IsVisible="{Binding KeysSummary.Length}"/>
+                       IsVisible="{Binding KeysSummary.Length}"
+                       AutomationProperties.LiveSetting="Polite"/>
             <TextBlock Classes="status" Text="A certificate request (CSR) is present in this file."
-                       IsVisible="{Binding HasCsr}"/>
+                       IsVisible="{Binding HasCsr}"
+                       AutomationProperties.LiveSetting="Polite"/>
           </StackPanel>
         </StackPanel>
       </Border>
