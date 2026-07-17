@@ -75,6 +75,10 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 `certificate converter` · `pem to pfx` · `x509` · `csr` · `pkcs12` ·
 `ssl certificate` · `certificate chain`
 
+**Short description** (supplemental, ≤270 — Short title and Voice title stay blank; they are Xbox fields):
+
+> Convert, chain, inspect and generate X.509 certificates entirely on your own PC. PEM, DER, PKCS #7 and PKCS #12 in both directions, offline chain validation and key tools — no uploads, no account, your private keys never leave the machine.
+
 **Copyright and trademark info:**
 
 > © 2026 Jermaine Walkes
