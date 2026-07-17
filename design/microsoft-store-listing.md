@@ -115,8 +115,7 @@ name); only the tile and the "Certificate Toolbox" strapline. Regenerate with
   consistent with the Mac listing; no store-policy need to mention them).
 - No OpenSSL mention anywhere in Store copy (trademark caution, same call as
   the Mac keywords).
-- **runFullTrust justification** (required field on the submission page):
+- **runFullTrust justification** (required field on the submission page; the
+  field truncates around 600 characters — this version fits at 578):
 
-  > CertConvert is a Win32 desktop application (built with the cross-platform .NET/Avalonia UI framework) packaged as MSIX. runFullTrust is the standard capability required to run a packaged Win32 desktop application; the app does not use any other restricted capability.
-  >
-  > The app is an offline X.509 certificate utility: it converts certificate formats (PEM, DER, PKCS #7, PKCS #12), validates certificate chains, inspects certificates and generates keys and CSRs. All processing happens locally using the operating system's built-in cryptography libraries. It makes no network connections, collects no data, requires no account and runs no background services. File access occurs only through user-invoked file open/save dialogs and files the user drags into the window. It does not require elevation, does not install drivers or services, and does not modify the system certificate store.
+  > CertConvert is a Win32 desktop app (.NET/Avalonia) packaged as MSIX; runFullTrust is the standard capability for running a packaged Win32 desktop app, and no other restricted capability is used. It is an offline X.509 certificate utility: convert PEM, DER, PKCS #7 and PKCS #12, validate chains, inspect certificates, generate keys and CSRs. All processing is local via the OS cryptography libraries — no network connections, no data collection, no background services, no elevation, no drivers. File access happens only through user-invoked open/save dialogs and drag-and-drop.
