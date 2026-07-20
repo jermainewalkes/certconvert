@@ -78,20 +78,24 @@ Delete it any time; the app recreates it with defaults.
 
 ## Install & run
 
-### From a release (no .NET needed)
+### Windows — Microsoft Store
 
-Grab the latest zip from [Releases](https://github.com/jermainewalkes/certconvert/releases)
-— the .NET runtime is bundled.
+Install from the [Microsoft Store](https://apps.microsoft.com/detail/9NT6HCG0JBFV) —
+signed by the Store, updates arrive automatically.
+
+### macOS — from a release (no .NET needed)
+
+Grab the zip that matches your Mac from
+[Releases](https://github.com/jermainewalkes/certconvert/releases) — the .NET
+runtime is bundled. (A Mac App Store edition is in review.)
 
 | Platform | File |
 |---|---|
 | macOS (Intel) | `CertConvert-<version>-osx-x64.zip` |
 | macOS (Apple Silicon) | `CertConvert-<version>-osx-arm64.zip` |
-| Windows x64 | `CertConvert-<version>-win-x64.zip` |
 
-Unzip; on macOS move `CertConvert.app` to Applications, on Windows run
-`CertConvert.exe`. Releases are currently unsigned — see Troubleshooting for
-the one-time first-launch step on each platform.
+Unzip and move `CertConvert.app` to Applications. The macOS release builds are
+currently unsigned — see Troubleshooting for the one-time first-launch step.
 
 ### From source
 
@@ -131,8 +135,9 @@ chain or a key that does not match).
 - **macOS: "CertConvert can't be opened"** — the build is unsigned;
   right-click the app → **Open** (one-time), or allow it under
   System Settings → Privacy & Security.
-- **Windows: "Windows protected your PC"** — SmartScreen on an unsigned
-  binary; **More info → Run anyway** (one-time).
+- **Windows: "Windows protected your PC"** — only applies to self-compiled
+  builds (SmartScreen on an unsigned binary; **More info → Run anyway**,
+  one-time). The Microsoft Store edition is signed and shows no warning.
 - **"…is password-protected"** — the file is an encrypted PFX or key; type
   the password in the password field and use Unlock (GUI) or `--password`
   (CLI). Errors always name the file that needs it.
