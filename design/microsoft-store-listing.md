@@ -88,9 +88,10 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 ## Screenshots — READY
 
 Seven 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
-variant, captured on the build VM 17 Jul): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded. Upload in
+variant; 1280×720 logical at 1.5× render scaling so the UI is sized like a real
+150%-scaled 1080p laptop, not sparse 1x): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded. Upload in
 that order — Inspect first, it's the strongest opener. Regenerate with the VM
-capture flow (`CERTCONVERT_CAPTURE_SIZE=1920x1080`; note the capture dir is
+capture flow (`CERTCONVERT_CAPTURE_SIZE=1280x720 CERTCONVERT_CAPTURE_SCALE=1.5`; note the capture dir is
 resolved against the TEST RUNNER's working directory, so pass an absolute path
 or fetch from `tests/.../bin/Debug/net10.0/design/msstore-screenshots`).
 

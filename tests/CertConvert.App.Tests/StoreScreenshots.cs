@@ -22,17 +22,27 @@ public class StoreShots
         if (string.IsNullOrEmpty(dir)) return;
         Directory.CreateDirectory(dir);
 
-        // Default 1280x800 suits the Mac App Store; the Microsoft Store needs
-        // >=1366x768, so CERTCONVERT_CAPTURE_SIZE=1920x1080 overrides it.
+        // CERTCONVERT_CAPTURE_SIZE sets the LOGICAL window size and
+        // CERTCONVERT_CAPTURE_SCALE the render scaling; the PNG comes out at
+        // size × scale. Real machines run scaled displays, so screenshots
+        // should too — e.g. 1280x720 at 1.5 = a typical 150% 1080p laptop
+        // (Microsoft Store), 1280x800 at 2 = Retina 2560x1600 (Mac App Store).
         int width = 1280, height = 800;
         var size = Environment.GetEnvironmentVariable("CERTCONVERT_CAPTURE_SIZE");
         if (!string.IsNullOrEmpty(size) && size.Split('x') is [var ws, var hs]
             && int.TryParse(ws, out int pw) && int.TryParse(hs, out int ph))
             (width, height) = (pw, ph);
+        double scale = 1;
+        var scaleVar = Environment.GetEnvironmentVariable("CERTCONVERT_CAPTURE_SCALE");
+        if (!string.IsNullOrEmpty(scaleVar) &&
+            double.TryParse(scaleVar, System.Globalization.CultureInfo.InvariantCulture, out double ps))
+            scale = ps;
 
         var vm = new MainWindowViewModel();
         var window = new MainWindow { DataContext = vm, Width = width, Height = height };
         window.Show();
+        if (scale != 1)
+            window.SetRenderScaling(scale);
 
         // 1 — Inspect a real cert.
         using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
