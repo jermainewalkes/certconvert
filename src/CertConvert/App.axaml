@@ -3,8 +3,18 @@
              x:Class="CertConvert.App"
              xmlns:local="using:CertConvert"
              xmlns:conv="using:CertConvert.Converters"
+             Name="CertConvert"
              RequestedThemeVariant="Default">
     <!-- "Default" follows the system light/dark setting. -->
+
+    <!-- macOS application menu. Avalonia's default About item is hardcoded
+         "About Avalonia"; defining our own app menu replaces it so the menu
+         reads CertConvert throughout (App Store guideline 2.3.8). -->
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About CertConvert" Click="OnAboutMenu"/>
+        </NativeMenu>
+    </NativeMenu.Menu>
 
     <Application.DataTemplates>
         <local:ViewLocator/>

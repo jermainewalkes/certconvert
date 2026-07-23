@@ -28,4 +28,12 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    // macOS app-menu "About CertConvert" — jump to the in-app About page.
+    private void OnAboutMenu(object? sender, System.EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
+            desktop.MainWindow?.DataContext is MainWindowViewModel vm)
+            vm.GoToAboutCommand.Execute(null);
+    }
 }
