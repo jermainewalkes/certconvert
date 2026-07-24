@@ -228,13 +228,23 @@ public sealed class UpdateService
         CancellationToken ct = default)
     {
         RequireHttps(url);
+        // fileName is the release asset name from GitHub JSON — strip any path
+        // components so a rooted or "../" name can't escape the update directory.
+        string safeName = Path.GetFileName(fileName);
+        if (string.IsNullOrEmpty(safeName))
+            throw new InvalidOperationException($"Refusing an update asset with no file name: \"{fileName}\".");
         string dir = Path.Combine(Path.GetTempPath(), "CertConvert-update");
         Directory.CreateDirectory(dir);
-        string destination = Path.Combine(dir, fileName);
+        string destination = Path.Combine(dir, safeName);
 
         using var response = await _http.GetAsync(
             url, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
+        // HttpClient will not auto-follow an https→http redirect, but assert the
+        // final URI is still https as belt-and-braces against a downgrade.
+        if (response.RequestMessage?.RequestUri is { } finalUri &&
+            finalUri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException($"Update download was redirected to a non-https URL: {finalUri}.");
         long? total = response.Content.Headers.ContentLength;
 
         await using var source = await response.Content.ReadAsStreamAsync(ct);
@@ -274,10 +284,12 @@ public sealed class UpdateService
             .Where(l => l.Length > 0)
             .Select(l =>
             {
-                int sp = l.IndexOf(' ');
+                // "<hex-hash><whitespace>[*]<filename>" — split on the first run of
+                // whitespace so tab- and space-delimited sums files both parse.
+                int sp = l.AsSpan().IndexOfAny(' ', '\t');
                 return sp <= 0
                     ? (Hash: "", File: "")
-                    : (Hash: l[..sp], File: l[(sp + 1)..].TrimStart(' ', '*'));
+                    : (Hash: l[..sp], File: l[sp..].TrimStart(' ', '\t', '*'));
             })
             .Where(e => e.File.Equals(assetName, StringComparison.OrdinalIgnoreCase))
             .Select(e => e.Hash)

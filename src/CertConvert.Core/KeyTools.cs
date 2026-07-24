@@ -59,7 +59,7 @@ public static class KeyTools
                 catch (CryptographicException e)
                 {
                     rsa.Dispose();
-                    throw new UnrecognisedContentException($"Not a valid RSA private key: {e.Message}");
+                    throw new UnrecognisedContentException($"Not a valid RSA private key: {e.Message}", e);
                 }
                 return Describe(rsa);
             }
@@ -70,7 +70,7 @@ public static class KeyTools
                 catch (CryptographicException e)
                 {
                     ec.Dispose();
-                    throw new UnrecognisedContentException($"Not a valid ECDSA private key: {e.Message}");
+                    throw new UnrecognisedContentException($"Not a valid ECDSA private key: {e.Message}", e);
                 }
                 return Describe(ec);
             }

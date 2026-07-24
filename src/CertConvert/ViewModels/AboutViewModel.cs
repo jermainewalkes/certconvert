@@ -111,11 +111,12 @@ public partial class AboutViewModel : ViewModelBase
                     break;
             }
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             // Belt-and-braces: CheckAsync catches its expected exceptions, but this
             // also runs fire-and-forget at launch — never let an unexpected type
-            // become an unobserved Task fault.
+            // become an unobserved Task fault. Cancellation (e.g. app shutdown) is
+            // not a failure, so it's excluded rather than shown as one.
             UpdateAvailable = false;
             CanInstall = false;
             UpdateStatus = $"Update check failed: {e.Message}";

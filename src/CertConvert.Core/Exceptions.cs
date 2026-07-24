@@ -33,4 +33,5 @@ public sealed class InvalidPasswordException : CertConvertException
 public sealed class UnrecognisedContentException : CertConvertException
 {
     public UnrecognisedContentException(string message) : base(message) { }
+    public UnrecognisedContentException(string message, Exception inner) : base(message, inner) { }
 }

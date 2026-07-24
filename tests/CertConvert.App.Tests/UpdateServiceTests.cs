@@ -272,4 +272,43 @@ public class UpdateServiceTests
         }
         finally { File.Delete(zip); }
     }
+
+    [Fact]
+    public async Task Checksum_TabDelimited_Verifies()
+    {
+        // GNU/coreutils sums files may separate hash and name with a tab.
+        string zip = WriteTempZip([2, 4, 6], out string hex);
+        var svc = new UpdateService(new FakeHandler(_ => Json($"{hex}\tbuild.zip\n")));
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, "https://x/SHA256SUMS.txt", "build.zip");
+            Assert.Equal(ChecksumResult.Verified, result);
+        }
+        finally { File.Delete(zip); }
+    }
+
+    [Fact]
+    public async Task Download_StripsPathComponentsFromAssetName()
+    {
+        var svc = new UpdateService(new FakeHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) }));
+        // A malicious asset name must not escape the update directory.
+        string path = await svc.DownloadAsync("https://x/a.zip", "../../evil.zip");
+        try
+        {
+            Assert.Equal("evil.zip", Path.GetFileName(path));
+            Assert.Contains("CertConvert-update", path);
+            Assert.DoesNotContain("..", path);
+        }
+        finally { if (File.Exists(path)) File.Delete(path); }
+    }
+
+    [Fact]
+    public async Task Download_NonHttpsUrl_IsRejected()
+    {
+        var svc = new UpdateService(new FakeHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1]) }));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => svc.DownloadAsync("http://insecure/a.zip", "a.zip"));
+    }
 }

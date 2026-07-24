@@ -36,54 +36,54 @@ public static class Pkcs12Util
 
         try
         {
-        foreach (Pkcs12SafeContents safe in info.AuthenticatedSafe)
-        {
-            if (safe.ConfidentialityMode == Pkcs12ConfidentialityMode.Password)
+            foreach (Pkcs12SafeContents safe in info.AuthenticatedSafe)
             {
-                try
+                if (safe.ConfidentialityMode == Pkcs12ConfidentialityMode.Password)
                 {
-                    safe.Decrypt(effective);
-                }
-                catch (CryptographicException)
-                {
-                    if (password is null)
-                        throw new PasswordRequiredException("This PKCS #12 file");
-                    throw new InvalidPasswordException("this PKCS #12 file");
-                }
-            }
-
-            foreach (Pkcs12SafeBag bag in safe.GetBags())
-            {
-                switch (bag)
-                {
-                    case Pkcs12CertBag certBag when certBag.IsX509Certificate:
-                        certs.Add(certBag.GetCertificate());
-                        break;
-
-                    case Pkcs12ShroudedKeyBag shrouded:
+                    try
                     {
-                        Pkcs8PrivateKeyInfo pk8;
-                        try
-                        {
-                            pk8 = Pkcs8PrivateKeyInfo.DecryptAndDecode(
-                                effective, shrouded.EncryptedPkcs8PrivateKey, out _);
-                        }
-                        catch (CryptographicException)
-                        {
-                            if (password is null)
-                                throw new PasswordRequiredException("This PKCS #12 file");
-                            throw new InvalidPasswordException("this PKCS #12 file");
-                        }
-                        keys.Add(KeyTools.ImportPkcs8Der(pk8.Encode()));
-                        break;
+                        safe.Decrypt(effective);
                     }
+                    catch (CryptographicException)
+                    {
+                        if (password is null)
+                            throw new PasswordRequiredException("This PKCS #12 file");
+                        throw new InvalidPasswordException("this PKCS #12 file");
+                    }
+                }
 
-                    case Pkcs12KeyBag keyBag:
-                        keys.Add(KeyTools.ImportPkcs8Der(keyBag.Pkcs8PrivateKey));
-                        break;
+                foreach (Pkcs12SafeBag bag in safe.GetBags())
+                {
+                    switch (bag)
+                    {
+                        case Pkcs12CertBag certBag when certBag.IsX509Certificate:
+                            certs.Add(certBag.GetCertificate());
+                            break;
+
+                        case Pkcs12ShroudedKeyBag shrouded:
+                        {
+                            Pkcs8PrivateKeyInfo pk8;
+                            try
+                            {
+                                pk8 = Pkcs8PrivateKeyInfo.DecryptAndDecode(
+                                    effective, shrouded.EncryptedPkcs8PrivateKey, out _);
+                            }
+                            catch (CryptographicException)
+                            {
+                                if (password is null)
+                                    throw new PasswordRequiredException("This PKCS #12 file");
+                                throw new InvalidPasswordException("this PKCS #12 file");
+                            }
+                            keys.Add(KeyTools.ImportPkcs8Der(pk8.Encode()));
+                            break;
+                        }
+
+                        case Pkcs12KeyBag keyBag:
+                            keys.Add(KeyTools.ImportPkcs8Der(keyBag.Pkcs8PrivateKey));
+                            break;
+                    }
                 }
             }
-        }
         }
         catch
         {

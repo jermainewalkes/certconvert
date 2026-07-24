@@ -92,4 +92,34 @@ public class GeneratorTests
         Assert.Throws<CertConvertException>(
             () => Generator.CreateSelfSigned(key.Key, Spec with { IpAddresses = ["not-an-ip"] }));
     }
+
+    [Theory]
+    [InlineData(KeyAlgorithmChoice.EcP256, "1.2.840.10045.4.3.2")] // ecdsa-with-SHA256
+    [InlineData(KeyAlgorithmChoice.EcP384, "1.2.840.10045.4.3.3")] // ecdsa-with-SHA384
+    [InlineData(KeyAlgorithmChoice.EcP521, "1.2.840.10045.4.3.4")] // ecdsa-with-SHA512
+    public void EcSignatureHash_TracksCurveStrength(KeyAlgorithmChoice choice, string expectedOid)
+    {
+        using var key = Generator.CreateKey(choice);
+        using var cert = Generator.CreateSelfSigned(key.Key, Spec);
+        Assert.Equal(expectedOid, cert.SignatureAlgorithm.Value);
+    }
+
+    [Fact]
+    public void Country_LowercaseIsNormalisedToUppercase()
+    {
+        using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
+        using var cert = Generator.CreateSelfSigned(key.Key, Spec with { Country = "gb" });
+        Assert.Contains("C=GB", cert.Subject);
+    }
+
+    [Theory]
+    [InlineData("G")]    // too short
+    [InlineData("GBR")]  // too long
+    [InlineData("G1")]   // not a letter
+    public void Country_InvalidIsRejected(string bad)
+    {
+        using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
+        Assert.Throws<CertConvertException>(
+            () => Generator.CreateSelfSigned(key.Key, Spec with { Country = bad }));
+    }
 }

@@ -73,10 +73,10 @@ public static class Generator
         if (!string.IsNullOrWhiteSpace(spec.Locality)) dn.AddLocalityName(spec.Locality);
         if (!string.IsNullOrWhiteSpace(spec.Country))
         {
-            string country = spec.Country.Trim();
+            string country = spec.Country.Trim().ToUpperInvariant();
             if (country.Length != 2 || !country.All(char.IsAsciiLetter))
                 throw new CertConvertException("Country must be a two-letter ISO code, e.g. GB.");
-            dn.AddCountryOrRegion(country);
+            dn.AddCountryOrRegion(country); // ISO 3166-1 alpha-2 is canonical uppercase
         }
 
         CertificateRequest request = key switch
