@@ -244,4 +244,32 @@ public class UpdateServiceTests
         }
         finally { File.Delete(zip); }
     }
+
+    [Fact]
+    public async Task Checksum_SupersetFilename_DoesNotMatch()
+    {
+        // The sums file lists a filename that merely ENDS WITH ours, with our real
+        // hash. Exact filename-field matching must reject it (not the old EndsWith).
+        string zip = WriteTempZip([5, 5, 5], out string hex);
+        var svc = new UpdateService(new FakeHandler(_ => Json($"{hex}  evil-build.zip\n")));
+        try
+        {
+            var result = await svc.VerifyChecksumAsync(zip, "https://x/SHA256SUMS.txt", "build.zip");
+            Assert.Equal(ChecksumResult.Failed, result);
+        }
+        finally { File.Delete(zip); }
+    }
+
+    [Fact]
+    public async Task Checksum_NonHttpsUrl_IsRejected()
+    {
+        string zip = WriteTempZip([1], out _);
+        var svc = new UpdateService(new FakeHandler(_ => Json("")));
+        try
+        {
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => svc.VerifyChecksumAsync(zip, "http://insecure/SHA256SUMS.txt", "build.zip"));
+        }
+        finally { File.Delete(zip); }
+    }
 }

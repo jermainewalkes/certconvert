@@ -212,10 +212,22 @@ public sealed class UpdateService
         "Install it from the Mac App Store or Microsoft Store, or build it from " +
         "source on GitHub.";
 
+    /// <summary>
+    /// Asset and checksum URLs come from GitHub API JSON — only ever fetch them
+    /// over https, never a downgraded/other scheme, before downloading or hashing.
+    /// </summary>
+    private static void RequireHttps(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            uri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException($"Refusing a non-https update URL: {url}");
+    }
+
     public async Task<string> DownloadAsync(
         string url, string fileName, IProgress<double>? progress = null,
         CancellationToken ct = default)
     {
+        RequireHttps(url);
         string dir = Path.Combine(Path.GetTempPath(), "CertConvert-update");
         Directory.CreateDirectory(dir);
         string destination = Path.Combine(dir, fileName);
@@ -252,12 +264,23 @@ public sealed class UpdateService
     {
         if (checksumsUrl is null)
             return ChecksumResult.NoChecksumFile;
+        RequireHttps(checksumsUrl);
         string sums = await _http.GetStringAsync(checksumsUrl, ct);
+        // Parse each "<hex-hash>  <filename>" (or "…*<filename>") line and match the
+        // filename FIELD exactly — not EndsWith, so "evil-<asset>" can't satisfy it.
         string? expected = sums
             .Split('\n')
             .Select(l => l.Trim())
-            .Where(l => l.EndsWith(assetName, StringComparison.OrdinalIgnoreCase))
-            .Select(l => l.Split(' ', 2)[0].Trim())
+            .Where(l => l.Length > 0)
+            .Select(l =>
+            {
+                int sp = l.IndexOf(' ');
+                return sp <= 0
+                    ? (Hash: "", File: "")
+                    : (Hash: l[..sp], File: l[(sp + 1)..].TrimStart(' ', '*'));
+            })
+            .Where(e => e.File.Equals(assetName, StringComparison.OrdinalIgnoreCase))
+            .Select(e => e.Hash)
             .FirstOrDefault();
         if (string.IsNullOrEmpty(expected))
             return ChecksumResult.Failed; // file present but asset unlisted → fail closed

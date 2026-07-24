@@ -111,6 +111,15 @@ public partial class AboutViewModel : ViewModelBase
                     break;
             }
         }
+        catch (Exception e)
+        {
+            // Belt-and-braces: CheckAsync catches its expected exceptions, but this
+            // also runs fire-and-forget at launch — never let an unexpected type
+            // become an unobserved Task fault.
+            UpdateAvailable = false;
+            CanInstall = false;
+            UpdateStatus = $"Update check failed: {e.Message}";
+        }
         finally
         {
             IsBusy = false;
