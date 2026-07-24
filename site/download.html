@@ -7,14 +7,14 @@
   <script src="js/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Download CertConvert — free certificate toolbox for macOS &amp; Windows</title>
-  <meta name="description" content="Get CertConvert for Windows from the Microsoft Store, or download free macOS builds from GitHub Releases. Self-contained — nothing else to install.">
+  <meta name="description" content="Get CertConvert from the Mac App Store or the Microsoft Store. A self-contained, offline X.509 certificate toolbox.">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/download.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="CertConvert">
   <meta property="og:title" content="Download CertConvert">
-  <meta property="og:description" content="Windows on the Microsoft Store; free macOS builds on GitHub Releases.">
+  <meta property="og:description" content="On the Mac App Store and the Microsoft Store.">
   <meta property="og:image" content="https://certconvert.com/img/og.png">
   <meta property="og:url" content="https://certconvert.com/download.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -28,7 +28,7 @@
     "operatingSystem": "macOS (Intel and Apple Silicon), Windows",
     "description": "Offline certificate toolbox: convert PEM, DER, PKCS#7 and PKCS#12, order and validate chains, inspect certificates, convert keys and generate CSRs. Free and open source.",
     "url": "https://certconvert.com/download.html",
-    "downloadUrl": "https://github.com/jermainewalkes/certconvert/releases/latest",
+    "downloadUrl": "https://certconvert.com/download.html",
     "softwareVersion": "1.1.0",
     "screenshot": "https://certconvert.com/img/screenshots/inspect-light.png",
     "license": "https://github.com/jermainewalkes/certconvert/blob/main/LICENSE",
@@ -54,7 +54,7 @@
 <div class="page-head">
   <div class="container center">
     <h1>Download CertConvert</h1>
-    <p class="lead">Open source, self-contained, nothing else to install. Windows is on the Microsoft Store; macOS builds are on GitHub while the Mac App Store listing is in review.</p>
+    <p class="lead">Open source, self-contained, nothing else to install. Get it from the Mac App Store or the Microsoft Store.</p>
   </div>
 </div>
 
@@ -65,37 +65,25 @@
       <div class="dl-row"><span class="k">Platforms</span><span class="v">macOS (Intel &amp; Apple Silicon), Windows x64</span></div>
       <div class="dl-row"><span class="k">Licence</span><span class="v">MIT &mdash; free and open source</span></div>
       <div style="margin-top:22px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="btn btn-primary btn-lg" href="https://apps.apple.com/app/id6791724651">Download on the Mac App Store</a>
         <a class="btn btn-primary btn-lg" href="https://apps.microsoft.com/detail/9NT6HCG0JBFV">Get it from Microsoft Store</a>
-        <a class="btn btn-lg" href="https://github.com/jermainewalkes/certconvert/releases/latest">macOS Download (GitHub)</a>
         <a class="btn btn-lg" href="changelog.html">Release notes</a>
       </div>
-      <p class="muted" style="margin-top:14px; font-size:14px;">The Microsoft Store edition installs and updates through the Store. macOS builds are hosted on GitHub Releases with SHA-256 checksums &mdash; and CertConvert is coming to the Mac App Store.</p>
+      <p class="muted" style="margin-top:14px; font-size:14px;">Both editions install and update through their app store. Prefer to build it yourself? The source and instructions are below.</p>
     </div>
 
-    <!-- Mac App Store: in review. When live, add its badge/link beside the
-         Microsoft Store button above and retire the GitHub macOS download. -->
 
     <div class="prose" style="margin-top:48px;">
       <h2 id="files">Per-platform downloads</h2>
-      <p>Windows installs from the <a href="https://apps.microsoft.com/detail/9NT6HCG0JBFV">Microsoft Store</a>. For macOS, grab the zip that matches your machine from the <a href="https://github.com/jermainewalkes/certconvert/releases/latest">latest release</a> (replace <code>&lt;version&gt;</code> with the version above):</p>
+      <p>CertConvert installs from your platform&rsquo;s app store:</p>
       <table>
         <thead><tr><th>Platform</th><th>File</th></tr></thead>
         <tbody>
-          <tr><td>macOS (Apple Silicon)</td><td class="mono">CertConvert-&lt;version&gt;-osx-arm64.zip</td></tr>
-          <tr><td>macOS (Intel)</td><td class="mono">CertConvert-&lt;version&gt;-osx-x64.zip</td></tr>
+          <tr><td>macOS (Apple Silicon)</td><td><a href="https://apps.apple.com/app/id6791724651">Mac App Store</a></td></tr>
           <tr><td>Windows x64</td><td><a href="https://apps.microsoft.com/detail/9NT6HCG0JBFV">Microsoft Store</a></td></tr>
         </tbody>
       </table>
-      <p>On macOS, unzip and move <code>CertConvert.app</code> to Applications. Each release lists the SHA-256 of every zip so you can verify your download.</p>
-
-      <h2 id="first-launch">First launch on an unsigned build</h2>
-      <div class="callout callout-warn">
-        <strong>Heads up:</strong> the macOS build from GitHub is not yet code-signed, so macOS warns the first time you open it. This is expected &mdash; the one-time step is below. The Microsoft Store edition is signed by the Store and installs without warnings.
-      </div>
-      <h3>macOS &mdash; &ldquo;CertConvert can&rsquo;t be opened&rdquo;</h3>
-      <p>Because the build is unsigned, Gatekeeper blocks the first open. Right-click (or Control-click) <code>CertConvert.app</code> and choose <strong>Open</strong>, then confirm &mdash; you only need to do this once. Alternatively, allow it under <strong>System Settings &rarr; Privacy &amp; Security</strong> after the first attempt.</p>
-      <h3>Windows</h3>
-      <p>Install from the <a href="https://apps.microsoft.com/detail/9NT6HCG0JBFV">Microsoft Store</a> &mdash; the package is signed by the Store, so there is no warning and updates arrive automatically. (A from-source build you compile yourself may still trigger SmartScreen: <strong>More info &rarr; Run anyway</strong>.)</p>
+      
 
       <h2 id="from-source">Build from source</h2>
       <p>Prefer to build it yourself? You need the <a href="https://dotnet.microsoft.com/download/dotnet/10.0">.NET 10 SDK</a>.</p>

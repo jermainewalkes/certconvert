@@ -78,24 +78,14 @@ Delete it any time; the app recreates it with defaults.
 
 ## Install & run
 
-### Windows — Microsoft Store
+CertConvert is available on both app stores — signed, with automatic updates:
 
-Install from the [Microsoft Store](https://apps.microsoft.com/detail/9NT6HCG0JBFV) —
-signed by the Store, updates arrive automatically.
-
-### macOS — from a release (no .NET needed)
-
-Grab the zip that matches your Mac from
-[Releases](https://github.com/jermainewalkes/certconvert/releases) — the .NET
-runtime is bundled. (A Mac App Store edition is in review.)
-
-| Platform | File |
+| Platform | Store |
 |---|---|
-| macOS (Intel) | `CertConvert-<version>-osx-x64.zip` |
-| macOS (Apple Silicon) | `CertConvert-<version>-osx-arm64.zip` |
+| macOS | [Mac App Store](https://apps.apple.com/app/id6791724651) |
+| Windows | [Microsoft Store](https://apps.microsoft.com/detail/9NT6HCG0JBFV) |
 
-Unzip and move `CertConvert.app` to Applications. The macOS release builds are
-currently unsigned — see Troubleshooting for the one-time first-launch step.
+Prefer to build it yourself? See [From source](#from-source) below.
 
 ### From source
 
@@ -132,9 +122,10 @@ chain or a key that does not match).
 
 ## Troubleshooting
 
-- **macOS: "CertConvert can't be opened"** — the build is unsigned;
-  right-click the app → **Open** (one-time), or allow it under
-  System Settings → Privacy & Security.
+- **macOS: "CertConvert can't be opened"** — only applies to a self-compiled
+  build (it is unsigned): right-click the app → **Open** (one-time), or allow
+  it under System Settings → Privacy & Security. The Mac App Store edition is
+  signed and opens normally.
 - **Windows: "Windows protected your PC"** — only applies to self-compiled
   builds (SmartScreen on an unsigned binary; **More info → Run anyway**,
   one-time). The Microsoft Store edition is signed and shows no warning.
@@ -145,11 +136,11 @@ chain or a key that does not match).
   program attaching to your console; press Enter to get the prompt back.
 - **Which build am I running?** — `certconvert --version` prints the version
   plus the exact git commit it was built from.
-- **Update didn't apply / partially applied** — download the latest zip from
-  [Releases](https://github.com/jermainewalkes/certconvert/releases) and replace
-  the app manually. If a self-update was interrupted, a recovery copy of the
-  previous version is kept beside the app (`CertConvert.app.bak` on macOS,
-  `CertConvert.exe.old` on Windows) until the next launch.
+- **Updates** — the Mac App Store and Microsoft Store editions update
+  themselves. A self-compiled build has no auto-update; rebuild from source to
+  update. (The legacy in-app self-updater, present in older GitHub builds, kept
+  a recovery copy — `CertConvert.app.bak` / `CertConvert.exe.old` — beside the
+  app until the next launch.)
 - **"Check For Updates" can't reach GitHub** — that check needs internet; on an
   offline machine it simply reports the failure and changes nothing. Everything
   else works offline.
