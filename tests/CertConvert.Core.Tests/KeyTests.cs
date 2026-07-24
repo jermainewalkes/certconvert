@@ -1,10 +1,22 @@
 using System.Security.Cryptography;
+using System.Security.Cryptography.Pkcs;
 using System.Text;
 
 namespace CertConvert.Core.Tests;
 
 public class KeyTests
 {
+    [Fact]
+    public void MalformedPkcs8InnerKey_ThrowsCleanError_NotCrash()
+    {
+        // A valid PKCS #8 envelope (RSA OID) wrapping garbage inner-key bytes:
+        // Decode() succeeds, ImportPkcs8PrivateKey throws. Must surface a clean
+        // UnrecognisedContentException, not an unhandled CryptographicException.
+        var bad = new Pkcs8PrivateKeyInfo(
+            new Oid("1.2.840.113549.1.1.1"), null, new byte[] { 1, 2, 3, 4 });
+        Assert.Throws<UnrecognisedContentException>(() => KeyTools.ImportPkcs8Der(bad.Encode()));
+    }
+
     [Fact]
     public void Pkcs8Pem_RoundTrips_Rsa()
     {

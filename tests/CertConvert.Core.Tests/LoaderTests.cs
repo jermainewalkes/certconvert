@@ -147,4 +147,18 @@ public class LoaderTests
             File.Delete(path);
         }
     }
+
+    [Fact]
+    public void EncryptedPemWithBadDekInfoIv_IsRejectedCleanly()
+    {
+        // A hand-edited encrypted PEM with a non-hex DEK-Info IV must produce a
+        // clean error, not a FormatException crash.
+        var pem = "-----BEGIN RSA PRIVATE KEY-----\n" +
+                  "Proc-Type: 4,ENCRYPTED\n" +
+                  "DEK-Info: AES-256-CBC,XYZ\n\n" +
+                  "AAAA\n" +
+                  "-----END RSA PRIVATE KEY-----\n";
+        Assert.Throws<UnrecognisedContentException>(
+            () => ContentLoader.Load(Encoding.ASCII.GetBytes(pem), "pass"));
+    }
 }

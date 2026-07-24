@@ -51,14 +51,27 @@ public static class KeyTools
         {
             case RsaOid:
             {
+                // Decode() only validated the PKCS #8 envelope; the inner key can
+                // still be malformed, so ImportPkcs8PrivateKey may throw. Surface
+                // that as a clean error and don't leak the key handle.
                 var rsa = RSA.Create();
-                rsa.ImportPkcs8PrivateKey(der.Span, out _);
+                try { rsa.ImportPkcs8PrivateKey(der.Span, out _); }
+                catch (CryptographicException e)
+                {
+                    rsa.Dispose();
+                    throw new UnrecognisedContentException($"Not a valid RSA private key: {e.Message}");
+                }
                 return Describe(rsa);
             }
             case EcOid:
             {
                 var ec = ECDsa.Create();
-                ec.ImportPkcs8PrivateKey(der.Span, out _);
+                try { ec.ImportPkcs8PrivateKey(der.Span, out _); }
+                catch (CryptographicException e)
+                {
+                    ec.Dispose();
+                    throw new UnrecognisedContentException($"Not a valid ECDSA private key: {e.Message}");
+                }
                 return Describe(ec);
             }
             default:

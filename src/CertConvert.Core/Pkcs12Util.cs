@@ -34,6 +34,8 @@ public static class Pkcs12Util
         var certs = new List<X509Certificate2>();
         var keys = new List<PrivateKeyEntry>();
 
+        try
+        {
         foreach (Pkcs12SafeContents safe in info.AuthenticatedSafe)
         {
             if (safe.ConfidentialityMode == Pkcs12ConfidentialityMode.Password)
@@ -81,6 +83,15 @@ public static class Pkcs12Util
                         break;
                 }
             }
+        }
+        }
+        catch
+        {
+            // A later bag/safe failed after earlier ones parsed — release the
+            // native handles already accumulated before propagating.
+            foreach (var c in certs) c.Dispose();
+            foreach (var k in keys) k.Dispose();
+            throw;
         }
 
         if (certs.Count == 0 && keys.Count == 0)

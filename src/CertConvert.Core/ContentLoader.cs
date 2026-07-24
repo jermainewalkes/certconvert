@@ -52,6 +52,12 @@ public static class ContentLoader
         {
             throw new CertConvertException($"{name}: {e.Message}", e);
         }
+        catch (CryptographicException e)
+        {
+            // Safety net: a malformed file that reaches an unwrapped BCL import
+            // surfaces as a clean error rather than crashing the app.
+            throw new UnrecognisedContentException($"{name}: not a recognisable key or certificate ({e.Message}).");
+        }
     }
 
     public static LoadedContent Load(byte[] data, string? password = null) =>
@@ -70,36 +76,47 @@ public static class ContentLoader
         string? csrPem = null;
         var skipped = new List<string>();
 
-        foreach (var block in blocks)
+        try
         {
-            switch (block.Label)
+            foreach (var block in blocks)
             {
-                case "CERTIFICATE":
-                case "X509 CERTIFICATE":
-                    certs.Add(X509CertificateLoader.LoadCertificate(block.Der));
-                    break;
+                switch (block.Label)
+                {
+                    case "CERTIFICATE":
+                    case "X509 CERTIFICATE":
+                        certs.Add(X509CertificateLoader.LoadCertificate(block.Der));
+                        break;
 
-                case "PKCS7":
-                case "PKCS #7 SIGNED DATA":
-                    certs.AddRange(Pkcs7Util.ReadCertificates(block.Der));
-                    break;
+                    case "PKCS7":
+                    case "PKCS #7 SIGNED DATA":
+                        certs.AddRange(Pkcs7Util.ReadCertificates(block.Der));
+                        break;
 
-                case "PRIVATE KEY":
-                case "ENCRYPTED PRIVATE KEY":
-                case "RSA PRIVATE KEY":
-                case "EC PRIVATE KEY":
-                    keys.Add(KeyTools.LoadPemBlock(block, password));
-                    break;
+                    case "PRIVATE KEY":
+                    case "ENCRYPTED PRIVATE KEY":
+                    case "RSA PRIVATE KEY":
+                    case "EC PRIVATE KEY":
+                        keys.Add(KeyTools.LoadPemBlock(block, password));
+                        break;
 
-                case "CERTIFICATE REQUEST":
-                case "NEW CERTIFICATE REQUEST":
-                    csrPem = PemUtil.Encode("CERTIFICATE REQUEST", block.Der);
-                    break;
+                    case "CERTIFICATE REQUEST":
+                    case "NEW CERTIFICATE REQUEST":
+                        csrPem = PemUtil.Encode("CERTIFICATE REQUEST", block.Der);
+                        break;
 
-                default:
-                    skipped.Add(block.Label);
-                    break;
+                    default:
+                        skipped.Add(block.Label);
+                        break;
+                }
             }
+        }
+        catch
+        {
+            // A later block failed after earlier ones parsed — don't leak the
+            // native handles of what we already loaded.
+            foreach (var c in certs) c.Dispose();
+            foreach (var k in keys) k.Dispose();
+            throw;
         }
 
         if (certs.Count == 0 && keys.Count == 0 && csrPem is null)

@@ -102,7 +102,18 @@ public static class PemUtil
             throw new UnrecognisedContentException($"Malformed DEK-Info header: \"{dekInfo}\".");
 
         string cipherName = parts[0].ToUpperInvariant();
-        byte[] iv = Convert.FromHexString(parts[1]);
+        // The IV is attacker-controllable hex from a file header: reject odd/non-hex
+        // and too-short values cleanly rather than crashing on FromHexString /
+        // AsSpan(0, 8) below (EvpBytesToKey salts on the first 8 IV bytes).
+        byte[] iv;
+        try { iv = Convert.FromHexString(parts[1]); }
+        catch (FormatException)
+        {
+            throw new UnrecognisedContentException($"Malformed DEK-Info IV: \"{parts[1]}\".");
+        }
+        if (iv.Length < 8)
+            throw new UnrecognisedContentException(
+                $"DEK-Info IV is too short ({iv.Length} bytes; at least 8 required).");
 
         int keyLen = cipherName switch
         {
