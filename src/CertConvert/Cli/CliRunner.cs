@@ -116,6 +116,17 @@ public static class CliRunner
 
     private static int PrintHelp()
     {
+#if STORE_BUILD
+        // Every file verb is refused in this variant (see Dispatch), so printing the
+        // full command reference would be advertising something that cannot run.
+        Console.WriteLine("""
+            certconvert — offline certificate conversion, chaining and inspection.
+            Run without arguments to open the app.
+            """);
+        Console.WriteLine();
+        Console.WriteLine(AppInfo.StoreCliPointer);
+        return ExitOk;
+#else
         Console.WriteLine("""
             certconvert — offline certificate conversion, chaining and inspection.
             Run without arguments to open the GUI.
@@ -165,14 +176,8 @@ public static class CliRunner
 
             Everything else runs locally; certificate data never leaves this machine.
             """);
-#if STORE_BUILD
-        Console.WriteLine();
-        Console.WriteLine(
-            "Note: this Store build is sandboxed and cannot open files given on the " +
-            "command line. For command-line use install the direct download: " +
-            "https://github.com/jermainewalkes/certconvert/releases");
-#endif
         return ExitOk;
+#endif
     }
 
     [DllImport("kernel32.dll", SetLastError = true)]

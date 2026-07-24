@@ -14,8 +14,14 @@ public static class AppInfo
     public const bool IsStoreBuild = false;
 #endif
 
-    /// <summary>Printed by the store CLI when a file command is blocked by the sandbox.</summary>
+    /// <summary>
+    /// Printed by the store CLI when a file command is blocked by the sandbox.
+    /// Deliberately does NOT send a paying customer to a download page: the store
+    /// editions are the graphical app, and the command line exists only in a
+    /// build compiled from source.
+    /// </summary>
     public const string StoreCliPointer =
-        "The command line requires the direct download: " +
-        "https://github.com/jermainewalkes/certconvert/releases";
+        "This edition of CertConvert is the graphical app. It runs in a sandbox that " +
+        "cannot open files named on the command line, so no command-line tool is " +
+        "included. Open CertConvert normally to inspect, convert, chain and generate.";
 }

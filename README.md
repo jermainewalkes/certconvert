@@ -99,8 +99,12 @@ dotnet run --project src/CertConvert    # launches the GUI
 
 ## Command line
 
-The same executable is a CLI when given arguments and a GUI when not. Run it
-with `--help` for the full list; a few examples:
+A copy built from source is a CLI when given arguments and a GUI when not. Run
+it with `--help` for the full list; a few examples:
+
+> The Mac App Store and Microsoft Store editions are sandboxed — a sandboxed
+> process cannot open files named on the command line, so those editions are the
+> graphical app only. Build from source for the CLI.
 
 ```bash
 certconvert inspect device.pem

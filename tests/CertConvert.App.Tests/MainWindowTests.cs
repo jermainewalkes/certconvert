@@ -170,4 +170,17 @@ public class MainWindowTests
         Assert.Contains("checking GitHub for a newer version", vm.About.SecurityStatement);
         Assert.DoesNotContain("Updates are delivered by the store", vm.About.SecurityStatement);
     }
+
+    [AvaloniaFact]
+    public void CliHint_DescribesTheCommandLineAndPointsNowhereDead()
+    {
+        // The About "Command line" card is not visibility-gated, so its text must be
+        // true for whichever variant is running. This is the non-store variant; the
+        // store wording is covered by the container gate compiling StoreBuild=true.
+        var vm = new MainWindowViewModel();
+        Assert.Contains("--help", vm.About.CliHint);
+        // Never send anyone to the releases page: it carries no binaries any more.
+        Assert.DoesNotContain("github.com", vm.About.CliHint);
+        Assert.DoesNotContain("github.com", CertConvert.AppInfo.StoreCliPointer);
+    }
 }

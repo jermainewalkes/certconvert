@@ -7,14 +7,14 @@
   <script src="js/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Features — Offline certificate conversion, chaining &amp; inspection | CertConvert</title>
-  <meta name="description" content="What CertConvert does: convert PEM, DER, P7B and PFX, order and validate certificate chains, inspect certificates, convert key formats and generate keys, CSRs and self-signed certificates — with a matching CLI.">
+  <meta name="description" content="What CertConvert does: convert PEM, DER, P7B and PFX, order and validate certificate chains, inspect certificates, convert key formats and generate keys, CSRs and self-signed certificates — entirely offline.">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/features.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="CertConvert">
   <meta property="og:title" content="Features — CertConvert">
-  <meta property="og:description" content="Convert formats, order and validate chains, inspect certificates, convert keys and generate CSRs — offline, GUI and CLI.">
+  <meta property="og:description" content="Convert formats, order and validate chains, inspect certificates, convert keys and generate CSRs — entirely offline.">
   <meta property="og:image" content="https://certconvert.com/img/og.png">
   <meta property="og:url" content="https://certconvert.com/features.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -36,7 +36,7 @@
 
 <div class="page-head"><div class="container center">
   <h1>Everything X.509, without OpenSSL</h1>
-  <p class="lead">Five focused jobs &mdash; inspect, convert, chain, keys and generate &mdash; in one self-contained app, with a matching command-line tool for scripts.</p>
+  <p class="lead">Five focused jobs &mdash; inspect, convert, chain, keys and generate &mdash; in one self-contained app. Nothing to install beyond the app itself.</p>
 </div></div>
 
 <section class="section">
@@ -149,9 +149,10 @@
   <div class="container">
     <div class="grid grid-2" style="align-items:center; gap:48px;">
       <div>
-        <div class="eyebrow" style="text-align:left;">Command line</div>
+        <div class="eyebrow" style="text-align:left;">Command line (build from source)</div>
         <h2 style="text-align:left;">The same binary, scriptable</h2>
-        <p>Pass arguments and CertConvert runs as a CLI instead of opening a window &mdash; ideal for build pipelines and one-off shell work. Every GUI job has a verb: <code>inspect</code>, <code>convert</code>, <code>chain</code>, <code>key</code> and <code>gen</code>.</p>
+        <p>Build CertConvert from source and the same executable runs as a CLI when you pass it arguments &mdash; ideal for build pipelines and one-off shell work. Every GUI job has a verb: <code>inspect</code>, <code>convert</code>, <code>chain</code>, <code>key</code> and <code>gen</code>.</p>
+        <p class="muted">The Mac App Store and Microsoft Store editions are sandboxed and are the graphical app only &mdash; a sandboxed process cannot open files named on the command line, so those editions ship without the CLI. <a href="download.html#from-source">Build from source</a> to get it.</p>
         <p>Exit codes make it easy to script: <code>0</code> success, <code>1</code> usage error, <code>2</code> failure (including an invalid chain or a key that does not match). See the <a href="docs.html#cli">CLI reference</a> for worked examples.</p>
       </div>
       <div>

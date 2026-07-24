@@ -49,7 +49,6 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 > • Build chains — drop root, intermediate and device certificates in any order, have them ordered and validated automatically, then export as a PEM bundle, P7B or PFX.
 > • Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.
 > • Generate keys, certificate signing requests and self-signed certificates (RSA or ECDSA) with SANs and CA options.
-> • Use it from the command line too — the same app is a full CLI when run with arguments (run it with --help in a terminal).
 >
 > BUILT FOR TRUST
 > All cryptography uses the operating system's own libraries — there is no third-party cryptographic code. The app makes no network connections and collects no data. Private keys loaded from PKCS #12 files are handled in memory and are never imported into your Windows certificate store.
@@ -58,7 +57,9 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **What's new in this version** (release notes):
 
-> Redesigned Generate: choose a self-signed certificate or a signing request first, and the form shows only the fields that output needs.
+> Clearer wording about what this edition includes, plus reliability fixes for unusual certificate and key files.
+
+**NOTE (1.1.1):** the CLI bullet was removed — the Store edition is sandboxed and is the graphical app only, so advertising a command line here was inaccurate.
 
 **Product features** (bullet list field, ≤200 chars each):
 
@@ -67,7 +68,6 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 - Build certificate chains: auto-order, validate offline, export as PEM bundle, P7B or PFX
 - Convert private-key formats (PKCS #8, PKCS #1, SEC 1) and check key–certificate matches
 - Generate keys, CSRs and self-signed certificates (RSA or ECDSA) with SANs and CA options
-- GUI and command line in one app
 - Fully offline: no uploads, no account, no telemetry
 
 **Search terms** (max 7, ≤30 chars each):

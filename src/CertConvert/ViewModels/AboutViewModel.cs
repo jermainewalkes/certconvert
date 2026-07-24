@@ -44,9 +44,15 @@ public partial class AboutViewModel : ViewModelBase
           "Private keys loaded from PKCS #12 files are handled in memory only and are not " +
           "imported into the system key store.";
 
-    public string CliHint { get; } =
-        "The same executable works from the command line: run it with --help to see " +
-        "the inspect, convert, chain, key, gen and update commands.";
+    // Store builds have no CLI (the sandbox cannot open command-line paths), so
+    // they must not tell a paying customer to run --help.
+    public string CliHint { get; } = AppInfo.IsStoreBuild
+        ? "This edition is the graphical app: everything happens in the window. " +
+          "CertConvert is open source (MIT), and a copy compiled from the source " +
+          "is also a command-line tool with the same inspect, convert, chain, key " +
+          "and gen jobs."
+        : "The same executable works from the command line: run it with --help to see " +
+          "the inspect, convert, chain, key, gen and update commands.";
 
     public string AccessibilityStatement { get; } =
         "Every control is reachable by keyboard, labelled for screen readers and " +
