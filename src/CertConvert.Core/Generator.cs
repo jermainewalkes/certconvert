@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -72,16 +73,19 @@ public static class Generator
         if (!string.IsNullOrWhiteSpace(spec.Locality)) dn.AddLocalityName(spec.Locality);
         if (!string.IsNullOrWhiteSpace(spec.Country))
         {
-            if (spec.Country.Trim().Length != 2)
+            string country = spec.Country.Trim();
+            if (country.Length != 2 || !country.All(char.IsAsciiLetter))
                 throw new CertConvertException("Country must be a two-letter ISO code, e.g. GB.");
-            dn.AddCountryOrRegion(spec.Country.Trim());
+            dn.AddCountryOrRegion(country);
         }
 
         CertificateRequest request = key switch
         {
             RSA rsa => new CertificateRequest(
                 dn.Build(), rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1),
-            ECDsa ec => new CertificateRequest(dn.Build(), ec, HashAlgorithmName.SHA256),
+            // Match the signature hash to the curve strength (SHA-384/512 for
+            // P-384/P-521); RSA stays SHA-256, which is standard practice.
+            ECDsa ec => new CertificateRequest(dn.Build(), ec, EcHash(ec)),
             _ => throw new CertConvertException(
                 $"Unsupported key algorithm: {key.GetType().Name}."),
         };
@@ -123,4 +127,11 @@ public static class Generator
             new X509SubjectKeyIdentifierExtension(request.PublicKey, false));
         return request;
     }
+
+    private static HashAlgorithmName EcHash(ECDsa ec) => ec.KeySize switch
+    {
+        >= 512 => HashAlgorithmName.SHA512,   // P-521
+        >= 384 => HashAlgorithmName.SHA384,   // P-384
+        _ => HashAlgorithmName.SHA256,        // P-256
+    };
 }
