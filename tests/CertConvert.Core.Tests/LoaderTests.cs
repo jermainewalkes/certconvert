@@ -161,4 +161,18 @@ public class LoaderTests
         Assert.Throws<UnrecognisedContentException>(
             () => ContentLoader.Load(Encoding.ASCII.GetBytes(pem), "pass"));
     }
+
+    [Fact]
+    public void EncryptedPemWithWrongLengthIv_IsRejectedCleanly()
+    {
+        // AES-256-CBC needs a 16-byte IV; supply 8 bytes (valid hex, wrong length).
+        var pem = "-----BEGIN RSA PRIVATE KEY-----\n" +
+                  "Proc-Type: 4,ENCRYPTED\n" +
+                  "DEK-Info: AES-256-CBC,0011223344556677\n\n" +
+                  "AAAA\n" +
+                  "-----END RSA PRIVATE KEY-----\n";
+        var e = Assert.Throws<UnrecognisedContentException>(
+            () => ContentLoader.Load(Encoding.ASCII.GetBytes(pem), "pass"));
+        Assert.Contains("16 bytes", e.Message);
+    }
 }

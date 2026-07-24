@@ -111,20 +111,22 @@ public static class PemUtil
         {
             throw new UnrecognisedContentException($"Malformed DEK-Info IV: \"{parts[1]}\".");
         }
-        if (iv.Length < 8)
-            throw new UnrecognisedContentException(
-                $"DEK-Info IV is too short ({iv.Length} bytes; at least 8 required).");
 
-        int keyLen = cipherName switch
+        (int keyLen, int blockLen) = cipherName switch
         {
-            "DES-EDE3-CBC" => 24,
-            "AES-128-CBC" => 16,
-            "AES-192-CBC" => 24,
-            "AES-256-CBC" => 32,
+            "DES-EDE3-CBC" => (24, 8),
+            "AES-128-CBC" => (16, 16),
+            "AES-192-CBC" => (24, 16),
+            "AES-256-CBC" => (32, 16),
             _ => throw new UnrecognisedContentException(
                 $"Unsupported legacy PEM cipher \"{cipherName}\". " +
                 "Convert the key with a modern tool first, or use PKCS #8."),
         };
+        // The IV must be exactly one cipher block; anything else is malformed and
+        // would otherwise reach the cipher API (or AsSpan(0, 8)) as a raw throw.
+        if (iv.Length != blockLen)
+            throw new UnrecognisedContentException(
+                $"DEK-Info IV for {cipherName} must be {blockLen} bytes, not {iv.Length}.");
 
         byte[] key = EvpBytesToKey(password, iv.AsSpan(0, 8).ToArray(), keyLen);
         try

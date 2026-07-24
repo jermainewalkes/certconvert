@@ -55,8 +55,10 @@ public static class ContentLoader
         catch (CryptographicException e)
         {
             // Safety net: a malformed file that reaches an unwrapped BCL import
-            // surfaces as a clean error rather than crashing the app.
-            throw new UnrecognisedContentException($"{name}: not a recognisable key or certificate ({e.Message}).");
+            // surfaces as a clean error rather than crashing the app. Keep the
+            // original as InnerException for diagnostics.
+            throw new UnrecognisedContentException(
+                $"{name}: not a recognisable key or certificate.", e);
         }
     }
 
@@ -113,9 +115,10 @@ public static class ContentLoader
         catch
         {
             // A later block failed after earlier ones parsed — don't leak the
-            // native handles of what we already loaded.
-            foreach (var c in certs) c.Dispose();
-            foreach (var k in keys) k.Dispose();
+            // native handles of what we already loaded. Shield each Dispose so one
+            // throwing doesn't mask the real error or strand the remaining handles.
+            foreach (var c in certs) { try { c.Dispose(); } catch { /* free the rest */ } }
+            foreach (var k in keys) { try { k.Dispose(); } catch { /* free the rest */ } }
             throw;
         }
 

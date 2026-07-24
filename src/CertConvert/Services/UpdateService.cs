@@ -233,7 +233,10 @@ public sealed class UpdateService
         string safeName = Path.GetFileName(fileName);
         if (string.IsNullOrEmpty(safeName))
             throw new InvalidOperationException($"Refusing an update asset with no file name: \"{fileName}\".");
-        string dir = Path.Combine(Path.GetTempPath(), "CertConvert-update");
+        // A fresh random subdirectory per download: no collision between attempts,
+        // and an unpredictable path so a pre-planted symlink at a known location
+        // can't redirect the write.
+        string dir = Path.Combine(Path.GetTempPath(), "CertConvert-update", Path.GetRandomFileName());
         Directory.CreateDirectory(dir);
         string destination = Path.Combine(dir, safeName);
 
@@ -248,7 +251,9 @@ public sealed class UpdateService
         long? total = response.Content.Headers.ContentLength;
 
         await using var source = await response.Content.ReadAsStreamAsync(ct);
-        await using var dest = File.Create(destination);
+        // CreateNew fails rather than follows/overwrites a pre-existing file at the
+        // destination (the dir is fresh, so this only trips on a planted file).
+        await using var dest = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None);
         var buffer = new byte[81920];
         long done = 0;
         int read;
@@ -275,6 +280,8 @@ public sealed class UpdateService
         if (checksumsUrl is null)
             return ChecksumResult.NoChecksumFile;
         RequireHttps(checksumsUrl);
+        // Match on the bare file name, consistent with how DownloadAsync saves it.
+        string wantName = Path.GetFileName(assetName);
         string sums = await _http.GetStringAsync(checksumsUrl, ct);
         // Parse each "<hex-hash>  <filename>" (or "…*<filename>") line and match the
         // filename FIELD exactly — not EndsWith, so "evil-<asset>" can't satisfy it.
@@ -282,16 +289,8 @@ public sealed class UpdateService
             .Split('\n')
             .Select(l => l.Trim())
             .Where(l => l.Length > 0)
-            .Select(l =>
-            {
-                // "<hex-hash><whitespace>[*]<filename>" — split on the first run of
-                // whitespace so tab- and space-delimited sums files both parse.
-                int sp = l.AsSpan().IndexOfAny(' ', '\t');
-                return sp <= 0
-                    ? (Hash: "", File: "")
-                    : (Hash: l[..sp], File: l[sp..].TrimStart(' ', '\t', '*'));
-            })
-            .Where(e => e.File.Equals(assetName, StringComparison.OrdinalIgnoreCase))
+            .Select(ParseSumLine)
+            .Where(e => e.File.Equals(wantName, StringComparison.OrdinalIgnoreCase))
             .Select(e => e.Hash)
             .FirstOrDefault();
         if (string.IsNullOrEmpty(expected))
@@ -302,6 +301,18 @@ public sealed class UpdateService
         return actual.Equals(expected, StringComparison.OrdinalIgnoreCase)
             ? ChecksumResult.Verified
             : ChecksumResult.Failed;
+    }
+
+    /// <summary>Parse a "&lt;hex-hash&gt;&lt;ws&gt;[*]&lt;filename&gt;" sums line.</summary>
+    private static (string Hash, string File) ParseSumLine(string line)
+    {
+        int sp = line.AsSpan().IndexOfAny(' ', '\t');
+        if (sp <= 0) return ("", "");
+        string rest = line[sp..].TrimStart(' ', '\t');
+        // Drop the optional SINGLE '*' binary-mode marker — never more, so a
+        // filename that legitimately begins with '*' is preserved.
+        if (rest.StartsWith('*')) rest = rest[1..];
+        return (line[..sp], rest);
     }
 
     // ---------- apply ----------

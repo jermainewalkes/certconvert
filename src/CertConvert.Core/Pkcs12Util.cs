@@ -88,9 +88,10 @@ public static class Pkcs12Util
         catch
         {
             // A later bag/safe failed after earlier ones parsed — release the
-            // native handles already accumulated before propagating.
-            foreach (var c in certs) c.Dispose();
-            foreach (var k in keys) k.Dispose();
+            // native handles already accumulated before propagating. Shield each
+            // Dispose so one throwing doesn't mask the real error or strand the rest.
+            foreach (var c in certs) { try { c.Dispose(); } catch { /* free the rest */ } }
+            foreach (var k in keys) { try { k.Dispose(); } catch { /* free the rest */ } }
             throw;
         }
 
