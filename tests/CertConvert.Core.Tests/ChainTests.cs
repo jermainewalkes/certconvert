@@ -95,4 +95,16 @@ public class ChainTests
         var ordered = ChainTools.Order([chain.Leaf]);
         Assert.Equal(chain.Leaf.Thumbprint, Assert.Single(ordered).Thumbprint);
     }
+
+    [Fact]
+    public void Validate_SelfSignedRootSupplied_NotesNotSystemTrusted()
+    {
+        // Anchoring to a self-signed root from the bundle (no system roots) is a
+        // valid chain, but the verdict must say it's not a system-trusted CA.
+        using var chain = TestChain.Create();
+        var result = ChainTools.Validate(chain.Shuffled);
+        Assert.True(result.IsValid,
+            string.Join("; ", result.Elements.SelectMany(e => e.Issues)));
+        Assert.Contains(result.Notes, n => n.Contains("not a system-trusted CA"));
+    }
 }

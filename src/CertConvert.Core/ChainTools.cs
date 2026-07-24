@@ -109,6 +109,9 @@ public static class ChainTools
                 chain.ChainPolicy.CustomTrustStore.Add(root);
             foreach (var extra in ordered.Skip(1).Where(c => !IsSelfSigned(c)))
                 chain.ChainPolicy.ExtraStore.Add(extra);
+            notes.Add("Anchored to a self-signed root supplied in the input — not a " +
+                      "system-trusted CA. Enable “Trust System Roots” to check against the " +
+                      "operating system’s trusted CAs instead.");
         }
         else
         {
@@ -144,9 +147,13 @@ public static class ChainTools
         // With AllowUnknownCertificateAuthority, Build returns true even though the root
         // is unconfirmed; reflect remaining element issues in the verdict instead.
         bool anyIssues = elements.Any(e => !e.IsOk);
+        bool isValid = valid && !anyIssues;
+        if (isValid)
+            notes.Add("Certificate revocation and extended key usage were not checked " +
+                      "(validation is fully offline).");
         return new ChainValidationResult
         {
-            IsValid = valid && !anyIssues,
+            IsValid = isValid,
             Elements = elements,
             Notes = notes,
         };
