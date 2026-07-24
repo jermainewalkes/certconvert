@@ -77,20 +77,30 @@ public partial class GenerateViewModel : ViewModelBase
             var choice = SelectedAlgorithm.Value;
             var entry = await Task.Run(() => Generator.CreateKey(choice));
 
-            string pem = KeyPassword.Length > 0
-                ? KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8EncryptedPem, KeyPassword)
-                : KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8Pem);
-            var outPath = await Dialogs.SaveFileAsync("Save Private Key", "private.key");
-            if (outPath is null)
+            // Dispose the fresh key on every path except the one where SetKey
+            // takes ownership — otherwise a failed save leaks the private key.
+            bool kept = false;
+            try
             {
-                entry.Dispose();
-                Status = "Key generation cancelled — nothing was saved.";
-                return;
+                string pem = KeyPassword.Length > 0
+                    ? KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8EncryptedPem, KeyPassword)
+                    : KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8Pem);
+                var outPath = await Dialogs.SaveFileAsync("Save Private Key", "private.key");
+                if (outPath is null)
+                {
+                    Status = "Key generation cancelled — nothing was saved.";
+                    return;
+                }
+                File.WriteAllBytes(outPath, Encoding.ASCII.GetBytes(pem));
+                SetKey(entry);
+                kept = true;
+                Status = $"Generated {entry.Description} key and wrote {Path.GetFileName(outPath)}." +
+                         (KeyPassword.Length > 0 ? " The key file is encrypted." : "");
             }
-            File.WriteAllBytes(outPath, Encoding.ASCII.GetBytes(pem));
-            SetKey(entry);
-            Status = $"Generated {entry.Description} key and wrote {Path.GetFileName(outPath)}." +
-                     (KeyPassword.Length > 0 ? " The key file is encrypted." : "");
+            finally
+            {
+                if (!kept) entry.Dispose();
+            }
         }
         catch (Exception e)
         {

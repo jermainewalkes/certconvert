@@ -215,33 +215,35 @@ internal static class Commands
         var opts = new ArgReader(args, "--ca");
         string outPath = opts.Require("--out", "Output file");
 
-        PrivateKeyEntry keyEntry;
+        PrivateKeyEntry? keyEntry = null;
         LoadedContent? keyContent = null;
-        if (opts.Get("--key") is { } keyPath)
-        {
-            keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
-            if (keyContent.PrivateKeys.Count == 0)
-                throw new CertConvertException("No private key found in the key file.");
-            keyEntry = keyContent.PrivateKeys[0];
-        }
-        else if (opts.Get("--new-key") is { } alg)
-        {
-            string keyOut = opts.Require("--key-out", "Key output file (--key-out)");
-            keyEntry = Generator.CreateKey(ParseAlgorithm(alg));
-            string? kp = opts.Get("--out-password");
-            string pem = kp is null
-                ? KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8Pem)
-                : KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8EncryptedPem, kp);
-            WriteFile(keyOut, Encoding.ASCII.GetBytes(pem));
-        }
-        else
-        {
-            throw new CertConvertException(
-                "Supply --key <file>, or --new-key <algorithm> with --key-out <file>.");
-        }
-
         try
         {
+            // Acquire the key inside the try so a failed --key-out write can't
+            // leak a freshly generated private key.
+            if (opts.Get("--key") is { } keyPath)
+            {
+                keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
+                if (keyContent.PrivateKeys.Count == 0)
+                    throw new CertConvertException("No private key found in the key file.");
+                keyEntry = keyContent.PrivateKeys[0];
+            }
+            else if (opts.Get("--new-key") is { } alg)
+            {
+                string keyOut = opts.Require("--key-out", "Key output file (--key-out)");
+                keyEntry = Generator.CreateKey(ParseAlgorithm(alg));
+                string? kp = opts.Get("--out-password");
+                string pem = kp is null
+                    ? KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8Pem)
+                    : KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8EncryptedPem, kp);
+                WriteFile(keyOut, Encoding.ASCII.GetBytes(pem));
+            }
+            else
+            {
+                throw new CertConvertException(
+                    "Supply --key <file>, or --new-key <algorithm> with --key-out <file>.");
+            }
+
             var spec = ReadSpec(opts) with
             {
                 ValidityDays = int.TryParse(opts.Get("--days") ?? "365", out int d)
@@ -256,7 +258,7 @@ internal static class Commands
         finally
         {
             if (keyContent is not null) keyContent.Dispose();
-            else keyEntry.Dispose();
+            else keyEntry?.Dispose();
         }
         return CliRunner.ExitOk;
     }
