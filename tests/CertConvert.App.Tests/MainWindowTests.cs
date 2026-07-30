@@ -87,6 +87,75 @@ public class MainWindowTests
     }
 
     [AvaloniaFact]
+    public void InspectView_ShowsCertificateRequestCard()
+    {
+        var vm = new MainWindowViewModel();
+        var window = new MainWindow { DataContext = vm };
+        window.Show();
+
+        using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
+        string csrPem = Generator.CreateCsrPem(key.Key, new CertSpec
+        {
+            CommonName = "request.headless.test",
+            DnsNames = ["request.headless.test"],
+        });
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".csr");
+        File.WriteAllText(path, csrPem);
+        try
+        {
+            vm.Inspect.LoadPath(path);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        Assert.Empty(vm.Inspect.Certificates);
+        Assert.Single(vm.Inspect.Csrs);
+        Assert.Equal("request.headless.test", vm.Inspect.Csrs[0].Header);
+        Assert.True(vm.Inspect.Csrs[0].SignatureOk);
+        // A CSR-only file must dismiss the drop zone empty state.
+        Assert.False(vm.Inspect.IsEmpty);
+
+        vm.Inspect.ClearCommand.Execute(null);
+        Assert.Empty(vm.Inspect.Csrs);
+        Assert.True(vm.Inspect.IsEmpty);
+    }
+
+    [AvaloniaFact]
+    public void InspectView_HostnameCheck_ReportsCoverage()
+    {
+        var vm = new MainWindowViewModel();
+        var window = new MainWindow { DataContext = vm };
+        window.Show();
+
+        using var key = Generator.CreateKey(KeyAlgorithmChoice.EcP256);
+        using var cert = Generator.CreateSelfSigned(key.Key, new CertSpec
+        {
+            CommonName = "www.example.com",
+            DnsNames = ["www.example.com"],
+            ValidityDays = 90,
+        });
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".pem");
+        File.WriteAllText(path, cert.ExportCertificatePem());
+        try { vm.Inspect.LoadPath(path); } finally { File.Delete(path); }
+
+        var card = vm.Inspect.Certificates[0];
+
+        card.HostToCheck = "www.example.com";
+        card.CheckHostnameCommand.Execute(null);
+        Assert.True(card.HostChecked);
+        Assert.True(card.HostCovered);
+        Assert.True(card.ShowCoveredPill);
+        Assert.False(card.ShowNotCoveredPill);
+
+        card.HostToCheck = "elsewhere.test";
+        card.CheckHostnameCommand.Execute(null);
+        Assert.False(card.HostCovered);
+        Assert.True(card.ShowNotCoveredPill);
+    }
+
+    [AvaloniaFact]
     public void AboutView_ExposesKoFiCommand()
     {
         var vm = new MainWindowViewModel();
