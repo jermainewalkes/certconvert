@@ -1,14 +1,14 @@
 # CertConvert — Microsoft Store submission prep
 
 Paste-ready copy for Partner Center → CertConvert (Store ID 9NT6HCG0JBFV) →
-Submissions. Package: `artifacts/msix/CertConvert-1.1.0.msix` (built 17 Jul,
-unsigned — the Store signs it; identity JermaineWalkes.CertConvert already
-matches). Mirrors `mac-app-store-listing.md`, adapted for Windows and the
-Partner Center field set.
+Submissions. Package: `artifacts/msix/CertConvert-1.2.0.msix` (rebuild for 1.2.0
+on the Windows VM — `build-on-windows.sh` → `make-msix.ps1`; unsigned, the Store
+signs it; identity JermaineWalkes.CertConvert already matches). Mirrors
+`mac-app-store-listing.md`, adapted for Windows and the Partner Center field set.
 
 ## Packages
 
-- Upload `CertConvert-1.1.0.msix` under **Packages**. Device family:
+- Upload `CertConvert-1.2.0.msix` under **Packages**. Device family:
   Windows 10/11 desktop (x64). No other families.
 
 ## Properties
@@ -44,7 +44,8 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 > Unlike the online certificate converters, CertConvert never sends your files or private keys to a server. Everything happens locally.
 >
 > WHAT IT DOES
-> • Inspect any certificate, key, CSR or bundle — drag it in and read the subject, issuer, validity, SANs, key usage and fingerprints.
+> • Inspect any certificate, key, CSR or bundle — subject, issuer, validity, SANs, key usage and fingerprints, plus a health check on every one.
+> • Check whether a certificate covers a host name, and decode signing requests in full — the subject, key and extensions they request.
 > • Convert between PEM, DER (.cer/.der), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12), in both directions.
 > • Build chains — drop root, intermediate and device certificates in any order, have them ordered and validated automatically, then export as a PEM bundle, P7B or PFX.
 > • Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.
@@ -57,13 +58,15 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **What's new in this version** (release notes):
 
-> Clearer wording about what this edition includes, plus reliability fixes for unusual certificate and key files.
+> Inspect is far more useful in this release. Every certificate and signing request now gets a health check that flags real problems — a missing subject alternative name, a weak key, an expired or SHA-1-signed certificate — and says what to do about each, without raising false alarms on private CA roots. Signing requests are now fully decoded, and you can check whether a certificate covers a particular host name.
 
 **NOTE (1.1.1):** the CLI bullet was removed — the Store edition is sandboxed and is the graphical app only, so advertising a command line here was inaccurate.
 
 **Product features** (bullet list field, ≤200 chars each):
 
 - Inspect any certificate, key, CSR or bundle — subject, issuer, validity, SANs, key usage and fingerprints
+- Health check on every certificate and CSR — flags weak keys, missing SANs, expiry and SHA-1
+- Check host-name coverage and fully decode certificate signing requests
 - Convert PEM, DER (.cer/.der), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) in both directions
 - Build certificate chains: auto-order, validate offline, export as PEM bundle, P7B or PFX
 - Convert private-key formats (PKCS #8, PKCS #1, SEC 1) and check key–certificate matches

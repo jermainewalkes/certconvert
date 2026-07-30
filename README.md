@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/licence-MIT-green" alt="MIT licence"/>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue" alt="Platforms: macOS and Windows"/>
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4" alt=".NET 10"/>
-  <img src="https://img.shields.io/badge/tests-86%20passing-brightgreen" alt="86 tests passing"/>
+  <img src="https://img.shields.io/badge/tests-159%20passing-brightgreen" alt="159 tests passing"/>
   <a href="https://ko-fi.com/jwalkes"><img src="https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white" alt="Support on Ko-fi"/></a>
 </p>
 
@@ -28,8 +28,10 @@ OpenSSL and running shell commands isn't an option.
 
 ## What it does
 
-- **Inspect** any certificate, key, CSR or bundle — drag it in and read the
-  subject, issuer, validity, SANs, key usage, fingerprints and more.
+- **Inspect** any certificate, key, CSR or bundle — subject, issuer, validity,
+  SANs, key usage, fingerprints and more. Signing requests decode in full, every
+  certificate gets a **health check** and you can ask whether a certificate
+  covers a given **host name**.
 - **Convert** between PEM, DER (`.cer`/`.der`), PKCS #7 (`.p7b`) and
   PKCS #12 (`.pfx`/`.p12`), in both directions.
 - **Chain** certificates: drop root, intermediate and device certs in any
@@ -108,6 +110,8 @@ it with `--help` for the full list; a few examples:
 
 ```bash
 certconvert inspect device.pem
+certconvert inspect device.pem --hostname www.example.com   # does it cover this host?
+certconvert check chain.pem                             # health check; non-zero exit on any critical finding
 certconvert convert device.pem -o device.cer            # PEM → DER
 certconvert convert bundle.p7b -o bundle.pem            # PKCS#7 → PEM
 certconvert chain build device.pem ca.pem root.pem -o chain.pfx \

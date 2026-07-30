@@ -7,7 +7,7 @@
   <script src="js/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Changelog — CertConvert</title>
-  <meta name="description" content="CertConvert release notes and version history: 1.0.0 through 1.1.1.">
+  <meta name="description" content="CertConvert release notes and version history: 1.0.0 through 1.2.0.">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/changelog.html">
@@ -41,6 +41,15 @@
 
 <section class="section" style="padding-top:24px;">
   <div class="container prose">
+
+    <h2>1.2.0 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 30 July 2026</span></h2>
+    <p>The biggest update to <strong>Inspect</strong> since launch.</p>
+    <ul>
+      <li><strong>Certificate health check</strong> &mdash; every certificate and signing request now comes with a health check. It flags the things that actually break a certificate &mdash; a missing subject alternative name, a weak key, an expired or nearly-expired certificate, a SHA-1 signature &mdash; and explains what to do about each. It knows a private CA root from a public server certificate, so it doesn&rsquo;t cry wolf.</li>
+      <li><strong>Full signing request (CSR) inspection</strong> &mdash; a CSR now decodes like a certificate: its subject and key, the SANs and usages it requests and whether its own signature checks out. Previously CertConvert only noted that a request was present.</li>
+      <li><strong>Host name check</strong> &mdash; ask whether a certificate covers a particular host name and get a yes or no with the reasoning, including the common trap of a name that appears only in the common name.</li>
+    </ul>
+    <p>No changes to certificate conversion, chaining or key handling.</p>
 
     <h2>1.1.1 <span class="muted" style="font-weight:400; font-size:16px;">&mdash; 25 July 2026</span></h2>
     <p>A maintenance release.</p>

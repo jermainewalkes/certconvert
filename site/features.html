@@ -45,7 +45,8 @@
       <div>
         <div class="eyebrow" style="text-align:left;">Inspect</div>
         <h2 style="text-align:left;">Read any certificate, key or bundle</h2>
-        <p>Drag in a certificate, private key, CSR or bundle and CertConvert decodes it: subject, issuer, validity, serial, public-key algorithm, SANs, key usage, extended key usage and SHA-256 / SHA-1 fingerprints. Formats are detected from file <em>content</em>, so a misnamed <code>.cer</code> that is really PEM opens without complaint.</p>
+        <p>Drag in a certificate, private key, CSR or bundle and CertConvert decodes it: subject, issuer, validity, serial, public-key algorithm, SANs, key usage, extended key usage and SHA-256 / SHA-1 fingerprints. A signing request is decoded the same way &mdash; the subject and key it carries, the SANs and usages it <em>requests</em> and whether its own signature verifies. Formats are detected from file <em>content</em>, so a misnamed <code>.cer</code> that is really PEM opens without complaint.</p>
+        <p>Every certificate and request also gets a <strong>health check</strong> that flags real problems &mdash; a missing subject alternative name, a weak key, an expired or SHA-1-signed certificate &mdash; and explains what to do, without raising false alarms on private CA roots. A <strong>host-name check</strong> answers whether a certificate is valid for a given host, including the common trap of a name that lives only in the common name.</p>
         <ul>
           <li>Works on PEM, DER, PKCS #7 and PKCS #12 input</li>
           <li>Copy the PEM or the SHA-256 fingerprint with one click</li>

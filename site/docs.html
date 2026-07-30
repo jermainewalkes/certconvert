@@ -46,7 +46,8 @@
     <p>CertConvert opens on a sidebar with six views — Inspect, Convert, Chain, Keys, Generate and About. Most jobs are drag-and-drop: point a view at a file and it detects the format from the file&rsquo;s content, not its extension.</p>
 
     <h3>Inspect</h3>
-    <p>Open or drag in any certificate, key, CSR or bundle. CertConvert decodes it and shows the subject, issuer, validity, serial, public-key algorithm, SANs, key usage and SHA-256 / SHA-1 fingerprints. Use <strong>Copy PEM</strong> or <strong>Copy SHA-256</strong> to grab either. If the file is a password-protected PFX or key, type the password and choose <strong>Unlock</strong>.</p>
+    <p>Open or drag in any certificate, key, CSR or bundle. CertConvert decodes it and shows the subject, issuer, validity, serial, public-key algorithm, SANs, key usage and SHA-256 / SHA-1 fingerprints. A signing request is decoded the same way, down to the SANs and usages it requests. Use <strong>Copy PEM</strong> or <strong>Copy SHA-256</strong> to grab either. If the file is a password-protected PFX or key, type the password and choose <strong>Unlock</strong>.</p>
+    <p>Every certificate and request also carries a <strong>health check</strong> &mdash; findings marked Critical, Warning or Note, each with an explanation &mdash; and a <strong>Does This Cover A Host Name?</strong> box that tells you whether a certificate is valid for a given host and why.</p>
 
     <h3>Convert</h3>
     <p>Load a file, pick the target format &mdash; PEM, DER (<code>.cer</code>), PKCS #7 (<code>.p7b</code>) or PKCS #12 (<code>.pfx</code>) &mdash; and save. To build a PFX you can supply the matching private key and set an export password.</p>
@@ -64,6 +65,8 @@
     <p>A copy built from source is a CLI when given arguments and a GUI when not. A few worked examples:</p>
     <div class="callout">The Mac App Store and Microsoft Store editions are sandboxed and are the graphical app only — a sandboxed process cannot open files named on the command line, so those editions ship without the CLI. <a href="download.html#from-source">Build from source</a> to use it.</div>
     <pre><code>certconvert inspect device.pem
+certconvert inspect device.pem --hostname www.example.com   # does it cover this host?
+certconvert check chain.pem                             # health check; non-zero exit on any critical finding
 certconvert convert device.pem -o device.cer            # PEM &rarr; DER
 certconvert convert bundle.p7b -o bundle.pem            # PKCS#7 &rarr; PEM
 certconvert chain build device.pem ca.pem root.pem -o chain.pfx \

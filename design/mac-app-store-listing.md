@@ -6,13 +6,13 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 
 ## Build
 
-- Package: `artifacts/mas/CertConvert-1.1.0.pkg` (42 MB, arm64, store variant —
+- Package: `artifacts/mas/CertConvert-1.2.0.pkg` (42 MB, arm64, store variant —
   self-updater and Ko-fi removed), signed with *3rd Party Mac Developer
   Installer*. Built by `build/make-mas-pkg.sh`.
 - **Upload** (does not submit — sends the build to App Store Connect so it
   appears under the version; you then attach it and submit):
   ```bash
-  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.1.0.pkg -t macos \
+  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.2.0.pkg -t macos \
     --apiKey X459QTHUM2 --apiIssuer 0d5235ae-7e19-4001-8eed-20689be6be83
   ```
 - **[DECIDE]** arm64-only. Intel Macs won't be offered it. Ship arm64 now, or
@@ -32,7 +32,7 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 - **[DECIDE] Price:** £8.99 / $9.99 tier (agreed earlier). All territories.
 - Small Business Program: confirm enrolment for the 15% rate.
 
-## Version 1.1.0 — listing text
+## Version 1.2.0 — listing text
 
 **Promotional text** (≤170, updatable anytime without review):
 > Convert, chain, inspect and generate X.509 certificates entirely on your Mac. No uploads, no command line, no OpenSSL — your private keys never leave the machine.
@@ -47,7 +47,8 @@ trademarks in this field):
 > Unlike the online certificate converters, CertConvert never sends your files or private keys to a server. Everything happens locally.
 >
 > WHAT IT DOES
-> • Inspect any certificate, key, CSR or bundle — drag it in and read the subject, issuer, validity, SANs, key usage and fingerprints.
+> • Inspect any certificate, key, CSR or bundle — subject, issuer, validity, SANs, key usage and fingerprints, plus a health check on every one.
+> • Check whether a certificate covers a host name, and decode signing requests in full — the subject, key and extensions they request.
 > • Convert between PEM, DER (.cer/.der), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12), in both directions.
 > • Build chains — drop root, intermediate and device certificates in any order, have them ordered and validated automatically, then export as a PEM bundle, P7B or PFX.
 > • Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.
@@ -58,8 +59,8 @@ trademarks in this field):
 >
 > Formats are detected from file content, not extensions, so misnamed files just work.
 
-**What's New in 1.1.0:**
-> Redesigned Generate: choose a self-signed certificate or a signing request first, and the form shows only the fields that output needs.
+**What's New in 1.2.0:**
+> Inspect is far more useful in this release. Every certificate and signing request now gets a health check that flags real problems — a missing subject alternative name, a weak key, an expired or SHA-1-signed certificate — and says what to do about each, without raising false alarms on private CA roots. Signing requests are now fully decoded, and you can check whether a certificate covers a particular host name.
 
 ## URLs
 
