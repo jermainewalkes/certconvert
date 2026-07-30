@@ -57,6 +57,8 @@
                     <Color x:Key="AppNavSelectedHoverColor">#D8D5F9</Color>
                     <SolidColorBrush x:Key="AppOkBackground" Color="#DCFCE7"/>
                     <SolidColorBrush x:Key="AppOkForeground" Color="#166534"/>
+                    <SolidColorBrush x:Key="AppWarnBackground" Color="#FEF3C7"/>
+                    <SolidColorBrush x:Key="AppWarnForeground" Color="#92400E"/>
                     <SolidColorBrush x:Key="AppFailBackground" Color="#FEE2E2"/>
                     <SolidColorBrush x:Key="AppFailForeground" Color="#991B1B"/>
                 </ResourceDictionary>
@@ -72,6 +74,8 @@
                     <Color x:Key="AppNavSelectedHoverColor">#3A3866</Color>
                     <SolidColorBrush x:Key="AppOkBackground" Color="#14532D"/>
                     <SolidColorBrush x:Key="AppOkForeground" Color="#BBF7D0"/>
+                    <SolidColorBrush x:Key="AppWarnBackground" Color="#78350F"/>
+                    <SolidColorBrush x:Key="AppWarnForeground" Color="#FDE68A"/>
                     <SolidColorBrush x:Key="AppFailBackground" Color="#7F1D1D"/>
                     <SolidColorBrush x:Key="AppFailForeground" Color="#FECACA"/>
                 </ResourceDictionary>
@@ -228,6 +232,26 @@
         </Style>
         <Style Selector="Border.pillFail TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource AppFailForeground}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Border.pillWarn">
+            <Setter Property="Background" Value="{DynamicResource AppWarnBackground}"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="10,2"/>
+        </Style>
+        <Style Selector="Border.pillWarn TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AppWarnForeground}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Border.pillNotice">
+            <Setter Property="Background" Value="{DynamicResource AppInsetBackground}"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="10,2"/>
+        </Style>
+        <Style Selector="Border.pillNotice TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondary}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>

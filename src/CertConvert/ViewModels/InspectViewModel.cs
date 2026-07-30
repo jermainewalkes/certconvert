@@ -16,9 +16,12 @@ public partial class InspectViewModel : ViewModelBase
     [ObservableProperty] private string _detected = "";
     [ObservableProperty] private string _status = "";
     [ObservableProperty] private string _keysSummary = "";
-    [ObservableProperty] private bool _hasCsr;
+    // The drop zone shows until something is loaded. Certificate-request-only and
+    // key-only files load no certificates, so this can't key off Certificates.Count.
+    [ObservableProperty] private bool _isEmpty = true;
 
     public ObservableCollection<CertItemViewModel> Certificates { get; } = new();
+    public ObservableCollection<CsrItemViewModel> Csrs { get; } = new();
 
     private string? _currentPath;
 
@@ -45,9 +48,10 @@ public partial class InspectViewModel : ViewModelBase
         Password = "";
         Detected = "";
         KeysSummary = "";
-        HasCsr = false;
+        IsEmpty = true;
         Status = "";
         Certificates.Clear();
+        Csrs.Clear();
     }
 
     public void LoadPath(string path)
@@ -55,9 +59,9 @@ public partial class InspectViewModel : ViewModelBase
         _currentPath = path;
         FileName = System.IO.Path.GetFileName(path);
         Certificates.Clear();
+        Csrs.Clear();
         Detected = "";
         KeysSummary = "";
-        HasCsr = false;
         try
         {
             using var content = ContentLoader.LoadFile(
@@ -66,10 +70,12 @@ public partial class InspectViewModel : ViewModelBase
             foreach (var cert in content.Certificates)
                 Certificates.Add(new CertItemViewModel(
                     Inspector.Inspect(cert), cert.ExportCertificatePem() + "\n"));
+            foreach (var csrPem in content.CertificateRequests)
+                Csrs.Add(new CsrItemViewModel(CsrInspector.InspectPem(csrPem), csrPem));
             if (content.PrivateKeys.Count > 0)
                 KeysSummary = "Private keys: " +
                     string.Join(", ", content.PrivateKeys.Select(k => k.Description));
-            HasCsr = content.CertificateRequestPem is not null;
+            IsEmpty = Certificates.Count == 0 && Csrs.Count == 0 && KeysSummary.Length == 0;
             Status = $"Loaded {FileName} — {Detected}.";
         }
         catch (PasswordRequiredException e)

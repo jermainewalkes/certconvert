@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -153,12 +154,20 @@ public partial class KeysViewModel : ViewModelBase
         try
         {
             using var certContent = ContentLoader.LoadFile(CertFile);
-            if (certContent.Certificates.Count == 0)
-                throw new CertConvertException("No certificate found in the file.");
-            bool match = KeyTools.Matches(certContent.Certificates[0], _loaded.Key);
+            var certs = certContent.Certificates;
+            var reqs = certContent.CertificateRequests;
+            if (certs.Count == 0 && reqs.Count == 0)
+                throw new CertConvertException("No certificate or certificate request found in the file.");
+
+            // Check both certificates and requests — a file may hold either or both.
+            bool match = certs.Any(c => KeyTools.Matches(c, _loaded.Key))
+                || KeyTools.MatchesAnyRequest(reqs, _loaded.Key);
+            string against = certs.Count > 0 && reqs.Count > 0 ? "certificate or request"
+                : certs.Count > 0 ? "certificate" : "request";
+
             MatchResult = match
-                ? "MATCH — the key belongs to this certificate."
-                : "NO MATCH — the key does not belong to this certificate.";
+                ? $"MATCH — the key belongs to this {against}."
+                : $"NO MATCH — the key does not belong to this {against}.";
             Status = MatchResult;
         }
         catch (Exception e)

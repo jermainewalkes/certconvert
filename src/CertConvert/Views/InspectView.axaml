@@ -4,6 +4,24 @@
              x:Class="CertConvert.Views.InspectView"
              x:DataType="vm:InspectViewModel"
              DragDrop.AllowDrop="True">
+  <UserControl.Resources>
+    <!-- One health-check finding: a severity pill (fail/warn/notice styles reused
+         from the pill idiom) plus what's wrong and what to do. -->
+    <DataTemplate x:Key="FindingTemplate" x:DataType="vm:FindingViewModel">
+      <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+        <Border Grid.Column="0" Classes="pillFail" VerticalAlignment="Top"
+                IsVisible="{Binding IsCritical}"><TextBlock Text="{Binding SeverityLabel}"/></Border>
+        <Border Grid.Column="0" Classes="pillWarn" VerticalAlignment="Top"
+                IsVisible="{Binding IsWarning}"><TextBlock Text="{Binding SeverityLabel}"/></Border>
+        <Border Grid.Column="0" Classes="pillNotice" VerticalAlignment="Top"
+                IsVisible="{Binding IsNotice}"><TextBlock Text="{Binding SeverityLabel}"/></Border>
+        <StackPanel Grid.Column="1" Margin="10,0,0,0" Spacing="1">
+          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding Explanation}" Classes="secondary" FontSize="12" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
   <ScrollViewer>
     <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="920" HorizontalAlignment="Stretch">
 
@@ -29,7 +47,7 @@
           </WrapPanel>
 
           <!-- Drop zone shown until something is loaded. -->
-          <Panel MinHeight="180" IsVisible="{Binding !Certificates.Count}">
+          <Panel MinHeight="180" IsVisible="{Binding IsEmpty}">
             <Rectangle Stroke="{DynamicResource AppCardBorder}" StrokeThickness="1.5"
                        StrokeDashArray="4,3" RadiusX="10" RadiusY="10" Fill="Transparent"/>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
@@ -50,9 +68,6 @@
             <TextBlock Classes="status" Text="{Binding KeysSummary}" TextWrapping="Wrap"
                        IsVisible="{Binding KeysSummary.Length}"
                        AutomationProperties.LiveSetting="Polite"/>
-            <TextBlock Classes="status" Text="A certificate request (CSR) is present in this file."
-                       IsVisible="{Binding HasCsr}"
-                       AutomationProperties.LiveSetting="Polite"/>
           </StackPanel>
         </StackPanel>
       </Border>
@@ -71,8 +86,9 @@
                                VerticalAlignment="Center"/>
                   </StackPanel>
                 </Expander.Header>
+                <StackPanel Spacing="0">
                 <Grid ColumnDefinitions="160,*"
-                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                       RowSpacing="6" Margin="8,10,8,4">
                   <TextBlock Grid.Row="0" Classes="secondary" Text="Subject"/>
                   <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Info.Subject}" TextWrapping="Wrap"/>
@@ -99,12 +115,102 @@
                   <SelectableTextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Info.Sha256Fingerprint}" TextWrapping="Wrap"/>
                   <TextBlock Grid.Row="10" Classes="secondary" Text="SHA-1"/>
                   <SelectableTextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Info.Sha1Fingerprint}" TextWrapping="Wrap"/>
-                  <StackPanel Grid.Row="11" Grid.ColumnSpan="2" Orientation="Horizontal"
-                              Spacing="8" Margin="0,10,0,0">
-                    <Button Content="Copy PEM" Command="{Binding CopyPemCommand}"/>
-                    <Button Content="Copy SHA-256" Command="{Binding CopySha256Command}"/>
-                  </StackPanel>
                 </Grid>
+                <StackPanel Spacing="8" Margin="8,12,8,0">
+                  <TextBlock Classes="section" Text="Health check"/>
+                  <Border Classes="pillOk" HorizontalAlignment="Left" IsVisible="{Binding IsHealthy}">
+                    <TextBlock Text="No problems found"/>
+                  </Border>
+                  <ItemsControl ItemsSource="{Binding Findings}" IsVisible="{Binding HasFindings}"
+                                ItemTemplate="{StaticResource FindingTemplate}"
+                                AutomationProperties.Name="Health check findings"
+                                AutomationProperties.LiveSetting="Polite"/>
+                </StackPanel>
+                <StackPanel Spacing="6" Margin="8,14,8,0">
+                  <TextBlock Classes="section" Text="Does this cover a host name?"/>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Width="240" PlaceholderText="e.g. www.example.com"
+                             Text="{Binding HostToCheck}"
+                             AutomationProperties.Name="Host name to check"/>
+                    <Button Content="Check" Command="{Binding CheckHostnameCommand}"/>
+                    <Border Classes="pillOk" VerticalAlignment="Center"
+                            IsVisible="{Binding ShowCoveredPill}"><TextBlock Text="Covered"/></Border>
+                    <Border Classes="pillFail" VerticalAlignment="Center"
+                            IsVisible="{Binding ShowNotCoveredPill}"><TextBlock Text="Doesn't cover"/></Border>
+                  </StackPanel>
+                  <TextBlock Text="{Binding HostResult}" Classes="secondary" FontSize="12"
+                             TextWrapping="Wrap" IsVisible="{Binding HostChecked}"
+                             AutomationProperties.LiveSetting="Polite"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,14,8,4">
+                  <Button Content="Copy PEM" Command="{Binding CopyPemCommand}"/>
+                  <Button Content="Copy SHA-256" Command="{Binding CopySha256Command}"/>
+                </StackPanel>
+                </StackPanel>
+              </Expander>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <ItemsControl ItemsSource="{Binding Csrs}"
+                    AutomationProperties.Name="Inspected certificate requests">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:CsrItemViewModel">
+            <Border Classes="card" Margin="0,0,0,12" Padding="10">
+              <Expander IsExpanded="True" Background="Transparent"
+                        HorizontalAlignment="Stretch">
+                <Expander.Header>
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{Binding Header}" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                    <Border Classes="pillOk" IsVisible="{Binding SignatureOk}"
+                            VerticalAlignment="Center">
+                      <TextBlock Text="Signing request"/>
+                    </Border>
+                    <Border Classes="pillFail" IsVisible="{Binding SignatureBad}"
+                            VerticalAlignment="Center">
+                      <TextBlock Text="Bad signature"/>
+                    </Border>
+                  </StackPanel>
+                </Expander.Header>
+                <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="160,*"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                      RowSpacing="6" Margin="8,10,8,4">
+                  <TextBlock Grid.Row="0" Classes="secondary" Text="Subject"/>
+                  <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Info.Subject}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="1" Classes="secondary" Text="Public key"/>
+                  <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Info.KeyAlgorithm}"/>
+                  <TextBlock Grid.Row="2" Classes="secondary" Text="Signature"/>
+                  <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Info.SignatureAlgorithm}"/>
+                  <TextBlock Grid.Row="3" Classes="secondary" Text="Requests SANs" IsVisible="{Binding HasSans}"/>
+                  <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SansText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasSans}"/>
+                  <TextBlock Grid.Row="4" Classes="secondary" Text="Requests key usage" IsVisible="{Binding HasKeyUsage}"/>
+                  <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding KeyUsageText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasKeyUsage}"/>
+                  <TextBlock Grid.Row="5" Classes="secondary" Text="Requests ext. usage" IsVisible="{Binding HasEku}"/>
+                  <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding EkuText}"
+                             TextWrapping="Wrap" IsVisible="{Binding HasEku}"/>
+                  <TextBlock Grid.Row="6" Classes="secondary" Text="SHA-256"/>
+                  <SelectableTextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Info.Sha256Fingerprint}" TextWrapping="Wrap"/>
+                </Grid>
+                <StackPanel Spacing="8" Margin="8,12,8,0">
+                  <TextBlock Classes="section" Text="Health check"/>
+                  <Border Classes="pillOk" HorizontalAlignment="Left" IsVisible="{Binding IsHealthy}">
+                    <TextBlock Text="No problems found"/>
+                  </Border>
+                  <ItemsControl ItemsSource="{Binding Findings}" IsVisible="{Binding HasFindings}"
+                                ItemTemplate="{StaticResource FindingTemplate}"
+                                AutomationProperties.Name="Health check findings"
+                                AutomationProperties.LiveSetting="Polite"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,14,8,4">
+                  <Button Content="Copy PEM" Command="{Binding CopyPemCommand}"/>
+                  <Button Content="Copy SHA-256" Command="{Binding CopySha256Command}"/>
+                </StackPanel>
+                </StackPanel>
               </Expander>
             </Border>
           </DataTemplate>
