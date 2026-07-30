@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
@@ -184,16 +185,34 @@ public static class KeyTools
 
     public static byte[] ExportDer(AsymmetricAlgorithm key) => key.ExportPkcs8PrivateKey();
 
-    /// <summary>True when the private key matches the certificate's public key.</summary>
-    public static bool Matches(X509Certificate2 cert, AsymmetricAlgorithm key)
+    /// <summary>The SubjectPublicKeyInfo of a private key's public half.</summary>
+    private static byte[] SpkiOf(AsymmetricAlgorithm key) => key switch
     {
-        byte[] keySpki = key switch
+        RSA rsa => rsa.ExportSubjectPublicKeyInfo(),
+        ECDsa ec => ec.ExportSubjectPublicKeyInfo(),
+        _ => throw new CertConvertException(
+            $"Unsupported key algorithm: {key.GetType().Name}."),
+    };
+
+    /// <summary>True when the private key matches the certificate's public key.</summary>
+    public static bool Matches(X509Certificate2 cert, AsymmetricAlgorithm key) =>
+        cert.PublicKey.ExportSubjectPublicKeyInfo().AsSpan().SequenceEqual(SpkiOf(key));
+
+    /// <summary>True when the private key matches the key requested in a CSR.</summary>
+    public static bool Matches(CsrInfo csr, AsymmetricAlgorithm key) =>
+        csr.PublicKeySpki.AsSpan().SequenceEqual(SpkiOf(key));
+
+    /// <summary>True when the key matches any of the given request PEMs. A request
+    /// that fails to parse is skipped, so one corrupt block can't abort the check.</summary>
+    public static bool MatchesAnyRequest(IEnumerable<string> requestPems, AsymmetricAlgorithm key)
+    {
+        foreach (var pem in requestPems)
         {
-            RSA rsa => rsa.ExportSubjectPublicKeyInfo(),
-            ECDsa ec => ec.ExportSubjectPublicKeyInfo(),
-            _ => throw new CertConvertException(
-                $"Unsupported key algorithm: {key.GetType().Name}."),
-        };
-        return cert.PublicKey.ExportSubjectPublicKeyInfo().AsSpan().SequenceEqual(keySpki);
+            CsrInfo info;
+            try { info = CsrInspector.InspectPem(pem); }
+            catch (CertConvertException) { continue; }
+            if (Matches(info, key)) return true;
+        }
+        return false;
     }
 }

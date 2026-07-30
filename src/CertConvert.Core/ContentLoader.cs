@@ -75,7 +75,7 @@ public static class ContentLoader
 
         var certs = new List<X509Certificate2>();
         var keys = new List<PrivateKeyEntry>();
-        string? csrPem = null;
+        var csrs = new List<string>();
         var skipped = new List<string>();
 
         try
@@ -103,7 +103,7 @@ public static class ContentLoader
 
                     case "CERTIFICATE REQUEST":
                     case "NEW CERTIFICATE REQUEST":
-                        csrPem = PemUtil.Encode("CERTIFICATE REQUEST", block.Der);
+                        csrs.Add(PemUtil.Encode("CERTIFICATE REQUEST", block.Der));
                         break;
 
                     default:
@@ -122,7 +122,7 @@ public static class ContentLoader
             throw;
         }
 
-        if (certs.Count == 0 && keys.Count == 0 && csrPem is null)
+        if (certs.Count == 0 && keys.Count == 0 && csrs.Count == 0)
             throw new UnrecognisedContentException(
                 $"No usable PEM content found. Blocks present: {string.Join(", ", skipped)}.");
 
@@ -135,8 +135,8 @@ public static class ContentLoader
             parts.Add(certs.Count == 1 ? "1 certificate" : $"{certs.Count} certificates");
         if (keys.Count > 0)
             parts.Add(keys.Count == 1 ? "1 private key" : $"{keys.Count} private keys");
-        if (csrPem is not null)
-            parts.Add("1 certificate request");
+        if (csrs.Count > 0)
+            parts.Add(csrs.Count == 1 ? "1 certificate request" : $"{csrs.Count} certificate requests");
         if (skipped.Count > 0)
             parts.Add($"ignored: {string.Join(", ", skipped)}");
 
@@ -144,10 +144,10 @@ public static class ContentLoader
         {
             Kind = kind,
             SourceDescription = $"PEM ({string.Join(", ", parts)})",
-            CertificateRequestPem = csrPem,
         };
         content.Certificates.AddRange(certs);
         content.PrivateKeys.AddRange(keys);
+        content.CertificateRequests.AddRange(csrs);
         return content;
     }
 
@@ -239,7 +239,20 @@ public static class ContentLoader
             rsa.Dispose();
         }
 
+        // 6. PKCS #10 certificate request (DER). Last, so it can never shadow a
+        //    format detected above.
+        if (CsrInspector.TryLoadDer(data, out string? reqPem))
+        {
+            var c = new LoadedContent
+            {
+                Kind = ContentKind.CertificateRequest,
+                SourceDescription = "DER (1 certificate request)",
+            };
+            c.CertificateRequests.Add(reqPem!);
+            return c;
+        }
+
         throw new UnrecognisedContentException(
-            "The input is not a recognisable certificate, key, PKCS #7 or PKCS #12 file.");
+            "The input is not a recognisable certificate, key, PKCS #7, PKCS #12 or certificate request file.");
     }
 }
