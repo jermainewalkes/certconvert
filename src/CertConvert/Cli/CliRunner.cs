@@ -66,6 +66,7 @@ public static class CliRunner
         return verb switch
         {
             "inspect" => Commands.Inspect(args[1..]),
+            "check" => Commands.Check(args[1..]),
             "convert" => Commands.Convert(args[1..]),
             "chain" => DispatchChain(args[1..]),
             "key" => DispatchKey(args[1..]),
@@ -132,8 +133,14 @@ public static class CliRunner
             Run without arguments to open the GUI.
 
             Usage:
-              certconvert inspect <file> [--password <pw>]
-                  Decode and print certificates, keys or CSRs in any supported format.
+              certconvert inspect <file> [--password <pw>] [--hostname <host>]
+                  Decode and print certificates, keys or CSRs in any supported format,
+                  each followed by a plain-English health check. --hostname also reports
+                  whether each certificate covers that host (exit 2 if none do).
+
+              certconvert check <file> [--password <pw>]
+                  Run only the health check. Exits 2 if anything Critical is found,
+                  so it can gate a script or CI job.
 
               certconvert convert <in>... -o <out> [--to pem|der|p7b|p7b-pem|pfx]
                                   [--password <pw>] [--key <file>] [--key-password <pw>]
@@ -155,7 +162,7 @@ public static class CliRunner
 
               certconvert key match --cert <file> --key <file>
                                   [--password <pw>] [--key-password <pw>]
-                  Check whether a private key belongs to a certificate.
+                  Check whether a private key belongs to a certificate or CSR.
 
               certconvert gen key [--algorithm rsa2048|rsa3072|rsa4096|p256|p384|p521]
                                   -o <out> [--out-password <pw>]

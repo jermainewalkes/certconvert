@@ -17,8 +17,10 @@ internal static class Commands
     {
         var opts = new ArgReader(args);
         if (opts.Positionals.Count != 1)
-            return CliRunner.Usage("Usage: certconvert inspect <file> [--password <pw>]");
+            return CliRunner.Usage("Usage: certconvert inspect <file> [--password <pw>] [--hostname <host>]");
 
+        string? host = opts.Get("--hostname");
+        bool hostCovered = false;
         using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Get("--password"));
         Console.WriteLine($"Detected: {content.SourceDescription}");
         Console.WriteLine();
@@ -27,14 +29,69 @@ internal static class Commands
         {
             if (content.Certificates.Count > 1)
                 Console.WriteLine($"--- Certificate {i + 1} of {content.Certificates.Count} ---");
-            Console.Write(Inspector.ToText(Inspector.Inspect(content.Certificates[i])));
+            var info = Inspector.Inspect(content.Certificates[i]);
+            Console.Write(Inspector.ToText(info));
+            Console.Write(HealthCheck.ToText(HealthCheck.Analyse(info)));
+            if (host is not null)
+            {
+                var r = HostnameCheck.Check(content.Certificates[i], host);
+                Console.WriteLine($"Host {host}:   {r.Explanation}");
+                hostCovered |= r.IsCovered;
+            }
             Console.WriteLine();
         }
         foreach (var key in content.PrivateKeys)
             Console.WriteLine($"Private key:   {key.Description}");
-        if (content.CertificateRequestPem is not null)
-            Console.WriteLine("Certificate request (CSR) present.");
-        return CliRunner.ExitOk;
+
+        for (int i = 0; i < content.CertificateRequests.Count; i++)
+        {
+            if (content.CertificateRequests.Count > 1)
+                Console.WriteLine($"--- Certificate request {i + 1} of {content.CertificateRequests.Count} ---");
+            var csr = CsrInspector.InspectPem(content.CertificateRequests[i]);
+            Console.Write(CsrInspector.ToText(csr));
+            Console.Write(HealthCheck.ToText(HealthCheck.Analyse(csr)));
+            Console.WriteLine();
+        }
+        // A host-name check that finds no certificate to test against is a failure,
+        // not a silent pass — say so and exit non-zero.
+        if (host is not null && content.Certificates.Count == 0)
+            Console.WriteLine($"Host {host}:   no certificate in this file to check it against.");
+        // Adding --hostname can't change any call that omits it.
+        return (host is not null && !hostCovered) ? CliRunner.ExitFailure : CliRunner.ExitOk;
+    }
+
+    // ---------- check ----------
+
+    public static int Check(string[] args)
+    {
+        var opts = new ArgReader(args);
+        if (opts.Positionals.Count != 1)
+            return CliRunner.Usage("Usage: certconvert check <file> [--password <pw>]");
+
+        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Get("--password"));
+        if (content.Certificates.Count == 0 && content.CertificateRequests.Count == 0)
+            throw new CertConvertException("No certificate or certificate request found to check.");
+
+        bool anyCritical = false;
+        foreach (var cert in content.Certificates)
+        {
+            var info = Inspector.Inspect(cert);
+            var findings = HealthCheck.Analyse(info);
+            Console.WriteLine($"{info.DisplayName}:");
+            Console.Write(HealthCheck.ToText(findings));
+            Console.WriteLine();
+            anyCritical |= findings.Any(f => f.Severity == Severity.Critical);
+        }
+        foreach (var csrPem in content.CertificateRequests)
+        {
+            var csr = CsrInspector.InspectPem(csrPem);
+            var findings = HealthCheck.Analyse(csr);
+            Console.WriteLine($"{csr.DisplayName} (request):");
+            Console.Write(HealthCheck.ToText(findings));
+            Console.WriteLine();
+            anyCritical |= findings.Any(f => f.Severity == Severity.Critical);
+        }
+        return anyCritical ? CliRunner.ExitFailure : CliRunner.ExitOk;
     }
 
     // ---------- convert ----------
@@ -164,16 +221,27 @@ internal static class Commands
 
         using var certContent = ContentLoader.LoadFile(certPath, opts.Get("--password"));
         using var keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
-        if (certContent.Certificates.Count == 0)
-            throw new CertConvertException("No certificate found in the certificate file.");
         if (keyContent.PrivateKeys.Count == 0)
             throw new CertConvertException("No private key found in the key file.");
+        var key = keyContent.PrivateKeys[0].Key;
 
-        bool match = KeyTools.Matches(
-            certContent.Certificates[0], keyContent.PrivateKeys[0].Key);
+        // Check every item in the file — certificates AND requests, not one or the
+        // other. A bundle may hold both, and the key matches at most one.
+        var certs = certContent.Certificates;
+        var reqs = certContent.CertificateRequests;
+        if (certs.Count == 0 && reqs.Count == 0)
+            throw new CertConvertException(
+                "No certificate or certificate request found in the certificate file.");
+
+        bool match = certs.Any(c => KeyTools.Matches(c, key))
+            || KeyTools.MatchesAnyRequest(reqs, key);
+        string against = certs.Count > 0 && reqs.Count > 0 ? "certificate or request in the file"
+            : certs.Count > 0 ? (certs.Count > 1 ? "any certificate in the file" : "certificate")
+            : reqs.Count > 1 ? "any request in the file" : "certificate request";
+
         Console.WriteLine(match
-            ? "MATCH: the private key belongs to the certificate."
-            : "NO MATCH: the private key does not belong to the certificate.");
+            ? $"MATCH: the private key belongs to the {against}."
+            : $"NO MATCH: the private key does not belong to the {against}.");
         return match ? CliRunner.ExitOk : CliRunner.ExitFailure;
     }
 
