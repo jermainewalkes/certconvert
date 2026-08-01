@@ -486,3 +486,8 @@ design/marketing-plan.md
 # Apple provisioning profiles: account-specific, expire yearly — regenerate
 # from the Developer portal (see build/RELEASING.md), never commit.
 design/*.provisionprofile
+
+# Monthly SEO report output (generated locally by the cc-seo-report scheduled
+# task). The report scripts in tools/site/ ARE tracked; the reports/history CSV
+# are local analytics, not committed.
+docs/reports/
