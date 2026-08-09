@@ -90,15 +90,14 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **Additional licence terms:** leave as Standard Application Licence Terms.
 
-## Screenshots — regenerate on the VM (adds 08-sign for 1.3)
+## Screenshots — READY (1.3, incl. 08-sign)
 
 Eight 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
 variant; 1280×720 logical at 1.5× render scaling so the UI is sized like a real
 150%-scaled 1080p laptop, not sparse 1x): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded, 08-sign. Upload in
-that order — Inspect first, it's the strongest opener. **01–07 carry over from
-1.2; the new 08-sign is produced when the set is regenerated on the Windows VM
-alongside the 1.3.0 MSIX** (these must be Windows-rendered, so they are not
-generated on the Mac). Regenerate with the VM capture flow (`CERTCONVERT_CAPTURE_SIZE=1280x720 CERTCONVERT_CAPTURE_SCALE=1.5`; note the capture dir is
+that order — Inspect first, it's the strongest opener. **All eight are the 1.3
+set, regenerated on the Windows build VM alongside the 1.3.0 MSIX** (they must be
+Windows-rendered, so they are not generated on the Mac). Regenerate with the VM capture flow (`CERTCONVERT_CAPTURE_SIZE=1280x720 CERTCONVERT_CAPTURE_SCALE=1.5`; note the capture dir is
 resolved against the TEST RUNNER's working directory, so pass an absolute path
 or fetch from `tests/.../bin/Debug/net10.0/design/msstore-screenshots`).
 
