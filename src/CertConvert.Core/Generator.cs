@@ -128,7 +128,7 @@ public static class Generator
         return request;
     }
 
-    private static HashAlgorithmName EcHash(ECDsa ec) => ec.KeySize switch
+    internal static HashAlgorithmName EcHash(ECDsa ec) => ec.KeySize switch
     {
         >= 512 => HashAlgorithmName.SHA512,   // P-521
         >= 384 => HashAlgorithmName.SHA384,   // P-384

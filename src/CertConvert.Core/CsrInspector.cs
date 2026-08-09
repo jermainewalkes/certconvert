@@ -159,14 +159,32 @@ public static class CsrInspector
     {
         try
         {
-            _ = CertificateRequest.LoadSigningRequest(der, HashAlgorithmName.SHA256);
+            _ = CertificateRequest.LoadSigningRequest(der, SignerHashAlgorithm(der));
             return CsrSignatureState.Valid;
         }
-        catch (CryptographicException)
+        catch (Exception e) when (
+            e is CryptographicException or AsnContentException or ArgumentException)
         {
             return CsrSignatureState.Invalid;
         }
     }
+
+    /// <summary>The hash the request was actually signed with, read from its signature
+    /// AlgorithmIdentifier. Pass this to <c>LoadSigningRequest</c> so proof-of-possession
+    /// is verified with the right hash rather than an assumed SHA-256 (which would reject
+    /// a legitimate P-384/SHA-384 or SHA-512 request).
+    /// <para>Two families the BCL cannot verify through this path fall through to SHA-256
+    /// on purpose: RSA-PSS (the hash lives in the signature parameters, and the plain
+    /// <c>LoadSigningRequest</c> overload assumes PKCS#1 padding) and SHA-224 (no
+    /// <see cref="HashAlgorithmName"/> for it exists). In both cases proof-of-possession
+    /// then fails and the request is refused — a safe false-negative, never a mis-issue.</para></summary>
+    internal static HashAlgorithmName SignerHashAlgorithm(byte[] der) => ReadSignatureAlgorithmOid(der) switch
+    {
+        "1.2.840.113549.1.1.12" or "1.2.840.10045.4.3.3" => HashAlgorithmName.SHA384,
+        "1.2.840.113549.1.1.13" or "1.2.840.10045.4.3.4" => HashAlgorithmName.SHA512,
+        "1.2.840.113549.1.1.5" or "1.2.840.10045.4.1" or "1.3.14.3.2.29" => HashAlgorithmName.SHA1,
+        _ => HashAlgorithmName.SHA256,   // sha256WithRSA / ecdsa-with-SHA256; RSA-PSS, SHA-224 and unknown fall here and are refused (see remarks)
+    };
 
     /// <summary>
     /// Reads the real signature AlgorithmIdentifier OID from the request.
