@@ -12,6 +12,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ChainViewModel Chain { get; } = new();
     public KeysViewModel Keys { get; } = new();
     public GenerateViewModel Generate { get; } = new();
+    public SignViewModel Sign { get; } = new();
     public AboutViewModel About { get; }
 
     private readonly ViewModelBase[] _pages;
@@ -29,7 +30,7 @@ public partial class MainWindowViewModel : ViewModelBase
         About = new AboutViewModel(settings, new UpdateService());
         About.UpdateFound += () => UpdateAvailable = true;
 
-        _pages = [Inspect, Convert, Chain, Keys, Generate, About];
+        _pages = [Inspect, Convert, Chain, Keys, Generate, Sign, About];
         _currentPage = Inspect;
 
         // Opt-in only; the env var lets tests construct this VM without network access.

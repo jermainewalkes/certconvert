@@ -21,7 +21,7 @@ namespace CertConvert.Gui.Tests;
 public class LayoutAuditTests
 {
     private static readonly string[] Pages =
-        { "Inspect", "Convert", "Chain", "Keys", "Generate", "About" };
+        { "Inspect", "Convert", "Chain", "Keys", "Generate", "Sign", "About" };
 
     [AvaloniaFact]
     public void Pages_DoNotClipHorizontally_AtMinimumWindow()

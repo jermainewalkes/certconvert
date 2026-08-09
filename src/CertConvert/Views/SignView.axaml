@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CertConvert.ViewModels"
+             x:Class="CertConvert.Views.SignView"
+             x:DataType="vm:SignViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="32,40,32,24" Spacing="14" MaxWidth="920">
+
+      <StackPanel Spacing="4" Margin="0,0,0,4">
+        <TextBlock Classes="pageTitle" Text="Sign"/>
+        <TextBlock Classes="pageSub"
+                   Text="Sign a certificate request with your own CA to issue a certificate."/>
+      </StackPanel>
+
+      <!-- CA -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="Certificate authority"/>
+          <WrapPanel Classes="toolbar">
+            <Button Content="Open CA Cert + Key…" Classes="accent" Command="{Binding LoadCaCommand}"/>
+            <TextBox Width="210" PlaceholderText="Key/PFX Password (If Needed)" PasswordChar="•"
+                     Text="{Binding CaPassword}"
+                     AutomationProperties.Name="CA key password"/>
+          </WrapPanel>
+          <TextBlock Classes="secondary" FontSize="12" TextWrapping="Wrap"
+                     Text="Select your CA certificate and its private key (two files), or a single PFX that holds both."/>
+          <TextBlock Text="{Binding CaIdentity}" FontWeight="SemiBold"
+                     IsVisible="{Binding CaIdentity.Length}"/>
+          <TextBlock Text="{Binding CaWarning}" TextWrapping="Wrap" FontSize="12"
+                     Foreground="{DynamicResource AppWarnForeground}"
+                     IsVisible="{Binding CaWarning.Length}"/>
+          <CheckBox Content="Allow non-CA signer" IsChecked="{Binding AllowNonCa}"
+                    AutomationProperties.HelpText="Sign with a certificate not marked as a CA"/>
+        </StackPanel>
+      </Border>
+
+      <!-- CSR -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="Request to sign"/>
+          <WrapPanel Classes="toolbar">
+            <Button Content="Open CSR…" Classes="accent" Command="{Binding LoadCsrCommand}"/>
+            <Border Classes="pillOk" VerticalAlignment="Center" IsVisible="{Binding CsrSignatureOk}">
+              <TextBlock Text="Signature OK"/>
+            </Border>
+            <Border Classes="pillFail" VerticalAlignment="Center" IsVisible="{Binding CsrSignatureBad}">
+              <TextBlock Text="Bad signature"/>
+            </Border>
+          </WrapPanel>
+          <StackPanel Spacing="4" IsVisible="{Binding HasCsr}">
+            <TextBlock Classes="secondary" FontSize="12" Text="Subject (copied into the issued certificate — verify it)"/>
+            <SelectableTextBlock Text="{Binding CsrSubject}" FontWeight="SemiBold" TextWrapping="Wrap"
+                                 FontFamily="{DynamicResource CodeFontFamily}"/>
+            <TextBlock Text="{Binding CsrRequested}" Classes="secondary" FontSize="12" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding CsrSignatureNote}" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppFailForeground}"
+                       IsVisible="{Binding CsrSignatureNote.Length}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Issuance -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="section" Text="Issue as"/>
+          <StackPanel Classes="segmented">
+            <RadioButton Classes="segment" GroupName="role" Content="TLS Server"
+                         IsChecked="{Binding Role, Mode=TwoWay,
+                                     Converter={StaticResource EnumBool}, ConverterParameter=TlsServer}"
+                         AutomationProperties.Name="Issue a TLS server certificate"/>
+            <RadioButton Classes="segment" GroupName="role" Content="TLS Client"
+                         IsChecked="{Binding Role, Mode=TwoWay,
+                                     Converter={StaticResource EnumBool}, ConverterParameter=TlsClient}"
+                         AutomationProperties.Name="Issue a TLS client certificate"/>
+          </StackPanel>
+
+          <Grid ColumnDefinitions="190,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+            <TextBlock Grid.Row="0" Classes="secondary" Text="Validity (days)" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Width="120" HorizontalAlignment="Left"
+                     Text="{Binding ValidityDays}" AutomationProperties.Name="Validity in days"/>
+
+            <!-- Server SANs -->
+            <TextBlock Grid.Row="1" Classes="secondary" Text="DNS names" VerticalAlignment="Center"
+                       IsVisible="{Binding IsServer}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding DnsNames}" PlaceholderText="device.example.com, *.example.com"
+                     IsVisible="{Binding IsServer}" AutomationProperties.Name="DNS names, comma separated"/>
+            <TextBlock Grid.Row="2" Classes="secondary" Text="IP addresses" VerticalAlignment="Center"
+                       IsVisible="{Binding IsServer}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding IpAddresses}" PlaceholderText="10.0.0.5"
+                     IsVisible="{Binding IsServer}" AutomationProperties.Name="IP addresses, comma separated"/>
+
+            <!-- Client SANs -->
+            <TextBlock Grid.Row="1" Classes="secondary" Text="Email addresses" VerticalAlignment="Center"
+                       IsVisible="{Binding !IsServer}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EmailNames}" PlaceholderText="user@example.com"
+                     IsVisible="{Binding !IsServer}" AutomationProperties.Name="Email addresses, comma separated"/>
+            <TextBlock Grid.Row="2" Classes="secondary" Text="URIs" VerticalAlignment="Center"
+                       IsVisible="{Binding !IsServer}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Uris}" PlaceholderText="spiffe://cluster/ns/sa"
+                     IsVisible="{Binding !IsServer}" AutomationProperties.Name="URIs, comma separated"/>
+          </Grid>
+
+          <CheckBox Content="Also write the CA (issued + CA chain)" IsChecked="{Binding IncludeChain}"/>
+          <TextBlock Classes="secondary" FontSize="12" TextWrapping="Wrap"
+                     Text="A requested CA:TRUE is ignored — the issued certificate is always an end-entity. Its validity is capped at the CA's, and usages are chosen from the role above, not the request."/>
+        </StackPanel>
+      </Border>
+
+      <!-- Sign -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <Button Content="Sign And Save…" Classes="accent" Command="{Binding SignAndSaveCommand}"
+                  IsEnabled="{Binding CanSign}"/>
+          <TextBlock Classes="status" Text="{Binding Status}" TextWrapping="Wrap"
+                     IsVisible="{Binding Status.Length}"
+                     AutomationProperties.LiveSetting="Polite"/>
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -91,6 +91,12 @@
                                 <TextBlock Text="Generate"/>
                             </StackPanel>
                         </ListBoxItem>
+                        <ListBoxItem AutomationProperties.Name="Sign">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconShield}"/>
+                                <TextBlock Text="Sign"/>
+                            </StackPanel>
+                        </ListBoxItem>
                         <ListBoxItem AutomationProperties.Name="About">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <PathIcon Data="{StaticResource IconInfo}"/>

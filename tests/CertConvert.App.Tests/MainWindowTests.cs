@@ -18,7 +18,7 @@ namespace CertConvert.Gui.Tests;
 public class MainWindowTests
 {
     [AvaloniaFact]
-    public void Window_Renders_WithAllSixNavigationItems()
+    public void Window_Renders_WithAllSevenNavigationItems()
     {
         var window = new MainWindow { DataContext = new MainWindowViewModel() };
         window.Show();
@@ -32,7 +32,7 @@ public class MainWindowTests
             .ToArray();
 
         Assert.Equal(
-            new[] { "Inspect", "Convert", "Chain", "Keys", "Generate", "About" },
+            new[] { "Inspect", "Convert", "Chain", "Keys", "Generate", "Sign", "About" },
             names);
     }
 
@@ -45,6 +45,8 @@ public class MainWindowTests
 
         Assert.Same(vm.Inspect, vm.CurrentPage);
         vm.SelectedIndex = 5;
+        Assert.Same(vm.Sign, vm.CurrentPage);
+        vm.SelectedIndex = 6;
         Assert.Same(vm.About, vm.CurrentPage);
         vm.SelectedIndex = 2;
         Assert.Same(vm.Chain, vm.CurrentPage);
