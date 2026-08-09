@@ -395,6 +395,115 @@ internal static class Commands
         return apply.Ok ? CliRunner.ExitOk : CliRunner.ExitFailure;
     }
 
+    // ---------- ca sign ----------
+
+    public static int CaSign(string[] args)
+    {
+        var opts = new ArgReader(args, "--chain", "--force");
+        string csrPath = opts.Require("--csr", "Certificate request file (--csr)");
+        string caCertPath = opts.Require("--ca-cert", "CA certificate file (--ca-cert)");
+        string outPath = opts.Require("--out", "Output file");
+
+        // CSR (PEM or DER) -> DER bytes for the signer.
+        using var csrContent = ContentLoader.LoadFile(csrPath);
+        if (csrContent.CertificateRequestPem is not { } csrPem)
+            throw new CertConvertException(
+                $"No certificate request found in {Path.GetFileName(csrPath)}.");
+        var csrBlocks = PemUtil.ParseAll(csrPem);
+        if (csrBlocks.Count == 0)
+            throw new CertConvertException($"No certificate request found in {Path.GetFileName(csrPath)}.");
+        byte[] csrDer = csrBlocks[0].Der;
+
+        // CA cert (may be a multi-cert PEM: leaf CA -> root) + its key (from a PFX, or --ca-key).
+        string? pw = opts.Get("--ca-key-password");
+        using var caCertContent = ContentLoader.LoadFile(caCertPath, pw);
+        if (caCertContent.Certificates.Count == 0)
+            throw new CertConvertException("No certificate found in the CA certificate file.");
+        LoadedContent? caKeyContent = null;
+        try
+        {
+            AsymmetricAlgorithm caKey;
+            if (caCertContent.PrivateKeys.Count > 0)
+            {
+                caKey = caCertContent.PrivateKeys[0].Key;          // PFX supplied both
+            }
+            else
+            {
+                string caKeyPath = opts.Require("--ca-key", "CA private key file (--ca-key)");
+                caKeyContent = ContentLoader.LoadFile(caKeyPath, pw);
+                if (caKeyContent.PrivateKeys.Count == 0)
+                    throw new CertConvertException("No private key found in the CA key file.");
+                caKey = caKeyContent.PrivateKeys[0].Key;
+            }
+
+            // A multi-cert CA file (issuing CA + root) may not list the signing cert first;
+            // pick the one the key belongs to. Fall back to the first — CaSigner re-checks
+            // the match and fails with a clear error if none fits.
+            var caCert = caCertContent.Certificates.FirstOrDefault(c => KeyTools.Matches(c, caKey))
+                ?? caCertContent.Certificates[0];
+
+            var issuance = new IssuanceOptions
+            {
+                ValidityDays = int.TryParse(opts.Get("--days") ?? "365", out int d) ? d
+                    : throw new CertConvertException("--days must be a number."),
+                Role = ParseRole(opts.Get("--type")),
+                DnsNames = SplitList(opts.Get("--dns")),
+                IpAddresses = SplitList(opts.Get("--ip")),
+                EmailNames = SplitList(opts.Get("--email")),
+                Uris = SplitList(opts.Get("--uri")),
+                AllowNonCaIssuer = opts.Has("--force"),
+            };
+
+            using var issued = CaSigner.Sign(caCert, caKey, csrDer, issuance);
+
+            // Output is cert-only (PEM cert, or issued+CA chain as PEM/P7B). No PFX: there
+            // is no leaf private key. The CA private key is never written.
+            // Leaf-to-root order: issued cert, then the matched CA, then any remaining
+            // certificates from the CA file (a multi-cert bundle may list them in any order).
+            var certs = new List<X509Certificate2> { issued };
+            if (opts.Has("--chain"))
+            {
+                certs.Add(caCert);
+                foreach (var c in caCertContent.Certificates)
+                    if (!ReferenceEquals(c, caCert)) certs.Add(c);
+            }
+            byte[] bytes = Converter.Export(certs, ResolveCaFormat(opts.Get("--to"), outPath));
+            WriteFile(outPath, bytes);
+
+            var info = Inspector.Inspect(issued);
+            Console.WriteLine($"Issued {info.DisplayName}, valid until {info.NotAfter:yyyy-MM-dd} UTC.");
+            foreach (var f in HealthCheck.Analyse(info))
+                if (f.Severity != Severity.Notice)
+                    Console.Error.WriteLine($"  [{f.Severity.ToString().ToUpperInvariant()}] {f.Title}");
+            return CliRunner.ExitOk;
+        }
+        finally
+        {
+            caKeyContent?.Dispose();
+        }
+    }
+
+    private static IssuedRole ParseRole(string? type) => (type ?? "server").ToLowerInvariant() switch
+    {
+        "server" => IssuedRole.TlsServer,
+        "client" => IssuedRole.TlsClient,
+        _ => throw new CertConvertException($"Unknown --type \"{type}\". Use server or client."),
+    };
+
+    private static CertOutputFormat ResolveCaFormat(string? to, string outPath)
+    {
+        string t = (to ?? Path.GetExtension(outPath).TrimStart('.')).ToLowerInvariant();
+        return t switch
+        {
+            "pem" or "crt" or "cer" => CertOutputFormat.Pem,
+            "p7b" or "pkcs7" => CertOutputFormat.Pkcs7Der,
+            "pfx" or "p12" or "pkcs12" => throw new CertConvertException(
+                "A signed certificate has no private key to place in a PFX — use --to pem or p7b."),
+            "" => throw new CertConvertException("Cannot guess the output format — pass --to pem or p7b."),
+            _ => throw new CertConvertException($"Unknown format \"{t}\". Use pem or p7b."),
+        };
+    }
+
     // ---------- shared helpers ----------
 
     private static (List<X509Certificate2> Certs, List<PrivateKeyEntry> Keys) LoadInputs(

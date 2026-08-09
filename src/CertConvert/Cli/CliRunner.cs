@@ -71,6 +71,7 @@ public static class CliRunner
             "chain" => DispatchChain(args[1..]),
             "key" => DispatchKey(args[1..]),
             "gen" => DispatchGen(args[1..]),
+            "ca" => DispatchCa(args[1..]),
             "update" => Commands.Update(args[1..]),
             _ => Usage($"Unknown command \"{args[0]}\"."),
         };
@@ -97,6 +98,12 @@ public static class CliRunner
         "csr" => Commands.GenCsr(rest[1..]),
         "selfsigned" => Commands.GenSelfSigned(rest[1..]),
         _ => Usage("Usage: certconvert gen <key|csr|selfsigned> ..."),
+    };
+
+    private static int DispatchCa(string[] rest) => rest.FirstOrDefault()?.ToLowerInvariant() switch
+    {
+        "sign" => Commands.CaSign(rest[1..]),
+        _ => Usage("Usage: certconvert ca sign --csr <f> --ca-cert <f> [--ca-key <f>] -o <out> ..."),
     };
 
     internal static int Usage(string message)
@@ -173,6 +180,18 @@ public static class CliRunner
 
               certconvert gen selfsigned (--key <file> | --new-key <alg> --key-out <file>)
                                   --cn <name> -o <out> [--days <n>] [--ca] [same subject options]
+
+              certconvert ca sign --csr <file> --ca-cert <file> [--ca-key <file>] -o <out>
+                                  [--type server|client] [--days <n>] [--to pem|p7b]
+                                  [--dns a,b] [--ip x,y] [--email a,b] [--uri a,b]
+                                  [--chain] [--ca-key-password <pw>] [--force]
+                  Sign a CSR with your own CA, issuing an end-entity certificate. The CA
+                  key comes from a PFX --ca-cert or a separate --ca-key. Requested
+                  extensions are never trusted: the issued cert is always end-entity,
+                  usages are issuer-chosen, and only the SANs you pass are included.
+                  The SUBJECT is taken verbatim from the CSR — inspect it first
+                  (certconvert inspect <csr>) and verify it before you sign.
+                  --chain also writes the CA. --force signs with a cert not marked as a CA.
 
               certconvert update [--install]
                   Check GitHub for a newer release; --install downloads, verifies and
