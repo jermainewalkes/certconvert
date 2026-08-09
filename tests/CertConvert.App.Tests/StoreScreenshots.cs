@@ -80,6 +80,18 @@ public class StoreShots
         vm.Keys.LoadDroppedKey(keyPem);
         Shot(window, dir, "07-keys-loaded");
 
+        // 8 — Sign: the mini-CA mid-issuance. Loading is file-dialog driven, so the
+        // shot sets the loaded state the dialogs would produce (a CA and a good CSR).
+        vm.Sign.CaIdentity = "Example Root CA — ECDSA P-256";
+        vm.Sign.HasCa = true;
+        vm.Sign.CsrSubject = "CN=device.example.com, O=Example Ltd, C=GB";
+        vm.Sign.CsrRequested = "Requests: SANs DNS:device.example.com";
+        vm.Sign.CsrSignatureOk = true;
+        vm.Sign.HasCsr = true;
+        vm.Sign.DnsNames = "device.example.com";
+        vm.SelectedIndex = 5;
+        Shot(window, dir, "08-sign");
+
         File.Delete(pem);
         File.Delete(keyPem);
         foreach (var f in chainFiles) File.Delete(f);
