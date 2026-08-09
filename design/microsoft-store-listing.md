@@ -6,6 +6,37 @@ on the Windows VM — `build-on-windows.sh` → `make-msix.ps1`; unsigned, the S
 signs it; identity JermaineWalkes.CertConvert already matches). Mirrors
 `mac-app-store-listing.md`, adapted for Windows and the Partner Center field set.
 
+---
+
+## 1.3 update — change ONLY these (everything else carries over from 1.2)
+
+Partner Center clones the live 1.2 submission; edit just the six fields below.
+Category, all URLs, age ratings, **pricing (£8.99 / $9.99)**, search terms,
+copyright, store logos, hero art, licence terms and the runFullTrust
+justification are unchanged — leave them as they carry over.
+
+1. **Packages** — remove the 1.2.0 package, upload `artifacts/msix/CertConvert-1.3.0.msix`.
+
+2. **Description** — add ONE bullet to the WHAT IT DOES list, right after the "Generate keys…" bullet:
+   > • Sign a certificate signing request with your own CA — choose a TLS server or client profile, set the validity and the subject alternative names and export either the issued certificate or the full chain. Requested extensions are never trusted; the result is always an end-entity certificate.
+
+3. **What's new in this version** — replace the whole field with:
+   > New in 1.3: Sign. Load your CA certificate and its key, load a certificate signing request, choose a TLS server or client profile, confirm the subject and subject alternative names, and CertConvert issues an end-entity certificate that chains to your CA — entirely offline. A request's own extensions are never trusted: the issued certificate is always end-entity, its key usage comes from the profile you choose and its validity never outlasts the CA.
+
+4. **Product features** — add ONE bullet:
+   > Sign a CSR with your own CA to issue a TLS server or client certificate — always end-entity, chaining to your CA, fully offline
+
+5. **Short description** — replace with:
+   > Convert, chain, inspect, generate and sign X.509 certificates entirely on your own PC. PEM, DER, PKCS #7 and PKCS #12 in both directions, offline chain validation, key tools and a private mini-CA — no uploads, no account, your keys never leave the machine.
+
+6. **Screenshots** — replace the set with the fresh eight from `design/msstore-screenshots/`
+   (01-inspect … 07-keys-loaded, **08-sign**). The sidebar gained a Sign item, so 01–07
+   changed too — replace all eight, don't just add 08.
+
+Everything below is the full listing of record (1.2 text with the 1.3 edits already folded in).
+
+---
+
 ## Packages
 
 - Upload `CertConvert-1.3.0.msix` under **Packages**. Device family:
