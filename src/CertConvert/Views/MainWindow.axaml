@@ -7,7 +7,7 @@
         x:Class="CertConvert.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/certconvert.ico"
-        Width="1060" Height="720" MinWidth="860" MinHeight="580"
+        Width="1060" Height="720" MinWidth="860" MinHeight="520"
         ExtendClientAreaToDecorationsHint="True"
         Background="{DynamicResource AppPageBackground}"
         Title="CertConvert">
