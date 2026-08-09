@@ -15,7 +15,7 @@
       </StackPanel>
 
       <TextBlock TextWrapping="Wrap" Classes="secondary"
-                 Text="Convert, chain, inspect and generate certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
+                 Text="Convert, chain, inspect, generate and sign certificates without installing openssl. PEM, DER (.cer), PKCS #7 (.p7b) and PKCS #12 (.pfx/.p12) are supported in both directions."/>
 
       <Border Classes="card" IsVisible="{Binding ShowUpdates}">
         <StackPanel Spacing="10">

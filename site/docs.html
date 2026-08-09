@@ -7,7 +7,7 @@
   <script src="js/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Documentation — CertConvert GUI walkthrough &amp; CLI reference</title>
-  <meta name="description" content="How to use CertConvert: a brief walkthrough of the Inspect, Convert, Chain, Keys and Generate views, the command-line verbs with examples, and troubleshooting.">
+  <meta name="description" content="How to use CertConvert: a brief walkthrough of the Inspect, Convert, Chain, Keys, Generate and Sign views, the command-line verbs with examples, and troubleshooting.">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/site.css">
   <link rel="canonical" href="https://certconvert.com/docs.html">
@@ -43,7 +43,7 @@
   <div class="container prose">
 
     <h2 id="gui">Using the app</h2>
-    <p>CertConvert opens on a sidebar with six views — Inspect, Convert, Chain, Keys, Generate and About. Most jobs are drag-and-drop: point a view at a file and it detects the format from the file&rsquo;s content, not its extension.</p>
+    <p>CertConvert opens on a sidebar with seven views — Inspect, Convert, Chain, Keys, Generate, Sign and About. Most jobs are drag-and-drop: point a view at a file and it detects the format from the file&rsquo;s content, not its extension.</p>
 
     <h3>Inspect</h3>
     <p>Open or drag in any certificate, key, CSR or bundle. CertConvert decodes it and shows the subject, issuer, validity, serial, public-key algorithm, SANs, key usage and SHA-256 / SHA-1 fingerprints. A signing request is decoded the same way, down to the SANs and usages it requests. Use <strong>Copy PEM</strong> or <strong>Copy SHA-256</strong> to grab either. If the file is a password-protected PFX or key, type the password and choose <strong>Unlock</strong>.</p>
@@ -61,6 +61,9 @@
     <h3>Generate</h3>
     <p>Create a new RSA or ECDSA key, a certificate signing request, or a self-signed certificate. Fill in the subject fields, add SANs (DNS names and IP addresses) and set CA options and a validity period, then export in whatever format you need.</p>
 
+    <h3>Sign</h3>
+    <p>Load your CA certificate and its private key (two files, or a single PFX) and a certificate signing request, then issue an end-entity certificate that chains to your CA. Choose a TLS server or client profile, confirm the subject and the SANs to include, and export the issued certificate on its own or bundled with the CA chain. A request&rsquo;s own extensions are never trusted &mdash; the result is always an end-entity certificate whose validity cannot outlast the CA.</p>
+
     <h2 id="cli">Command-line reference</h2>
     <p>A copy built from source is a CLI when given arguments and a GUI when not. A few worked examples:</p>
     <div class="callout">The Mac App Store and Microsoft Store editions are sandboxed and are the graphical app only — a sandboxed process cannot open files named on the command line, so those editions ship without the CLI. <a href="download.html#from-source">Build from source</a> to use it.</div>
@@ -76,6 +79,8 @@ certconvert key convert device.key -o device_pkcs8.key --to pkcs8
 certconvert key match --cert device.pem --key device.key
 certconvert gen selfsigned --new-key p256 --key-out dev.key \
             --cn device.local --dns device.local -o dev.pem
+certconvert ca sign --csr device.csr --ca-cert ca.pem --ca-key ca.key \
+            --type server --dns device.local -o device.pem   # sign a CSR with your CA
 </code></pre>
     <p><strong>Exit codes:</strong> <code>0</code> success, <code>1</code> usage error, <code>2</code> failure (including an invalid chain or a key that does not match). That makes CertConvert easy to drop into a build pipeline or a shell script.</p>
 
@@ -111,7 +116,7 @@ certconvert gen selfsigned --new-key p256 --key-out dev.key \
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect, generate and sign X.509 certificates.</p></div>
       <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
       <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
       <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="privacy.html#trademarks">Trademarks</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>

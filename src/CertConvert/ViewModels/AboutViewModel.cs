@@ -49,10 +49,10 @@ public partial class AboutViewModel : ViewModelBase
     public string CliHint { get; } = AppInfo.IsStoreBuild
         ? "This edition is the graphical app: everything happens in the window. " +
           "CertConvert is open source (MIT), and a copy compiled from the source " +
-          "is also a command-line tool with the same inspect, convert, chain, key " +
-          "and gen jobs."
+          "is also a command-line tool with the same inspect, convert, chain, key, " +
+          "gen and ca jobs."
         : "The same executable works from the command line: run it with --help to see " +
-          "the inspect, convert, chain, key, gen and update commands.";
+          "the inspect, convert, chain, key, gen, ca and update commands.";
 
     public string AccessibilityStatement { get; } =
         "Every control is reachable by keyboard, labelled for screen readers and " +

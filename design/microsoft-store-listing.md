@@ -1,14 +1,14 @@
 # CertConvert — Microsoft Store submission prep
 
 Paste-ready copy for Partner Center → CertConvert (Store ID 9NT6HCG0JBFV) →
-Submissions. Package: `artifacts/msix/CertConvert-1.2.0.msix` (rebuild for 1.2.0
+Submissions. Package: `artifacts/msix/CertConvert-1.3.0.msix` (rebuild for 1.3.0
 on the Windows VM — `build-on-windows.sh` → `make-msix.ps1`; unsigned, the Store
 signs it; identity JermaineWalkes.CertConvert already matches). Mirrors
 `mac-app-store-listing.md`, adapted for Windows and the Partner Center field set.
 
 ## Packages
 
-- Upload `CertConvert-1.2.0.msix` under **Packages**. Device family:
+- Upload `CertConvert-1.3.0.msix` under **Packages**. Device family:
   Windows 10/11 desktop (x64). No other families.
 
 ## Properties
@@ -50,6 +50,7 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 > • Build chains — drop root, intermediate and device certificates in any order, have them ordered and validated automatically, then export as a PEM bundle, P7B or PFX.
 > • Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.
 > • Generate keys, certificate signing requests and self-signed certificates (RSA or ECDSA) with SANs and CA options.
+> • Sign a certificate signing request with your own CA — choose a TLS server or client profile, set the validity and the subject alternative names and export either the issued certificate or the full chain. Requested extensions are never trusted; the result is always an end-entity certificate.
 >
 > BUILT FOR TRUST
 > All cryptography uses the operating system's own libraries — there is no third-party cryptographic code. The app makes no network connections and collects no data. Private keys loaded from PKCS #12 files are handled in memory and are never imported into your Windows certificate store.
@@ -58,7 +59,7 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **What's new in this version** (release notes):
 
-> Inspect is far more useful in this release. Every certificate and signing request now gets a health check that flags real problems — a missing subject alternative name, a weak key, an expired or SHA-1-signed certificate — and says what to do about each, without raising false alarms on private CA roots. Signing requests are now fully decoded, and you can check whether a certificate covers a particular host name.
+> New in 1.3: Sign. Load your CA certificate and its key, load a certificate signing request, choose a TLS server or client profile, confirm the subject and subject alternative names, and CertConvert issues an end-entity certificate that chains to your CA — entirely offline. A request's own extensions are never trusted: the issued certificate is always end-entity, its key usage comes from the profile you choose and its validity never outlasts the CA.
 
 **NOTE (1.1.1):** the CLI bullet was removed — the Store edition is sandboxed and is the graphical app only, so advertising a command line here was inaccurate.
 
@@ -71,6 +72,7 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 - Build certificate chains: auto-order, validate offline, export as PEM bundle, P7B or PFX
 - Convert private-key formats (PKCS #8, PKCS #1, SEC 1) and check key–certificate matches
 - Generate keys, CSRs and self-signed certificates (RSA or ECDSA) with SANs and CA options
+- Sign a CSR with your own CA to issue a TLS server or client certificate — always end-entity, chaining to your CA, fully offline
 - Fully offline: no uploads, no account, no telemetry
 
 **Search terms** (max 7, ≤30 chars each):
@@ -80,7 +82,7 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **Short description** (supplemental, ≤270 — Short title and Voice title stay blank; they are Xbox fields):
 
-> Convert, chain, inspect and generate X.509 certificates entirely on your own PC. PEM, DER, PKCS #7 and PKCS #12 in both directions, offline chain validation and key tools — no uploads, no account, your private keys never leave the machine.
+> Convert, chain, inspect, generate and sign X.509 certificates entirely on your own PC. PEM, DER, PKCS #7 and PKCS #12 in both directions, offline chain validation, key tools and a private mini-CA — no uploads, no account, your keys never leave the machine.
 
 **Copyright and trademark info:**
 
@@ -88,13 +90,15 @@ Result should be rated for all ages (PEGI 3 / ESRB E equivalents).
 
 **Additional licence terms:** leave as Standard Application Licence Terms.
 
-## Screenshots — READY
+## Screenshots — regenerate on the VM (adds 08-sign for 1.3)
 
-Seven 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
+Eight 1920×1080 PNGs in `design/msstore-screenshots/` (Windows-rendered, store
 variant; 1280×720 logical at 1.5× render scaling so the UI is sized like a real
-150%-scaled 1080p laptop, not sparse 1x): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded. Upload in
-that order — Inspect first, it's the strongest opener. Regenerate with the VM
-capture flow (`CERTCONVERT_CAPTURE_SIZE=1280x720 CERTCONVERT_CAPTURE_SCALE=1.5`; note the capture dir is
+150%-scaled 1080p laptop, not sparse 1x): 01-inspect … 05-generate, 06-chain-validated, 07-keys-loaded, 08-sign. Upload in
+that order — Inspect first, it's the strongest opener. **01–07 carry over from
+1.2; the new 08-sign is produced when the set is regenerated on the Windows VM
+alongside the 1.3.0 MSIX** (these must be Windows-rendered, so they are not
+generated on the Mac). Regenerate with the VM capture flow (`CERTCONVERT_CAPTURE_SIZE=1280x720 CERTCONVERT_CAPTURE_SCALE=1.5`; note the capture dir is
 resolved against the TEST RUNNER's working directory, so pass an absolute path
 or fetch from `tests/.../bin/Debug/net10.0/design/msstore-screenshots`).
 

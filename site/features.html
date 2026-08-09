@@ -150,9 +150,30 @@
   <div class="container">
     <div class="grid grid-2" style="align-items:center; gap:48px;">
       <div>
+        <div class="eyebrow" style="text-align:left;">Sign</div>
+        <h2 style="text-align:left;">Sign a request with your own CA</h2>
+        <p>Load your CA certificate and its private key, load a certificate signing request, then issue an end-entity certificate that chains to your CA &mdash; choosing a TLS server or client profile and confirming the subject and SANs before you sign. Export the issued certificate on its own or bundled with the CA chain.</p>
+        <ul>
+          <li>TLS server or client certificates, RSA or ECDSA</li>
+          <li>Subject alternative names you confirm: DNS and IP, or email and URI</li>
+          <li>Validity capped at the CA, with a random positive serial</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Safe by construction</h3>
+        <p>A request&rsquo;s own extensions are never trusted. The issued certificate is always an end-entity (a requested CA:TRUE is ignored), its key usage comes from the profile you pick and it can never outlast the CA. Everything happens offline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:48px;">
+      <div>
         <div class="eyebrow" style="text-align:left;">Command line (build from source)</div>
         <h2 style="text-align:left;">The same binary, scriptable</h2>
-        <p>Build CertConvert from source and the same executable runs as a CLI when you pass it arguments &mdash; ideal for build pipelines and one-off shell work. Every GUI job has a verb: <code>inspect</code>, <code>convert</code>, <code>chain</code>, <code>key</code> and <code>gen</code>.</p>
+        <p>Build CertConvert from source and the same executable runs as a CLI when you pass it arguments &mdash; ideal for build pipelines and one-off shell work. Every GUI job has a verb: <code>inspect</code>, <code>convert</code>, <code>chain</code>, <code>key</code>, <code>gen</code> and <code>ca</code>.</p>
         <p class="muted">The Mac App Store and Microsoft Store editions are sandboxed and are the graphical app only &mdash; a sandboxed process cannot open files named on the command line, so those editions ship without the CLI. <a href="download.html#from-source">Build from source</a> to get it.</p>
         <p>Exit codes make it easy to script: <code>0</code> success, <code>1</code> usage error, <code>2</code> failure (including an invalid chain or a key that does not match). See the <a href="docs.html#cli">CLI reference</a> for worked examples.</p>
       </div>
@@ -168,7 +189,7 @@ certconvert key match --cert device.pem --key device.key</code></pre>
   </div>
 </section>
 
-<section class="section" id="security">
+<section class="section section-soft" id="security">
   <div class="container">
     <div class="eyebrow">Security posture</div>
     <h2>Built for a tool that handles private keys</h2>
@@ -190,7 +211,7 @@ certconvert key match --cert device.pem --key device.key</code></pre>
   </div>
 </section>
 
-<section class="section section-soft center">
+<section class="section center">
   <div class="container">
     <h2>Ready to try it?</h2>
     <p class="sub">Open source (MIT). Get it on the Mac App Store or Microsoft Store &mdash; nothing else to install.</p>
@@ -202,7 +223,7 @@ certconvert key match --cert device.pem --key device.key</code></pre>
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p></div>
+      <div><img src="img/certconvert-lockup-ondark.svg" alt="CertConvert"><p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect, generate and sign X.509 certificates.</p></div>
       <div><h4>Product</h4><a href="features.html">Features</a><a href="download.html">Download</a><a href="changelog.html">Changelog</a></div>
       <div><h4>Help</h4><a href="docs.html">Documentation</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a></div>
       <div><h4>Legal</h4><a href="privacy.html">Privacy</a><a href="accessibility.html">Accessibility</a><a href="privacy.html#trademarks">Trademarks</a><a href="https://github.com/jermainewalkes/certconvert/blob/main/LICENSE">Licence (MIT)</a></div>

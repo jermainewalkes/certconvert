@@ -44,10 +44,10 @@
         "name": "CertConvert",
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "macOS (Intel and Apple Silicon), Windows",
-        "description": "Offline certificate toolbox: convert PEM, DER, PKCS#7 and PKCS#12, order and validate certificate chains, inspect certificates with a health check and host-name coverage, decode signing requests, convert key formats and generate keys, CSRs and self-signed certificates. Runs entirely offline. Open source (MIT).",
+        "description": "Offline certificate toolbox: convert PEM, DER, PKCS#7 and PKCS#12, order and validate certificate chains, inspect certificates with a health check and host-name coverage, decode signing requests, convert key formats, generate keys, CSRs and self-signed certificates, and sign a signing request with your own CA to issue an end-entity certificate. Runs entirely offline. Open source (MIT).",
         "url": "https://certconvert.com/",
         "downloadUrl": "https://certconvert.com/download.html",
-        "softwareVersion": "1.2.0",
+        "softwareVersion": "1.3.0",
         "screenshot": "https://certconvert.com/img/screenshots/inspect-light.png",
         "license": "https://github.com/jermainewalkes/certconvert/blob/main/LICENSE",
         "offers": { "@type": "Offer", "price": "8.99", "priceCurrency": "GBP" },
@@ -80,8 +80,8 @@
 <section class="hero">
   <div class="container">
     <span class="pill" style="background:rgba(165,180,252,0.16); color:#c7d2fe;">Certificate Toolbox</span>
-    <h1 style="margin-top:14px;">Convert, chain, inspect and check certificates — offline</h1>
-    <p class="lead">CertConvert is a self-contained desktop app for X.509 certificates. Convert <strong style="color:#fff;">PEM to PFX without OpenSSL</strong>, order and validate a certificate chain, inspect any certificate, key or bundle, and generate keys, CSRs and self-signed certificates — all on your own machine, with no shell commands to memorise.</p>
+    <h1 style="margin-top:14px;">Convert, chain, inspect and sign certificates — offline</h1>
+    <p class="lead">CertConvert is a self-contained desktop app for X.509 certificates. Convert <strong style="color:#fff;">PEM to PFX without OpenSSL</strong>, order and validate a certificate chain, inspect any certificate, key or bundle, generate keys, CSRs and self-signed certificates, and sign a request with your own CA — all on your own machine, with no shell commands to memorise.</p>
     <div class="actions">
       <a class="btn btn-primary btn-lg" href="download.html">Download for macOS &amp; Windows</a>
       <a class="btn btn-ghost-light btn-lg" href="features.html">See what it does</a>
@@ -123,8 +123,8 @@
         <p>Create keys, CSRs and self-signed certificates (RSA or ECDSA) with SANs and CA options — the <code>openssl req</code> workflows, without OpenSSL.</p>
       </div>
       <div class="card">
-        <h3><span class="ico">&#128274;</span> Offline by design</h3>
-        <p>No uploads, no account, no telemetry. CertConvert makes no network connections at all &mdash; your certificates and private keys never leave the machine.</p>
+        <h3><span class="ico">&#128737;</span> Sign / mini-CA</h3>
+        <p>Sign a certificate signing request with your own CA to issue a TLS server or client certificate. Requested extensions are never trusted and the result always chains to your CA — a private mini-CA, fully offline.</p>
       </div>
     </div>
   </div>
@@ -171,7 +171,7 @@
     <div class="footer-grid">
       <div>
         <img src="img/certconvert-lockup-ondark.svg" alt="CertConvert">
-        <p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect and generate X.509 certificates.</p>
+        <p style="color:#9c9fc4; margin-top:14px; max-width:34ch;">Offline certificate toolbox for macOS and Windows &mdash; convert, chain, inspect, generate and sign X.509 certificates.</p>
       </div>
       <div>
         <h4>Product</h4>

@@ -6,13 +6,13 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 
 ## Build
 
-- Package: `artifacts/mas/CertConvert-1.2.0.pkg` (42 MB, arm64, store variant —
+- Package: `artifacts/mas/CertConvert-1.3.0.pkg` (42 MB, arm64, store variant —
   self-updater and Ko-fi removed), signed with *3rd Party Mac Developer
   Installer*. Built by `build/make-mas-pkg.sh`.
 - **Upload** (does not submit — sends the build to App Store Connect so it
   appears under the version; you then attach it and submit):
   ```bash
-  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.2.0.pkg -t macos \
+  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.3.0.pkg -t macos \
     --apiKey X459QTHUM2 --apiIssuer 0d5235ae-7e19-4001-8eed-20689be6be83
   ```
 - **[DECIDE]** arm64-only. Intel Macs won't be offered it. Ship arm64 now, or
@@ -32,10 +32,10 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 - **[DECIDE] Price:** £8.99 / $9.99 tier (agreed earlier). All territories.
 - Small Business Program: confirm enrolment for the 15% rate.
 
-## Version 1.2.0 — listing text
+## Version 1.3.0 — listing text
 
 **Promotional text** (≤170, updatable anytime without review):
-> Convert, chain, inspect and generate X.509 certificates entirely on your Mac. No uploads, no command line, no OpenSSL — your private keys never leave the machine.
+> Convert, chain, inspect, generate and sign X.509 certificates entirely on your Mac. No uploads, no command line, no OpenSSL — your keys never leave the machine.
 
 **Keywords** (≤100 chars, comma-separated — deliberately NO "OpenSSL" or other
 trademarks in this field):
@@ -53,14 +53,15 @@ trademarks in this field):
 > • Build chains — drop root, intermediate and device certificates in any order, have them ordered and validated automatically, then export as a PEM bundle, P7B or PFX.
 > • Convert private-key formats (PKCS #8, PKCS #1, SEC 1, encrypted or not) and check whether a key matches a certificate.
 > • Generate keys, certificate signing requests and self-signed certificates (RSA or ECDSA) with SANs and CA options.
+> • Sign a certificate signing request with your own CA — choose a TLS server or client profile, set the validity and the subject alternative names and export either the issued certificate or the full chain. Requested extensions are never trusted; the result is always an end-entity certificate.
 >
 > BUILT FOR TRUST
 > All cryptography uses the operating system's own libraries — there is no third-party cryptographic code. The app makes no network connections and collects no data. Private keys loaded from PKCS #12 files are handled in memory and are never imported into your keychain.
 >
 > Formats are detected from file content, not extensions, so misnamed files just work.
 
-**What's New in 1.2.0:**
-> Inspect is far more useful in this release. Every certificate and signing request now gets a health check that flags real problems — a missing subject alternative name, a weak key, an expired or SHA-1-signed certificate — and says what to do about each, without raising false alarms on private CA roots. Signing requests are now fully decoded, and you can check whether a certificate covers a particular host name.
+**What's New in 1.3.0:**
+> New in 1.3: Sign. Load your CA certificate and its key, load a certificate signing request, choose a TLS server or client profile, confirm the subject and subject alternative names, and CertConvert issues an end-entity certificate that chains to your CA — entirely offline. A request's own extensions are never trusted: the issued certificate is always end-entity, its key usage comes from the profile you choose and its validity never outlasts the CA.
 
 ## URLs
 
@@ -92,9 +93,9 @@ with Encryption Export Regulations"; 15 CFR 740.17 / Category 5D002.
 
 ## Screenshots
 
-Five 1280×800 PNGs (a valid App Store macOS size), store variant, in
+Six 1280×800 PNGs (a valid App Store macOS size), store variant, in
 `design/appstore-screenshots/`: 01-inspect, 02-convert, 03-chain, 04-keys,
-05-generate. Regenerate with:
+05-generate, 08-sign. Regenerate with:
 `CERTCONVERT_CAPTURE_DIR=design/appstore-screenshots dotnet test tests/CertConvert.App.Tests --filter StoreShots -p:StoreBuild=true`
 
 ## Decisions — all confirmed
