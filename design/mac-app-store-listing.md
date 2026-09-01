@@ -6,13 +6,13 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 
 ## Build
 
-- Package: `artifacts/mas/CertConvert-1.3.0.pkg` (42 MB, arm64, store variant —
+- Package: `artifacts/mas/CertConvert-1.3.1.pkg` (42 MB, arm64, store variant —
   self-updater and Ko-fi removed), signed with *3rd Party Mac Developer
   Installer*. Built by `build/make-mas-pkg.sh`.
 - **Upload** (does not submit — sends the build to App Store Connect so it
   appears under the version; you then attach it and submit):
   ```bash
-  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.3.0.pkg -t macos \
+  xcrun altool --upload-app -f artifacts/mas/CertConvert-1.3.1.pkg -t macos \
     --apiKey X459QTHUM2 --apiIssuer 0d5235ae-7e19-4001-8eed-20689be6be83
   ```
 - **[DECIDE]** arm64-only. Intel Macs won't be offered it. Ship arm64 now, or
@@ -32,7 +32,7 @@ Everything needed to complete the App Store Connect listing for **CertConvert**
 - **[DECIDE] Price:** £8.99 / $9.99 tier (agreed earlier). All territories.
 - Small Business Program: confirm enrolment for the 15% rate.
 
-## Version 1.3.0 — listing text
+## Version 1.3.1 — listing text
 
 **Promotional text** (≤170, updatable anytime without review):
 > Convert, chain, inspect, generate and sign X.509 certificates entirely on your Mac. No uploads, no command line, no OpenSSL — your keys never leave the machine.
@@ -60,8 +60,8 @@ trademarks in this field):
 >
 > Formats are detected from file content, not extensions, so misnamed files just work.
 
-**What's New in 1.3.0:**
-> New in 1.3: Sign. Load your CA certificate and its key, load a certificate signing request, choose a TLS server or client profile, confirm the subject and subject alternative names, and CertConvert issues an end-entity certificate that chains to your CA — entirely offline. A request's own extensions are never trusted: the issued certificate is always end-entity, its key usage comes from the profile you choose and its validity never outlasts the CA.
+**What's New in 1.3.1:**
+> A maintenance release: CertConvert is rebuilt on the latest .NET 10 servicing update, bringing security fixes to the cryptography and runtime libraries it relies on. No changes to features or behaviour.
 
 ## URLs
 
