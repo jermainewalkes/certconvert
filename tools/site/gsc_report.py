@@ -15,11 +15,16 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+# Seconds any single connect or read may block. Not a total deadline: a server
+# that keeps trickling data can run longer, but a stalled connection cannot hang the run.
+TIMEOUT = 30
+
 SITE = "https://certconvert.com/"
 SITEMAP = "https://certconvert.com/sitemap.xml"
 URLS = [
     "", "features.html", "download.html", "docs.html", "changelog.html",
     "donate.html", "contact.html", "privacy.html", "accessibility.html",
+    "pem-to-pfx.html", "pfx-to-pem.html", "certificate-chain-order.html",
 ]
 
 
@@ -28,7 +33,8 @@ def token(creds):
         "client_id": creds["client_id"], "client_secret": creds["client_secret"],
         "refresh_token": creds["refresh_token"], "grant_type": "refresh_token"}).encode()
     return json.load(urllib.request.urlopen(
-        urllib.request.Request("https://oauth2.googleapis.com/token", data=data)))["access_token"]
+        urllib.request.Request("https://oauth2.googleapis.com/token", data=data),
+        timeout=TIMEOUT))["access_token"]
 
 
 def api(method, url, tok, body=None):
@@ -36,7 +42,7 @@ def api(method, url, tok, body=None):
         url, data=json.dumps(body).encode() if body else None, method=method,
         headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
     try:
-        r = urllib.request.urlopen(req)
+        r = urllib.request.urlopen(req, timeout=TIMEOUT)
         return json.load(r) if r.status != 204 and r.length != 0 else {}
     except urllib.error.HTTPError as e:
         return {"_error": e.code, "detail": e.read().decode()[:300]}
@@ -92,4 +98,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (urllib.error.URLError, TimeoutError) as e:
+        # A stalled or refused connection: fail fast with one line so the caller
+        # can retry, instead of hanging with no output.
+        sys.exit(f"Network error: {e}")

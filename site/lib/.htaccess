@@ -1,3 +1,0 @@
-# Library code is included by contact.php via the filesystem — it is never
-# served directly, so deny all HTTP access to this directory.
-Require all denied

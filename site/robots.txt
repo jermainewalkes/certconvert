@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /samples/
-
-Sitemap: https://certconvert.com/sitemap.xml

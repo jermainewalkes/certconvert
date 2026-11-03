@@ -21,7 +21,7 @@ cd "$(dirname "$0")"
 # Pinned by digest so the verification gate is reproducible — a floating
 # :10.0 tag can change SDK patch level between runs. To bump: pull the tag,
 # then `docker image inspect --format '{{index .RepoDigests 0}}'` it.
-IMAGE="${CC_SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0@sha256:e1ffd2a92ae84c1291bc1b6887501f8af98e6331e7af6d4c8d37168c5e87a64c}"
+IMAGE="${CC_SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317}"
 # Isolated, gitignored (under artifacts/) home for the container's obj/bin.
 ARTIFACTS_PATH="artifacts/docker-build"
 

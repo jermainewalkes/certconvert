@@ -21,7 +21,7 @@ internal static class Commands
 
         string? host = opts.Get("--hostname");
         bool hostCovered = false;
-        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Get("--password"));
+        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Password("--password"));
         Console.WriteLine($"Detected: {content.SourceDescription}");
         Console.WriteLine();
 
@@ -68,7 +68,7 @@ internal static class Commands
         if (opts.Positionals.Count != 1)
             return CliRunner.Usage("Usage: certconvert check <file> [--password <pw>]");
 
-        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Get("--password"));
+        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Password("--password"));
         if (content.Certificates.Count == 0 && content.CertificateRequests.Count == 0)
             throw new CertConvertException("No certificate or certificate request found to check.");
 
@@ -187,22 +187,27 @@ internal static class Commands
             return CliRunner.Usage("Usage: certconvert key convert <in> -o <out> [--to <format>]");
         string outPath = opts.Require("--out", "Output file");
 
-        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Get("--password"));
+        using var content = ContentLoader.LoadFile(opts.Positionals[0], opts.Password("--password"));
         if (content.PrivateKeys.Count == 0)
             throw new CertConvertException("No private key found in the input.");
         var key = content.PrivateKeys[0].Key;
 
         string to = opts.Get("--to")?.ToLowerInvariant()
             ?? (Path.GetExtension(outPath).ToLowerInvariant() == ".der" ? "der" : "pkcs8");
-        string? outPassword = opts.Get("--out-password");
+        // Only encrypted output takes a password. Resolve it there and nowhere else,
+        // so no one is asked to type a password that would then be thrown away.
+        if (to != "pkcs8-enc")
+            opts.WarnIfUnused("--out-password",
+                $"the output format {to} is not encrypted; use --to pkcs8-enc to encrypt the key");
 
         byte[] bytes = to switch
         {
             "pkcs8" => Encoding.ASCII.GetBytes(KeyTools.ExportPem(key, KeyOutputFormat.Pkcs8Pem)),
             "pkcs8-enc" => Encoding.ASCII.GetBytes(KeyTools.ExportPem(
                 key, KeyOutputFormat.Pkcs8EncryptedPem,
-                outPassword ?? throw new CertConvertException(
-                    "--out-password is required for encrypted output."))),
+                opts.Password("--out-password") ?? throw new CertConvertException(
+                    "A new password is required for encrypted output. Give one with " +
+                    PasswordSources.SaferForms("--out-password") + "."))),
             "pkcs1" => Encoding.ASCII.GetBytes(KeyTools.ExportPem(key, KeyOutputFormat.Pkcs1Pem)),
             "sec1" => Encoding.ASCII.GetBytes(KeyTools.ExportPem(key, KeyOutputFormat.Sec1Pem)),
             "der" => KeyTools.ExportDer(key),
@@ -219,8 +224,8 @@ internal static class Commands
         string certPath = opts.Require("--cert", "Certificate file");
         string keyPath = opts.Require("--key", "Key file");
 
-        using var certContent = ContentLoader.LoadFile(certPath, opts.Get("--password"));
-        using var keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
+        using var certContent = ContentLoader.LoadFile(certPath, opts.Password("--password"));
+        using var keyContent = ContentLoader.LoadFile(keyPath, opts.Password("--key-password"));
         if (keyContent.PrivateKeys.Count == 0)
             throw new CertConvertException("No private key found in the key file.");
         var key = keyContent.PrivateKeys[0].Key;
@@ -254,7 +259,7 @@ internal static class Commands
         using var entry = Generator.CreateKey(
             ParseAlgorithm(opts.Get("--algorithm") ?? "rsa2048"));
 
-        string? password = opts.Get("--out-password");
+        string? password = opts.Password("--out-password");
         string pem = password is null
             ? KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8Pem)
             : KeyTools.ExportPem(entry.Key, KeyOutputFormat.Pkcs8EncryptedPem, password);
@@ -269,7 +274,7 @@ internal static class Commands
         string outPath = opts.Require("--out", "Output file");
         string keyPath = opts.Require("--key", "Key file");
 
-        using var keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
+        using var keyContent = ContentLoader.LoadFile(keyPath, opts.Password("--key-password"));
         if (keyContent.PrivateKeys.Count == 0)
             throw new CertConvertException("No private key found in the key file.");
 
@@ -291,7 +296,7 @@ internal static class Commands
             // leak a freshly generated private key.
             if (opts.Get("--key") is { } keyPath)
             {
-                keyContent = ContentLoader.LoadFile(keyPath, opts.Get("--key-password"));
+                keyContent = ContentLoader.LoadFile(keyPath, opts.Password("--key-password"));
                 if (keyContent.PrivateKeys.Count == 0)
                     throw new CertConvertException("No private key found in the key file.");
                 keyEntry = keyContent.PrivateKeys[0];
@@ -300,7 +305,7 @@ internal static class Commands
             {
                 string keyOut = opts.Require("--key-out", "Key output file (--key-out)");
                 keyEntry = Generator.CreateKey(ParseAlgorithm(alg));
-                string? kp = opts.Get("--out-password");
+                string? kp = opts.Password("--out-password");
                 string pem = kp is null
                     ? KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8Pem)
                     : KeyTools.ExportPem(keyEntry.Key, KeyOutputFormat.Pkcs8EncryptedPem, kp);
@@ -415,7 +420,7 @@ internal static class Commands
         byte[] csrDer = csrBlocks[0].Der;
 
         // CA cert (may be a multi-cert PEM: leaf CA -> root) + its key (from a PFX, or --ca-key).
-        string? pw = opts.Get("--ca-key-password");
+        string? pw = opts.Password("--ca-key-password");
         using var caCertContent = ContentLoader.LoadFile(caCertPath, pw);
         if (caCertContent.Certificates.Count == 0)
             throw new CertConvertException("No certificate found in the CA certificate file.");
@@ -513,18 +518,22 @@ internal static class Commands
         var keys = new List<PrivateKeyEntry>();
         foreach (var path in opts.Positionals)
         {
-            var content = ContentLoader.LoadFile(path, opts.Get("--password"));
+            var content = ContentLoader.LoadFile(path, opts.Password("--password"));
             certs.AddRange(content.Certificates);
             keys.AddRange(content.PrivateKeys);
         }
         if (opts.Get("--key") is { } keyPath)
         {
             var keyContent = ContentLoader.LoadFile(
-                keyPath, opts.Get("--key-password") ?? opts.Get("--password"));
+                keyPath, opts.Password("--key-password") ?? opts.Password("--password"));
             if (keyContent.PrivateKeys.Count == 0)
                 throw new CertConvertException($"No private key found in {keyPath}.");
             keys.AddRange(keyContent.PrivateKeys);
             certs.AddRange(keyContent.Certificates);
+        }
+        else
+        {
+            opts.WarnIfUnused("--key-password", "no --key file was given");
         }
         Converter.RemoveDuplicates(certs);
         return (certs, keys);
@@ -550,12 +559,22 @@ internal static class Commands
         }
         if (format == CertOutputFormat.Pkcs12 && pfxKey is null)
             Console.Error.WriteLine("Warning: writing a PKCS #12 file without a private key.");
-        if (format == CertOutputFormat.Pkcs12 && string.IsNullOrEmpty(opts.Get("--out-password")))
-            Console.Error.WriteLine("Warning: the PKCS #12 file will have an empty password.");
+        // Only a PFX is password-protected; the other formats hold certificates alone.
+        string? outPassword = null;
+        if (format == CertOutputFormat.Pkcs12)
+        {
+            outPassword = opts.Password("--out-password");
+            if (string.IsNullOrEmpty(outPassword))
+                Console.Error.WriteLine("Warning: the PKCS #12 file will have an empty password.");
+        }
+        else
+        {
+            opts.WarnIfUnused("--out-password", "only a PFX output takes a password");
+        }
 
         byte[] bytes = Converter.Export(certs, format, new ExportOptions
         {
-            Password = opts.Get("--out-password"),
+            Password = outPassword,
             PrivateKey = pfxKey,
             Encryption = opts.Has("--legacy") ? Pkcs12Encryption.Legacy : Pkcs12Encryption.Modern,
         });

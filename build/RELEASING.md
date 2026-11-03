@@ -1,24 +1,42 @@
 # Releasing CertConvert
 
-A concise runbook for cutting a public release. CertConvert ships as a
-self-contained single-file binary per platform, and the in-app updater reads
-the GitHub `releases/latest` endpoint, so a few steps below are load-bearing —
-get the order wrong and the updater breaks for everyone. Follow it top to bottom.
+A concise runbook for cutting a release. CertConvert is published on the **Mac
+App Store** and the **Microsoft Store**; those two packages are the release.
+GitLab (`origin`) holds the release commit and tag. **GitHub is deliberately kept
+one version behind the Stores** (see step 6), so nothing in a release is pushed
+there. Follow it top to bottom.
 
 ## Prerequisites
 
-- Docker (for the no-SDK verification gate and the containerised win-x64 publish).
-- A host .NET 10 SDK for the macOS publishes — `DOTNET_ROOT="$HOME/.dotnet"` and
-  `PATH="$HOME/.dotnet:$PATH"` if it is user-local. Not needed if you pass
-  `--docker-win` and only want the Windows artifact.
-- `gh` authenticated as `jermainewalkes`, and push access to both remotes
-  (`origin` = GitLab, `github` = GitHub).
+- Docker (for the verification gate).
+- A host .NET 10 SDK for the macOS build — `DOTNET_ROOT="$HOME/.dotnet"` and
+  `PATH="$HOME/.dotnet:$PATH"` if it is user-local. The Store builds are
+  self-contained, so **the SDK decides which runtime patch ships**: install the
+  newest .NET 10 SDK first (for example SDK 10.0.401, which carries runtime
+  10.0.12), and re-pin the Docker image in `build-in-docker.sh` to the digest
+  that carries the same SDK. `dotnet --list-runtimes` shows what an SDK brings.
+- The Windows build VM (`ssh winbuild`) for the Microsoft Store package.
+- The Apple signing identities and provisioning profile described under
+  [Mac App Store](#mac-app-store-buildmake-mas-pkgsh).
 
 ## 1. Bump the version
 
 Edit `src/CertConvert/CertConvert.csproj` — set both `<Version>` and
 `<InformationalVersion>` to the new `X.Y.Z` (semver: breaking.feature.fix).
 The updater compares against `InformationalVersion`, so they must match.
+
+Then update the places that state the version or describe the release:
+
+- `site/changelog.html` — the new entry, and the range in its meta description.
+- `site/index.html` and `site/download.html` — `softwareVersion`, and the
+  "Latest version" row on the download page.
+- `design/mac-app-store-listing.md` and `design/microsoft-store-listing.md` —
+  package file names and the "What's New" text.
+
+The site describes what a customer can get today, so **deploy the site only
+once the Stores have approved the release** (`site/deploy-site.sh`). Site copy
+about a command-line feature waits longer still: the command line exists only
+in source builds, and the public source is one version behind (step 6).
 
 ## 2. Run the verification gate
 
@@ -33,38 +51,87 @@ No host SDK required. It must be green before you go on. The container writes
 its obj/bin under `artifacts/docker-build/` (gitignored) so it never clashes
 with in-tree host builds.
 
-## 3. Build the artifacts
+## 3. Commit, then build the Store packages
+
+Commit the release first. `certconvert --version` reports the git commit it was
+built from, so the packages must be built from the committed release, with a
+clean working tree.
 
 ```bash
-build/publish.sh                 # host dotnet for all three RIDs
-# or, no Windows toolchain / SDK on PATH:
-build/publish.sh --docker-win    # win-x64 via the container, osx-* on the host
+build/make-mas-pkg.sh        # → artifacts/mas/CertConvert-X.Y.Z.pkg   (this Mac)
+./build-on-windows.sh        # → artifacts/msix/CertConvert-X.Y.Z.msix (Windows VM)
 ```
 
-Produces four files in `artifacts/`:
+Details and prerequisites for each are in the [Mac App Store](#mac-app-store-buildmake-mas-pkgsh)
+and [Microsoft Store](#microsoft-store-buildmake-msixps1) sections below.
 
-- `CertConvert-X.Y.Z-osx-x64.zip`
-- `CertConvert-X.Y.Z-osx-arm64.zip`
-- `CertConvert-X.Y.Z-win-x64.zip`
-- `SHA256SUMS.txt`
+## 4. Check what was built
 
-Do not rename these or change the layout: the updater matches an asset by its
-RID substring and a `.zip` suffix, and reads `SHA256SUMS.txt` entries in the
-`<hex><two spaces><filename>` form that `shasum -a 256` emits. The zip must keep
-`win-x64/CertConvert.exe...` inside it.
+Before uploading, confirm each package is what the release claims:
 
-## 4. Tag and push to both remotes
+- The Mac package is signed by the installer identity:
+  `pkgutil --check-signature artifacts/mas/CertConvert-X.Y.Z.pkg`.
+- Both bundle the intended runtime patch. The restored runtime pack version is
+  recorded in `artifacts/mas/int/obj/CertConvert/project.assets.json` and in
+  `artifacts/msix/layout/CertConvert.deps.json`.
+- The MSIX manifest carries version `X.Y.Z.0` and the unchanged Store identity
+  (`artifacts/msix/layout/AppxManifest.xml`).
+
+## 5. Tag, push to GitLab and upload to the Stores
 
 ```bash
 git tag -a vX.Y.Z -m "CertConvert X.Y.Z"
-git push origin vX.Y.Z      # GitLab
-git push github vX.Y.Z      # GitHub
+git push origin main vX.Y.Z      # GitLab only
 ```
 
-## 5. Publish the GitHub release — release first, assets second
+Upload the `.pkg` to App Store Connect and the `.msix` to Partner Center, using
+the paste-ready text in `design/mac-app-store-listing.md` and
+`design/microsoft-store-listing.md`. Uploading does not submit: attaching the
+build and submitting for review is a separate, deliberate step.
 
-This ordering is not optional. Create the release **published and without
-assets**, then upload the four files separately:
+## 6. GitHub: one version behind
+
+GitHub (`github` remote, `jermainewalkes/certconvert`) is the free, public
+source. It is kept **one released version behind the Stores**, so Store
+customers get each release first. When version N is published on the Stores:
+
+- Do **not** push N to GitHub.
+- GitHub may now receive N-1. Push that release's commit, never the tip of
+  `main`:
+
+  ```bash
+  PREV=v1.3.1        # set this: the tag of the release BEFORE the one just published
+  git push github "$PREV^{commit}:refs/heads/main"
+  git push github "$PREV"
+  ```
+
+  Every release from 1.3.1 on is tagged on GitLab (`git tag --sort=-v:refname`
+  lists them). At the 1.4.0 release there was nothing to push: GitHub already
+  held 1.3.1.
+
+GitHub pushes need Jermaine's go-ahead each time.
+
+## 7. After the Stores approve: deploy the site
+
+Once both Stores show the new version as live, publish the site changes made in
+step 1, so the download page and changelog match what customers can get:
+
+```bash
+site/deploy-site.sh
+```
+
+### If a GitHub release with downloads is ever published
+
+Build the downloads from the release being published to GitHub, not from the
+tip of `main`: `git checkout "$PREV"` first. The in-app updater of a source build reads the GitHub `releases/latest`
+endpoint, so the order below is load-bearing. `build/publish.sh` produces
+`CertConvert-X.Y.Z-osx-x64.zip`, `-osx-arm64.zip`, `-win-x64.zip` and
+`SHA256SUMS.txt` in `artifacts/`. Do not rename them or change the layout: the
+updater matches an asset by its RID substring and a `.zip` suffix, and reads
+`SHA256SUMS.txt` in the `<hex><two spaces><filename>` form `shasum -a 256` emits.
+
+Create the release **published and without assets**, then upload the files
+separately:
 
 ```bash
 gh release create vX.Y.Z --repo jermainewalkes/certconvert \
@@ -77,28 +144,19 @@ gh release upload vX.Y.Z --repo jermainewalkes/certconvert \
   artifacts/SHA256SUMS.txt
 ```
 
-Why split it: a single `gh release create ... <assets>` that is interrupted
-mid-upload leaves the release stuck as an invisible **draft**. Drafts are hidden
-from `releases/latest` (it 404s), so the in-app updater silently stops seeing
-new versions. Publishing first guarantees the release is live the moment the tag
-resolves; the uploads then only add files to an already-visible release. The
-updater needs a non-draft release with `SHA256SUMS.txt` attached — without the
-checksums file it falls back to TLS-only integrity, and without the platform zip
-it reports no build for this platform.
-
-## 6. Smoke check
+A single `gh release create ... <assets>` that is interrupted mid-upload leaves
+the release stuck as an invisible **draft**. Drafts are hidden from
+`releases/latest` (it 404s), so the updater silently stops seeing new versions.
+Check afterwards that the endpoint returns the new tag:
 
 ```bash
 curl -s https://api.github.com/repos/jermainewalkes/certconvert/releases/latest \
   | grep '"tag_name"'
 ```
 
-Must return the new `vX.Y.Z`. If it 404s or shows the previous tag, the release
-is still a draft — fix it before announcing, or the updater will not offer it.
-
 ## Release notes conventions
 
-Keep notes in the house style — British punctuation, no Oxford comma,
+For a GitHub release with downloads (see above). Keep notes in the house style — British punctuation, no Oxford comma,
 sentence-case headings, no AI attribution. Include:
 
 - A short summary of what changed.

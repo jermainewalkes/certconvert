@@ -27,8 +27,15 @@ public static class CliRunner
         catch (PasswordRequiredException e)
         {
             Console.Error.WriteLine($"Error: {e.Message}");
-            Console.Error.WriteLine("Pass it with --password (or --key-password for a separate key file).");
+            // SaferForms leaves out the prompt on Windows, where it is not offered.
+            Console.Error.WriteLine(
+                $"Supply it with {PasswordSources.SaferForms("--password")}. " +
+                "A separate key file uses the --key-password forms.");
             return ExitFailure;
+        }
+        catch (UsageException e)
+        {
+            return Usage($"Error: {e.Message}");
         }
         catch (CertConvertException e)
         {
@@ -197,6 +204,17 @@ public static class CliRunner
                   Check GitHub for a newer release; --install downloads, verifies and
                   applies it. This is the only command that uses the network.
 
+            Passwords:
+              Every password option above (--password, --key-password, --out-password,
+              --ca-key-password) can be given four ways. Use one per password:
+                --password-prompt        ask on the terminal without showing it
+                                         (macOS and Linux; --out-password-prompt asks twice)
+                --password-file <file>   the first line of a file; "-" reads it from
+                                         standard input, e.g. piped from a password manager
+                --password-env <NAME>    the value of an environment variable
+                --password <value>       on the command line itself — avoid this: it is
+                                         saved in shell history and visible to other processes
+
             Exit codes: 0 success · 1 usage error · 2 failure (including an invalid chain
             or a key that does not match).
 
@@ -220,11 +238,16 @@ public static class CliRunner
     }
 }
 
-/// <summary>Tiny option parser: positionals plus --name value / --flag tokens.</summary>
+/// <summary>
+/// Tiny option parser: positionals plus --name value / --flag tokens. Password
+/// options are handed to <see cref="PasswordSources"/>, which checks them as they
+/// are parsed and reads each password only when a command asks for it.
+/// </summary>
 internal sealed class ArgReader
 {
     private readonly Dictionary<string, string> _values = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _flags = new(StringComparer.OrdinalIgnoreCase);
+    private readonly PasswordSources _passwords = new(PasswordIo.Current);
     public List<string> Positionals { get; } = new();
 
     public ArgReader(string[] args, params string[] boolFlags)
@@ -240,11 +263,25 @@ internal sealed class ArgReader
                 {
                     _flags.Add(a);
                 }
+                else if (PasswordSources.IsPromptOption(a))
+                {
+                    _passwords.Add(a, "");
+                }
                 else
                 {
+                    // A misspelt password option must not be mistaken for an ordinary
+                    // one: it would swallow the next argument and leave the password
+                    // unset. Add() rejects any name it does not know.
+                    bool isPassword = PasswordSources.LooksLikePasswordOption(a);
                     if (i + 1 >= args.Length)
-                        throw new CertConvertException($"Option {a} needs a value.");
-                    _values[a] = args[++i];
+                    {
+                        if (!isPassword)   // unchanged behaviour for every existing option
+                            throw new CertConvertException($"Option {a} needs a value.");
+                        _passwords.Add(a, "");                   // unknown name -> clearer error
+                        throw new UsageException($"Option {a} needs a value.");
+                    }
+                    if (isPassword) _passwords.Add(a, args[++i]);
+                    else _values[a] = args[++i];
                 }
             }
             else
@@ -252,10 +289,33 @@ internal sealed class ArgReader
                 Positionals.Add(a);
             }
         }
+        _passwords.Validate();
     }
 
-    public string? Get(string name) => _values.GetValueOrDefault(name);
+    public string? Get(string name)
+    {
+        // Passwords are never in _values; asking for one here would silently get null.
+        if (PasswordSources.LooksLikePasswordOption(name))
+            throw new InvalidOperationException($"Read {name} with Password(), not Get().");
+        return _values.GetValueOrDefault(name);
+    }
     public bool Has(string flag) => _flags.Contains(flag);
+
+    /// <summary>
+    /// The password for one of <see cref="PasswordSources.Names"/>, from whichever form
+    /// was given (value, -file, -env or -prompt), or null when none was.
+    /// </summary>
+    public string? Password(string name) => _passwords.Resolve(name);
+
+    /// <summary>
+    /// Call when a command will not use a password the command line supplied: says so
+    /// instead of quietly dropping it (or prompting for something then discarded).
+    /// </summary>
+    public void WarnIfUnused(string name, string because)
+    {
+        if (_passwords.OptionFor(name) is { } option)
+            Console.Error.WriteLine($"Warning: {option} was ignored — {because}.");
+    }
 
     public string Require(string name, string hint)
     {

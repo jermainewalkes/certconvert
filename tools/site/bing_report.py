@@ -14,10 +14,15 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+# Seconds any single connect or read may block. Not a total deadline: a server
+# that keeps trickling data can run longer, but a stalled connection cannot hang the run.
+TIMEOUT = 30
+
 SITE = "https://certconvert.com"
 KEY_PAGES = [
     "/", "features.html", "download.html", "docs.html", "changelog.html",
     "donate.html", "contact.html", "privacy.html", "accessibility.html",
+    "pem-to-pfx.html", "pfx-to-pem.html", "certificate-chain-order.html",
 ]
 BASE = "https://ssl.bing.com/webmaster/api.svc/json"
 
@@ -25,7 +30,7 @@ BASE = "https://ssl.bing.com/webmaster/api.svc/json"
 def api_get(method, key, **params):
     q = urllib.parse.urlencode({"apikey": key, **params})
     try:
-        return json.load(urllib.request.urlopen(f"{BASE}/{method}?{q}"))
+        return json.load(urllib.request.urlopen(f"{BASE}/{method}?{q}", timeout=TIMEOUT))
     except urllib.error.HTTPError as e:
         return {"_error": e.code, "detail": e.read().decode()[:200]}
 
@@ -35,7 +40,7 @@ def api_post(method, key, body):
         data=json.dumps(body).encode(), method="POST",
         headers={"Content-Type": "application/json; charset=utf-8"})
     try:
-        r = urllib.request.urlopen(req)
+        r = urllib.request.urlopen(req, timeout=TIMEOUT)
         return json.load(r) if r.length else {"ok": True}
     except urllib.error.HTTPError as e:
         return {"_error": e.code, "detail": e.read().decode()[:200]}
@@ -79,4 +84,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (urllib.error.URLError, TimeoutError) as e:
+        # A stalled or refused connection: fail fast with one line so the caller
+        # can retry, instead of hanging with no output.
+        sys.exit(f"Network error: {e}")

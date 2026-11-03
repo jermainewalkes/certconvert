@@ -17,6 +17,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+# Seconds any single connect or read may block. Not a total deadline: a server
+# that keeps trickling data can run longer, but a stalled connection cannot hang the run.
+TIMEOUT = 30
+
 MEASUREMENT_ID = "G-66Q02ES3BN"
 STORE_DOMAINS = ("apps.apple.com", "apps.microsoft.com")
 
@@ -26,19 +30,20 @@ def token(creds):
         "client_id": creds["client_id"], "client_secret": creds["client_secret"],
         "refresh_token": creds["refresh_token"], "grant_type": "refresh_token"}).encode()
     return json.load(urllib.request.urlopen(
-        urllib.request.Request("https://oauth2.googleapis.com/token", data=data)))["access_token"]
+        urllib.request.Request("https://oauth2.googleapis.com/token", data=data),
+        timeout=TIMEOUT))["access_token"]
 
 
 def get(url, tok):
     req = urllib.request.Request(url, headers={"Authorization": "Bearer " + tok})
-    return json.load(urllib.request.urlopen(req))
+    return json.load(urllib.request.urlopen(req, timeout=TIMEOUT))
 
 
 def post(url, tok, body):
     req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST",
         headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
     try:
-        return json.load(urllib.request.urlopen(req))
+        return json.load(urllib.request.urlopen(req, timeout=TIMEOUT))
     except urllib.error.HTTPError as e:
         return {"_error": e.code, "detail": e.read().decode()[:400]}
 
@@ -144,4 +149,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (urllib.error.URLError, TimeoutError) as e:
+        # A stalled or refused connection: fail fast with one line so the caller
+        # can retry, instead of hanging with no output.
+        sys.exit(f"Network error: {e}")

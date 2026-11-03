@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/licence-MIT-green" alt="MIT licence"/>
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue" alt="Platforms: macOS and Windows"/>
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4" alt=".NET 10"/>
-  <img src="https://img.shields.io/badge/tests-159%20passing-brightgreen" alt="159 tests passing"/>
+  <img src="https://img.shields.io/badge/tests-253%20passing-brightgreen" alt="253 tests passing"/>
   <a href="https://ko-fi.com/jwalkes"><img src="https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white" alt="Support on Ko-fi"/></a>
 </p>
 
@@ -115,7 +115,7 @@ certconvert check chain.pem                             # health check; non-zero
 certconvert convert device.pem -o device.cer            # PEM → DER
 certconvert convert bundle.p7b -o bundle.pem            # PKCS#7 → PEM
 certconvert chain build device.pem ca.pem root.pem -o chain.pfx \
-            --key device.key --out-password secret
+            --key device.key --out-password-prompt          # asks for the new password, unseen
 certconvert chain verify chain.p7b
 certconvert key convert device.key -o device_pkcs8.key --to pkcs8
 certconvert key match --cert device.pem --key device.key
@@ -125,8 +125,40 @@ certconvert update                                      # check GitHub for a new
 certconvert update --install                            # download, verify and apply it
 ```
 
-Exit codes: `0` success, `1` usage error, `2` failure (including an invalid
-chain or a key that does not match).
+Exit codes: `0` success, `1` usage error (including a misspelt password option),
+`2` failure (including an invalid chain or a key that does not match).
+
+### Passwords
+
+Every password option (`--password`, `--key-password`, `--out-password` and
+`--ca-key-password`) can be given four ways. Use one per password:
+
+| Form | What it does |
+|---|---|
+| `--password-prompt` | Asks on the terminal without showing what you type. A new password (`--out-password-prompt`) is asked for twice. macOS and Linux only. |
+| `--password-file <file>` | Reads the first line of a file. Use `-` to read it from standard input, for example piped from a password manager. |
+| `--password-env <NAME>` | Reads an environment variable, which suits CI secrets. |
+| `--password <value>` | Takes it from the command line itself. Avoid this for a password that matters: it is saved in shell history and other processes can see it. |
+
+```bash
+certconvert inspect device.pfx --password-prompt
+pass show certs/device | certconvert inspect device.pfx --password-file -
+certconvert convert device.pem --key device.key -o device.pfx --out-password-env PFX_PASSWORD
+```
+
+On Windows the app is a windowed program that shares the console with your
+shell, so it cannot read typed keys reliably and the prompt form is refused
+there. Use the file or environment form. In PowerShell:
+
+```powershell
+$env:PFX_PASSWORD = Read-Host -MaskInput 'New password'
+certconvert convert device.pem --key device.key -o device.pfx --out-password-env PFX_PASSWORD
+Remove-Item Env:PFX_PASSWORD      # do not leave it in the session
+```
+
+An environment variable is visible to other programs you run as the same user,
+and a password file to anyone who can read it, so keep the file private
+(`chmod 600`). CertConvert warns when a password file is readable by others.
 
 ## Troubleshooting
 
@@ -138,8 +170,9 @@ chain or a key that does not match).
   builds (SmartScreen on an unsigned binary; **More info → Run anyway**,
   one-time). The Microsoft Store edition is signed and shows no warning.
 - **"…is password-protected"** — the file is an encrypted PFX or key; type
-  the password in the password field and use Unlock (GUI) or `--password`
-  (CLI). Errors always name the file that needs it.
+  the password in the password field and use Unlock (GUI), or on the CLI give it
+  with `--password-prompt`, `--password-file` or `--password-env` (see
+  [Passwords](#passwords)). Errors always name the file that needs it.
 - **Windows CLI output interleaves with the prompt** — the exe is a GUI
   program attaching to your console; press Enter to get the prompt back.
 - **Which build am I running?** — `certconvert --version` prints the version
